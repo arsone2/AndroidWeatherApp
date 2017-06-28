@@ -51,6 +51,7 @@
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:layout_gravity="start"
+            android:visibility="gone"
             android:text="BACKUP"/>
 
         <Button
