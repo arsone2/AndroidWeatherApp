@@ -1,0 +1,69 @@
+<resources>
+    <string name="app_name">City weather</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- openweathermap.org parameters -->
+
+    <string name="api_key">f4178cee3f64ae240a7cc0a602369fb2</string>
+    <string name="web_service_url">http://api.openweathermap.org/data/2.5/forecast/daily?q=</string>
+    <string name="user_agent">Mozilla/5.0 (Linux; U; Android 1.6; en-us; GenericAndroidDevice) AppleWebKit/528.5+ (KHTML, like Gecko) Version/3.1.2 Mobile Safari/525.20.1</string>
+
+   <!-- UI text -->
+
+    <string name="cities_list_title">ВЫБЕРИТЕ ГОРОД</string>
+    <string name="action_add">Добавить запись</string>
+    <string name="action_edit">Редактировать запись</string>
+    <string name="action_delete">Удалить запись</string>
+    <string name="hint_city_add">Введите название города</string>
+    <string name="edit_save">Сохранить</string>
+    <string name="edit_cancel">Отмена</string>
+    <string name="text_city">Город</string>
+    <string name="ok">OK</string>
+    <string name="button_delete_city_cancel">ОТМЕНА</string>
+    <string name="button_delete_city">УДАЛИТЬ</string>
+
+    <!--  messages  -->
+
+    <string name="message_fill_city">Заполните название города</string>
+    <string name="message_invalid_url">Некорректный URL</string>
+    <string name="message_city_not_found">Не найден</string>
+<!--    <string name="reader_error">Ошибка чтения данных с сервера</string>
+    <string name="connect_error">Не удалось подключиться к OpenWeatherMap.org</string>-->
+    <string name="message_wait_for_server">Получение данных, подождите...</string>
+
+    <!-- delete city confirm dialog -->
+
+    <string name="delete_dialog_question">Подтверждение</string>
+    <string name="delete_dialog_text">Хотите удалить записи?</string>
+    <string name="delete_dialog_ok">Удалить</string>
+    <string name="delete_dialog_cancel">Отмена</string>
+    <string name="rows_deleted">Удалено записей: </string>
+
+    <!-- city ListView item format -->
+
+    <string name="entered_city">%s</string>
+    <string name="returned_city">/%s</string>
+
+    <!-- weather ListView item format -->
+
+<!--    <string name="returned_city_format">/%s</string>-->
+
+    <!-- weather ListView item format -->
+
+    <string name="weather_min_max_temp">Мин./макс. дневная температура: %1$s°C/ %2$s°C</string>
+    <string name="weather_morning_temp">Утренняя температура: %s°C</string>
+    <string name="weather_day">%s°C</string>
+    <string name="weather_day_temp">Дневная температура: %s°C</string>
+    <string name="weather_evening_temp">Вечерняя температура: %s°C</string>
+    <string name="weather_night_temp">Ночная температура: %s°C</string>
+    <string name="weather_humidity">Влажность воздуха: %s</string>
+    <string name="weather_wind_speed">Скорость ветра: %.1f м/с</string>
+    <string name="weather_pressure">Атмосферное давление: %s мм рт ст</string>
+    <string name="weather_wind_direction">Направление ветра: %s°</string>
+
+   <!-- &#65285; - percent sign  -->
+
+    <string name="offline">OffLine</string>
+    <string name="online">OnLine</string>
+
+</resources>
