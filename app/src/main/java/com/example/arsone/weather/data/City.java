@@ -8,6 +8,8 @@ public class City {
     //	constants for field references
     public static final String CITY_ID = "city_id";
     public static final String ENTERED_CITY = "entered_city";
+    public static final String RETURNED_CITY = "retutned_city";
+    public static final String UPDATE_TIME = "update_time";
 
 /*    public static final String IMAGE_RESOURCE = "imageResource";
     public static final String PRICE = "price";
@@ -51,7 +53,7 @@ public class City {
     }
 
 
-    public int getId() {
+/*    public int getId() {
         return id;
     }
 
@@ -78,5 +80,5 @@ public class City {
 
     public void setReturnedCity(String returnedCity) {
         this.returnedCity = returnedCity;
-    }
+    }*/
 }

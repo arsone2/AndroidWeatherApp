@@ -5,13 +5,14 @@
     <!-- Base application theme. -->
     <style name="AppBaseTheme" parent="Theme.AppCompat">
 
-        <!--        <item name="colorPrimary">@color/colorPrimary</item>
-                <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-                <item name="colorAccent">@color/colorAccent</item>-->
+        <!--<item name="preferenceTheme">@style/PreferenceThemeOverlay</item>-->
+       <!-- <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>-->
+
     </style>
 
-    <style name="MyTheme" parent="AppBaseTheme">
 
+
+    <style name="MyTheme" parent="AppBaseTheme">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -19,50 +20,40 @@
         <item name="android:textColor">@color/basicText</item>
         <item name="android:windowBackground">@color/colorPrimary</item>
 
+  <!--      <item name="android:alertDialogTheme">@style/AlertDialog.AppCompat.Light</item>-->
+
+        <!--<style name="SettingsTheme" parent="Theme.AppCompat.NoActionBar">-->
+            <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+
+        <!--<item name="preferenceTheme">@style/PreferenceThemeOverlay</item>-->
+        <!--<item name="preferenceTheme">@style/Preference</item>-->
+        <!--<item name="preferenceTheme">@style/PreferenceThemeOverlay</item>-->
+        <!--<item name="preferenceTheme">@style/PreferenceThemeOverlay</item>-->
     </style>
 
-
     <style name="mainTitle">
-
         <item name="android:textSize">21sp</item>
         <item name="android:textColor">@color/mainTitleColor</item>
         <item name="android:textStyle">bold</item>
         <item name="android:layout_marginLeft">10dp</item>
         <item name="android:padding">5dp</item>
-
     </style>
 
     <style name="titleText">
-
         <item name="android:textSize">27sp</item>
         <item name="android:textColor">@color/titleColor</item>
         <item name="android:textStyle">bold</item>
-
     </style>
 
     <style name="titleDesc">
-
         <item name="android:textSize">17sp</item>
         <item name="android:textColor">@color/titleColor</item>
         <item name="android:textStyle">bold</item>
-
     </style>
-
-
-    <style name="listView">
-
-<!--        <item name="android:background">#0d47a1</item>
-        <item name="android:fastScrollEnabled">true</item>-->
-    </style>
-
 
     <style name="weatherListItem">
-
         <item name="android:background">#0d47a1</item>
-
-
     </style>
-
 
     <style name="ButtonText">
         <item name="android:layout_width">wrap_content</item>
@@ -83,20 +74,18 @@
         <item name="android:background">@drawable/button_background</item>
     </style>
 
-    <!--    <style name="AppTheme.NoActionBar">
-            <item name="windowActionBar">true</item>
-            <item name="windowNoTitle">false</item>
-        </style>-->
-
-    <!--    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
-
-        <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>-->
-
     <style name="CustomProgressBarHorizontal" parent="android:Widget.ProgressBar.Horizontal">
         <item name="android:progressDrawable">@drawable/progress_bar_load</item>
         <item name="android:minHeight">10dp</item>
         <item name="android:maxHeight">10dp</item>
     </style>
 
+
+
+
+
+    <style name="SettingsTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+    </style>
 
 </resources>

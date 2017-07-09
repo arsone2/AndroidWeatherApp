@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:mapbox="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/add_edit_city_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="true"
+    android:orientation="vertical"
+    >
+
+
+    <EditText
+        android:id="@+id/cityEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="70dp"
+        android:background="@drawable/edittext_background"
+        android:elevation="3dp"
+        android:hint="@string/hint_city_add"
+        android:inputType="textCapWords"
+        android:text="text some"
+        />
+
+    <TextView
+        android:id="@+id/messageTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/cityEditText"
+        android:layout_marginRight="70dp"
+        android:background="@color/colorBlue"
+        android:elevation="3dp"
+        android:text="messageTextView"/>
+
+<!--        <Button
+            android:id="@+id/editCancelButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="5dp"
+            android:layout_marginStart="5dp"
+            android:text="@string/edit_cancel"
+            />
+
+    <Button
+        android:id="@+id/saveCityButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="5dp"
+        android:layout_marginRight="5dp"
+        android:text="@string/edit_save"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        />-->
+
+
+    <com.mapbox.mapboxsdk.maps.MapView
+        android:id="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+
+    </com.mapbox.mapboxsdk.maps.MapView>
+
+
+</RelativeLayout>
+
+
+   <!-- mapbox:mapbox_cameraTargetLat="40.73581"
+    mapbox:mapbox_cameraTargetLng="-73.99155"
+    mapbox:mapbox_cameraZoom="11"
+    mapbox:mapbox_styleUrl="mapbox://styles/mapbox/dark-v9"-->
+
+
+<!--    <com.mapbox.mapboxsdk.maps.MapView
+
+        android:id="@+id/mapView1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        mapbox:mapbox_cameraTargetLat="-36.84"
+        mapbox:mapbox_cameraTargetLng="174.76"
+        mapbox:mapbox_cameraZoom="10"
+        mapbox:mapbox_cameraBearing="34.33"
+        mapbox:mapbox_cameraTilt="50.25"
+        mapbox:mapbox_styleUrl="@string/mapbox_style_satellite_streets"
+        mapbox:mapbox_cameraZoomMax="12.41"
+        mapbox:mapbox_cameraZoomMin="6"
+        mapbox:mapbox_uiRotateGestures="false"
+        />-->
+
+
+

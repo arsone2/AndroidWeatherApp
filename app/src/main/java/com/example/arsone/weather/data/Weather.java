@@ -12,19 +12,19 @@ public class Weather {
     public final String dayOfWeek;
     public final long timeStamp;
     public final String date;
-    public final String dayTemp;
-    public final String nightTemp;
-    public final String minTemp;
-    public final String maxTemp;
-    public final String humidity;
+    public final double dayTemp;
+    public final double nightTemp;
+    public final double minTemp;
+    public final double maxTemp;
+    public final int humidity;
     public final String description;
     public final String iconURL;
-    public final String tempMinMax;
-    public final Double windSpeed;
-    public final String windDirection;
-    public final String pressure;
-    public final String morningTemp;
-    public final String eveningTemp;
+  ///  public final String tempMinMax;
+    public final double windSpeed;
+    public final int windDirection;
+    public final double pressure;
+    public final double morningTemp;
+    public final double eveningTemp;
     public final String iconName;
     public final int weatherID;
 
@@ -55,32 +55,42 @@ public class Weather {
         this.dayOfWeek = convertTimeStampToDay(timeStamp);
 
         SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-        this.date = formatter.format(new Date(timeStamp * 1000L)).toString(); // convert to milliseconds
+        this.date = formatter.format(new Date(timeStamp * 1000L)); // convert to milliseconds
 
         // this.date = DateFormat.getDateInstance().format(timeStamp) + "\u00B0C";
 
-        this.tempMinMax = numberFormat.format(minTemp) + "/" + numberFormat.format(maxTemp); // + "\u00B0C";
+       /// this.tempMinMax = numberFormat.format(minTemp) + "/" + numberFormat.format(maxTemp); // + "\u00B0C";
 
-        this.morningTemp = numberFormat.format(morningTemp);// + "\u00B0C";
+        ///this.morningTemp = numberFormat.format(morningTemp);// + "\u00B0C";
+        this.morningTemp = morningTemp;// + "\u00B0C";
 
-        this.dayTemp = numberFormat.format(dayTemp);// + "\u00B0C";
+        /// this.dayTemp = numberFormat.format(dayTemp);// + "\u00B0C";
+        this.dayTemp = dayTemp;// + "\u00B0C";
 
-        this.eveningTemp = numberFormat.format(eveningTemp);// + "\u00B0C";
+        /// this.eveningTemp = numberFormat.format(eveningTemp);// + "\u00B0C";
+        this.eveningTemp = eveningTemp;// + "\u00B0C";
 
-        this.nightTemp = numberFormat.format(nightTemp);// + "\u00B0C";
+        /// this.nightTemp = numberFormat.format(nightTemp);// + "\u00B0C";
+        this.nightTemp = nightTemp;// + "\u00B0C";
 
-        this.minTemp = numberFormat.format(minTemp);// + "\u00B0C";
+        /// this.minTemp = numberFormat.format(minTemp);// + "\u00B0C";
+        this.minTemp = minTemp;// + "\u00B0C";
 
-        this.maxTemp = numberFormat.format(maxTemp);// + "\u00B0C";
+        /// this.maxTemp = numberFormat.format(maxTemp);// + "\u00B0C";
+        this.maxTemp = maxTemp;// + "\u00B0C";
 
-        this.humidity = NumberFormat.getPercentInstance().format(humidity / 100.0);
+        /// this.humidity = NumberFormat.getPercentInstance().format(humidity / 100.0);
+        this.humidity = humidity;
 
-        this.pressure = numberFormat.format(pressure * 0.750063755419211); // в мм ртутного столба
+        /// this.pressure = numberFormat.format(pressure * 0.750063755419211); // в мм ртутного столба
+        /// this.pressure = numberFormat.format(pressure); // hPa
+        this.pressure = pressure; // hPa
 
         /// this.windSpeed = numberFormat.format(windSpeed);
         this.windSpeed = windSpeed;
 
-        this.windDirection = numberFormat.format(windDirection);
+        /// this.windDirection = numberFormat.format(windDirection);
+        this.windDirection = windDirection;
 
         this.description = description;
 
