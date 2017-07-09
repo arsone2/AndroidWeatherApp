@@ -44,6 +44,7 @@ import com.mapbox.mapboxsdk.Mapbox;
 
 public class MainActivity extends AppCompatActivity implements
         CitiesListFragment.Callbacks,
+        DetailsFragment.Callbacks,
         AddCityFragment.Callbacks,
         SettingsFragment.Callbacks {
 
@@ -99,6 +100,8 @@ public class MainActivity extends AppCompatActivity implements
     public final static int STATUS_GET_WEATHER_ALL_CITIES_START = 103;
     public final static int STATUS_GET_WEATHER_ALL_CITIES_FINISH = 104;
 
+    public final static int STATUS_SETTINGS_CHANGED = 105;
+
 
     public static final String UNITS_FORMAT = "units_format";
 
@@ -134,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements
                 int task = intent.getIntExtra(PARAM_TASK, 0);
                 int status = intent.getIntExtra(PARAM_STATUS, 0);
 
-                Log.d("AAAAA", "MainActivity: onReceive: task = " + task + ", status = " + status);
+           ///     Log.d("AAAAA", "MainActivity: onReceive: task = " + task + ", status = " + status);
 
                 // Ловим сообщения о старте задач
                 //   if (status == STATUS_START) {
@@ -154,9 +157,11 @@ public class MainActivity extends AppCompatActivity implements
                         Log.d("AAAAA", "GET: STATUS_GET_WEATHER_ONE_CITY_FINISH");
 
                         /// reInitCityListViewLoader();
-                        refreshCitiesListForTabletDevice();
+                        ///refreshCitiesListForTabletDevice();
 
-                        hideMessageBar();
+                        refreshData();
+
+                        //  hideMessageBar();
 
                         break;
 
@@ -174,13 +179,13 @@ public class MainActivity extends AppCompatActivity implements
 
                         /// reInitCityListViewLoader();
 
-                        refreshCitiesListForTabletDevice();
+                        /// refreshCitiesListForTabletDevice();
+                        refreshData();
 
-                        hideMessageBar();
+                        // hideMessageBar();
 
                         break;
                 }
-                //      }
             }
         };
 
@@ -232,7 +237,7 @@ public class MainActivity extends AppCompatActivity implements
 
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.onePaneLayout, citiesFragment)
-                    .addToBackStack(null)
+                    //   .addToBackStack(null)
                     .commit();
 
         } else { // tablet
@@ -255,9 +260,9 @@ public class MainActivity extends AppCompatActivity implements
 
         //    Log.d("AAAAA", "bundle.putInt(MainActivity.UNITS_FORMAT, mUnitsFormat) - mUnitsFormat = " + mUnitsFormat);
 
-        Bundle bundle = new Bundle();
+/*        Bundle bundle = new Bundle();
         bundle.putInt(MainActivity.UNITS_FORMAT, mUnitsFormat);
-        settingsFragment.setArguments(bundle);
+        settingsFragment.setArguments(bundle);*/
 
         if (findViewById(R.id.onePaneLayout) != null) { // phone
 
@@ -275,49 +280,12 @@ public class MainActivity extends AppCompatActivity implements
                     .commit();
         }
         // ----------------------------------------------------
-
-
- /*       int viewID;
-
-        if (findViewById(R.id.onePaneLayout) == null) { // tablet
-
-            viewID = R.id.rightFrameLayout;
-
-        } else { // phone
-
-            viewID = R.id.onePaneLayout;
-        }
-
-
-        // get settings from DB
-        readSettingsFromDB();
-
-        // put settings to SettingsFragment
-        Bundle bundle = new Bundle();
-
-        bundle.putInt(MainActivity.UNITS_FORMAT, mUnitsFormat);
-
-        SettingsFragment fragment = new SettingsFragment();
-
-        fragment.setArguments(bundle);
-
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-
-        transaction.replace(viewID, fragment);
-        // .addToBackStack(null)
-
-        if (findViewById(R.id.onePaneLayout) != null) // phone only
-        {
-            transaction.addToBackStack(null);
-        }
-
-        transaction.commit(); // causes fragment to display*/
     }
 
 
     private void readSettingsFromDB() {
 
-        Log.d("AAAAA", "readSettingsFromDB");
+  ///      Log.d("AAAAA", "readSettingsFromDB");
 
         // read all columns
         Cursor cursor = getContentResolver().query(DataContentProvider.SETTINGS_CONTENT_URI,
@@ -333,60 +301,27 @@ public class MainActivity extends AppCompatActivity implements
             mUnitsFormat = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_UNITS_FORMAT));
             cursor.close();
 
-            Log.d("AAAAA", "readSettingsFromDB - mUnitsFormat = " + mUnitsFormat);
+       ///     Log.d("AAAAA", "readSettingsFromDB - mUnitsFormat = " + mUnitsFormat);
         }
     }
 
 
     public void writeSettingsToDB(int unitsFormat) {
 
-        ///    mUnitsFormat = unitsFormat;
-
-        ContentValues values = new ContentValues();
+/*        ContentValues values = new ContentValues();
 
         values.put(DataContract.SettingsEntry.COLUMN_UNITS_FORMAT, unitsFormat);
 
         int updatedRowsCount = getContentResolver().update(DataContentProvider.SETTINGS_CONTENT_URI, values, null, null);
 
-        //    Log.d("AAAAA", "writeSettingsToDB(): updatedRowsCount = " + updatedRowsCount);
-
-
-
-        // hideKeyboard();
-        // this.onBackPressed(); // close SettingsFragment
-
-/*        // ----------------------------------------------------
-        // remove SettingsFragment after save added city in DB
-        if (findViewById(R.id.onePaneLayout) != null) { // phone
-
-            this.onBackPressed(); // remove addEditFragment`s activity
-
-        } else {
-
-            SettingsFragment addCityFragment = (AddCityFragment)getSupportFragmentManager()
-                    .findFragmentById(R.id.rightFrameLayout);
-
-            if (addCityFragment != null) {
-
-///                Log.d("AAAAA", "detailsFragment != null");
-                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                transaction.remove(addCityFragment);
-                transaction.commit();
-            }
-            // ----------------------------------------------------*/
-
+        //    Log.d("AAAAA", "writeSettingsToDB(): updatedRowsCount = " + updatedRowsCount);*/
 
         // refresh cities list fragment on tablet devices only!
         if (findViewById(R.id.onePaneLayout) == null) { // tablet
-            refreshCitiesListForTabletDevice();
+            ///  refreshCitiesListForTabletDevice(); // COMMENTED !!!!
         }
     }
 
-/*
-    public int getUnitsFormat(){
-
-        return mUnitsFormat;
-    }*/
 
 /*
     // Setup a recurring alarm every hour
@@ -409,20 +344,6 @@ public class MainActivity extends AppCompatActivity implements
         alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMillis,
                 AlarmManager.INTERVAL_HOUR, pIntent);
     }*/
-
-
-/*        setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });*/
 
 
     @Override
@@ -449,48 +370,18 @@ public class MainActivity extends AppCompatActivity implements
                     .commit();
         }
         // ----------------------------------------------------
-
-/*        if (findViewById(R.id.onePaneLayout) == null) { // tablet
-
-            Log.d("AAAAA", "findViewById(R.id.onePaneLayout) == null");
-            // reInitCityListViewLoader();
-            /// refreshCityListView();
-
-            CitiesListFragment citiesListFragment = (CitiesListFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.citiesContainer);
-
-//            if (citiesListFragment != null) {
-
-            Log.d("AAAAA", "citiesListFragment != null");
-
-            // citiesListFragment.refreshCityList();
-            citiesListFragment.initLoader();
-
-        }*/
-
-/*        if (findViewById(R.id.onePaneLayout) == null) { // tablet
-
-            AddEditCity(R.id.rightFrameLayout);
-        } else { // phone
-
-            AddEditCity(R.id.onePaneLayout);
-        }*/
     }
 
 
-
-    // in the CitiesListFragment city selected
+    // CitiesListFragment: ListView -> city selected
     @Override
     public void onCityItemSelected(int cityID, String enteredName, String returnedName, String dataUpdateTime, int unitsFormat) {
-
-
-        //  readSettingsFromDB(); // TEST !!!
 
 //        Log.d("AAAAA", "onCityItemSelected - cityID = " + cityID);
 //        Log.d("AAAAA", "onCityItemSelected - cityName = " + cityName);
 
         // ----------------------------------------------------
-        // RUN DetailsFragment
+        // Show DetailsFragment
 
         DetailsFragment detailsFragment = new DetailsFragment();
 
@@ -511,57 +402,17 @@ public class MainActivity extends AppCompatActivity implements
 
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.onePaneLayout, detailsFragment)
+                    .addToBackStack(null)
                     .commit();
 
         } else { // tablet
 
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.rightFrameLayout, detailsFragment)
-                   // .addToBackStack(null) // DO NOT ADD this root fragment to backstack!!
                     .commit();
         }
-/*
-            //  showDetails(R.id.rightFrameLayout, cityID, enteredName, returnedName, dataUpdateTime, unitsFormat);
-
-        } else { // tablet
-
-            //   showDetails(R.id.onePaneLayout, cityID, enteredName, returnedName, dataUpdateTime, unitsFormat);
-        }*/
         // ----------------------------------------------------
     }
-
-
- /*   // listItem click
-
-    private void showDetails(int viewID, int cityID, String enteredName,
-                             String returnedName, String dataUpdateTime,  int unitsFormat) {
-
-        DetailsFragment detailsFragment = new DetailsFragment();
-
-        // put data to DetailsFragment
-        Bundle bundle = new Bundle();
-
-        bundle.putInt(City.CITY_ID, cityID);
-        bundle.putString(City.ENTERED_CITY, enteredName);
-        bundle.putString(City.RETURNED_CITY, returnedName);
-        bundle.putString(City.UPDATE_TIME, dataUpdateTime);
-        bundle.putInt(MainActivity.UNITS_FORMAT, unitsFormat);
-
-     //   Log.d("AAAAA", "MainActivity - putInt - unitsFormat = " + unitsFormat);
-
-        detailsFragment.setArguments(bundle);
-
-        // use a FragmentTransaction to display the fragment
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-
-        transaction.replace(viewID, detailsFragment);
-
-        if (findViewById(R.id.onePaneLayout) != null) { // add to backstack for phone screen only
-            transaction.addToBackStack(null);
-        }
-
-        transaction.commit(); // causes fragment to display
-    }*/
 
 
     @Override
@@ -569,7 +420,7 @@ public class MainActivity extends AppCompatActivity implements
 
         hideKeyboard();
 
-  //      this.onBackPressed(); // remove addEditFragment`s activity
+        //      this.onBackPressed(); // remove addEditFragment`s activity
 
         // ----------------------------------------------------
         // remove addCityFragment after save added city in DB
@@ -577,9 +428,9 @@ public class MainActivity extends AppCompatActivity implements
 
             this.onBackPressed(); // remove addEditFragment`s activity
 
-        } else {
+        } else { // tablet
 
-            AddCityFragment addCityFragment = (AddCityFragment)getSupportFragmentManager()
+            AddCityFragment addCityFragment = (AddCityFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.rightFrameLayout);
 
             if (addCityFragment != null) {
@@ -589,37 +440,38 @@ public class MainActivity extends AppCompatActivity implements
                 transaction.remove(addCityFragment);
                 transaction.commit();
             }
-        // ----------------------------------------------------
-
-/*
-            Fragment f = getSupportFragmentManager().findFragmentById(R.id.rightFrameLayout);
-            DetailsFragment detailsFragment = null;
-
-            if (f instanceof DetailsFragment)
-                detailsFragment = (DetailsFragment) f;
-
-            if (detailsFragment != null) {
-
-                Log.d("AAAAA", "detailsFragment != null");
-
-                // remove right DetailsFragment after delete city
-                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                transaction.remove(detailsFragment);
-                transaction.commit(); // causes fragment to display
-            }
-*/
+            // ----------------------------------------------------
         }
 
 
+        syncOneCity(id, enteredCity);
 
 
 
-
-        // get data for added city only
+ /*       // get data for added city only
         Log.d("AAAAA", "Sync running after add new city...");
 
         /// scheduleAlarm();
 
+        // -----------------------------------------------------------
+        // get detailed data for ONE added city
+        Intent intent = new Intent(this, GetDataService.class)
+                .putExtra(PARAM_TASK, TASK_GET_WEATHER_ONE_CITY) // get weather data for one city only!
+                .putExtra(PARAM_CITY_ID, id) //  "CITIES" table: column "_id"
+                .putExtra(PARAM_ENTERED_CITY, enteredCity); // "CITIES" table: column "entered_city"
+
+        // start service for added a city details and weather data
+        startService(intent);
+        // -----------------------------------------------------------*/
+    }
+
+
+    private void syncOneCity(int id, String enteredCity) {
+
+        // get data for added city only
+     ///   Log.d("AAAAA", "Sync running after add new city...");
+
+        /// scheduleAlarm();
 
         // -----------------------------------------------------------
         // get detailed data for ONE added city
@@ -632,7 +484,7 @@ public class MainActivity extends AppCompatActivity implements
         startService(intent);
         // -----------------------------------------------------------
 
-        /// refreshCitiesListForTabletDevice();
+
     }
 
 
@@ -640,7 +492,7 @@ public class MainActivity extends AppCompatActivity implements
 
         hideKeyboard();
 
-      //  this.onBackPressed(); // close addEditFragment
+        //  this.onBackPressed(); // close addEditFragment
 
         // ----------------------------------------------------
         // remove addCityFragment after save added city in DB
@@ -661,15 +513,137 @@ public class MainActivity extends AppCompatActivity implements
                 transaction.commit();
             }
         }
-            // ----------------------------------------------------
+        // ----------------------------------------------------
     }
 
+
+    private void refreshData() {
+
+        hideMessageBar();
+
+        // determine what is the fragments are in activity?
+        if (findViewById(R.id.onePaneLayout) == null) { // tablet
+
+            Fragment leftFragment = getSupportFragmentManager().findFragmentById(R.id.citiesContainer);
+            Fragment rightFragment = getSupportFragmentManager().findFragmentById(R.id.rightFrameLayout);
+
+            // if (fragment instanceof CitiesListFragment) { // refresh details: weather ListView
+
+            // show cities fragment
+           // Log.d("AAAAA", "refreshData: citiesListFragment - initLoader();");
+            CitiesListFragment citiesListFragment = (CitiesListFragment) leftFragment;
+            citiesListFragment.initLoader();
+
+
+
+            // }
+
+/*            switch (taskStatus) {
+
+                case STATUS_GET_WEATHER_ALL_CITIES_FINISH:
+
+
+                    break;
+
+                case STATUS_GET_WEATHER_ONE_CITY_FINISH:
+
+
+                    break;
+            }*/
+
+        } else { // phone
+
+            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.onePaneLayout);
+
+            if (fragment instanceof CitiesListFragment) { // refresh details: weather ListView
+
+            //    Log.d("AAAAA", "refreshData: citiesListFragment - initLoader();");
+
+                CitiesListFragment citiesListFragment = (CitiesListFragment) fragment;
+
+                citiesListFragment.initLoader();
+            } else if (fragment instanceof DetailsFragment) { // refresh cities: cities ListView
+
+          //      Log.d("AAAAA", "refreshData: DetailsFragment - initLoader()");
+
+                DetailsFragment detailsFragment = (DetailsFragment) fragment;
+
+                detailsFragment.initLoader();
+            }
+
+        }
+    }
+
+
+    // icon "sync" pressed
+    private void syncData() {
+
+        //   hideMessageBar();
+
+        // determine what is the fragments are in activity?
+        if (findViewById(R.id.onePaneLayout) == null) { // tablet
+
+            Fragment leftFragment = getSupportFragmentManager().findFragmentById(R.id.citiesContainer);
+            Fragment rightFragment = getSupportFragmentManager().findFragmentById(R.id.rightFrameLayout);
+
+            /// if (leftFragment instanceof CitiesListFragment) { // refresh details: weather ListView
+
+            // sync cities Listview data
+         //   Log.d("AAAAA", "refreshData: citiesListFragment - syncAllData()");
+
+            CitiesListFragment citiesListFragment = (CitiesListFragment) leftFragment;
+            syncAllData();
+
+
+        } else { // phone
+
+            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.onePaneLayout);
+
+            if (fragment instanceof CitiesListFragment) { // refresh details: weather ListView
+
+           //     Log.d("AAAAA", "refreshData: citiesListFragment - syncAllData()");
+
+                /// CitiesListFragment citiesListFragment = (CitiesListFragment) fragment;
+
+                syncAllData();
+            } else if (fragment instanceof DetailsFragment) { // refresh cities: cities ListView
+
+           //     Log.d("AAAAA", "refreshData: DetailsFragment - syncData()");
+
+                DetailsFragment detailsFragment = (DetailsFragment) fragment;
+
+                detailsFragment.syncCurrentCity();
+            }
+
+        }
+    }
+
+
+    public void syncAllData() {
+
+    ///    Log.d("AAAAA", "syncAllData()");
+
+        //    scheduleAlarm();
+
+        // run sync single time
+        if (!isMyServiceRunning(GetDataService.class)) {
+
+            // -----------------------------------------------------------
+            // get detailed data for ALL cities
+            Intent intent = new Intent(this, GetDataService.class)
+                    .putExtra(PARAM_TASK, TASK_GET_WEATHER_ALL_CITIES); // get weather data for all cities
+
+            // start service for added a city details and weather data
+            startService(intent);
+            // -----------------------------------------------------------
+        }
+    }
+
+/*
 
     public void refreshCitiesListForTabletDevice() {
 
         Log.d("AAAAA", "refreshCitiesListForTabletDevice()");
-
-        //  if (findViewById(R.id.onePaneLayout) == null) { // tablet
 
         //  Log.d("AAAAA", "refreshCitiesListForTabletDevice() - is tablet!");
 
@@ -688,9 +662,6 @@ public class MainActivity extends AppCompatActivity implements
         if (f instanceof DetailsFragment)
             detailsFragment = (DetailsFragment) f;
 
-/*        DetailsFragment detailsFragment = (DetailsFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.rightFrameLayout);*/
-
         if (detailsFragment != null) {
 
             Log.d("AAAAA", "detailsFragment != null");
@@ -698,31 +669,15 @@ public class MainActivity extends AppCompatActivity implements
             // remove right DetailsFragment after delete city
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.remove(detailsFragment);
-            transaction.commit(); // causes fragment to display
+            transaction.commit();
         }
-        //    }
     }
-
-
-
-
-
-/*    private void AddEditCity(int viewID) {
-
-        //  AddCityFragment fragment = new AddCityFragment();
-
-        // use a FragmentTransaction to display the fragment
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(viewID, new AddCityFragment());
-        transaction.addToBackStack(null);
-        transaction.commit(); // causes fragment to display
-
-    }*/
+*/
 
 
     public void onDeleteCity() {
 
-        Log.d("AAAAA", "onDeleteCity()");
+   ///     Log.d("AAAAA", "onDeleteCity()");
 
         // refresh cities ListView after city was deleted
         // reinitialize CitiesFragment LoadManager IN TABLET DEVICES ONLY!
@@ -735,7 +690,7 @@ public class MainActivity extends AppCompatActivity implements
 
         if (rightFragment != null) {
 
-            Log.d("AAAAA", "rightFragment != null");
+         ///   Log.d("AAAAA", "rightFragment != null");
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.remove(rightFragment);
             transaction.commit();
@@ -750,70 +705,6 @@ public class MainActivity extends AppCompatActivity implements
 
             citiesListFragment.initLoader();
         }
-
-
-/*        // ----------------------------------------------------
-        // remove right pane fragment after delete city in DB
-        if (findViewById(R.id.onePaneLayout) != null) { // phone
-
-          //  this.onBackPressed(); // remove addEditFragment`s activity
-
-        } else { // tablet
-
-            Fragment rightFragment = getSupportFragmentManager().findFragmentById(R.id.rightFrameLayout);
-
-            if (rightFragment != null) {
-
-                Log.d("AAAAA", "rightFragment != null");
-                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                transaction.remove(rightFragment);
-                transaction.commit();
-            }
-        }
-            // ----------------------------------------------------*/
-
-
-        /*        if (findViewById(R.id.onePaneLayout) == null) { // tablet
-
-            Log.d("AAAAA", "findViewById(R.id.onePaneLayout) == null");
-            // reInitCityListViewLoader();
-            /// refreshCityListView();
-
-            CitiesListFragment citiesListFragment = (CitiesListFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.citiesContainer);
-
-//            if (citiesListFragment != null) {
-
-            Log.d("AAAAA", "citiesListFragment != null");
-
-            // citiesListFragment.refreshCityList();
-            citiesListFragment.initLoader();
-        }*/
-
-/*       if (findViewById(R.id.onePaneLayout) == null) { // tablet
-
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .remove(getSupportFragmentManager()
-                    .findFragmentById(R.id.rightFrameLayout))
-                    .commit();
-
-           // AddEditCity(R.id.rightFrameLayout);
-        }*/
-
-/*        // remove right fragment on tablet
-        if (findViewById(R.id.rightFrameLayout) != null) { // is tablet
-
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .remove(getSupportFragmentManager()
-                            .findFragmentById(R.id.rightFrameLayout))
-                    .commit();
-        }
-        ///  this.onBackPressed(); // close addEditFragment
-        //    getSupportFragmentManager().popBackStack(); // remove details fragment on tablet*/
-
-        ///    reInitCityListViewLoader();
     }
 
 
@@ -829,124 +720,11 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-    private void reInitCityListViewLoader() {
-
-        Log.d("AAAAA", "reInitCityListViewLoader()");
-
-
-        CitiesListFragment citiesListFragment = null;
-
-        // show cities fragment
-        if (findViewById(R.id.onePaneLayout) != null) { // phone
-
-            Fragment f = getSupportFragmentManager().findFragmentById(R.id.onePaneLayout);
-
-            if (f instanceof CitiesListFragment) {
-                citiesListFragment = (CitiesListFragment) getSupportFragmentManager()
-                        .findFragmentById(R.id.onePaneLayout);
-            }
-        } else { // tablet
-
-            Log.d("AAAAA", "TABLET !!!");
-
-            Fragment f = getSupportFragmentManager().findFragmentById(R.id.rightFrameLayout);
-
-            if (f instanceof CitiesListFragment)
-                citiesListFragment = (CitiesListFragment) getSupportFragmentManager()
-                        .findFragmentById(R.id.rightFrameLayout);
-        }
-
-        if (citiesListFragment != null) {
-
-            Log.d("AAAAA", "citiesListFragment != null");
-            citiesListFragment.initLoader();
-        }
-
-/*
-        CitiesListFragment citiesListFragment = null;
-
-        if (findViewById(R.id.onePaneLayout) == null) { // tablet
-
-            citiesListFragment = (CitiesListFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.rightFrameLayout);
-            //  AddEditCity(R.id.rightFrameLayout);
-        } else { // phone
-            citiesListFragment = (CitiesListFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.onePaneLayout);
-            // AddEditCity(R.id.onePaneLayout);
-        }
-
-        if (citiesListFragment != null) {
-
-            Log.d("AAAAA", "citiesListFragment != null");
-
-            citiesListFragment.initLoader();
-        }*/
-
- /*       CitiesListFragment citiesListFragment = null;
-
-        if (findViewById(R.id.onePaneLayout) != null) { // tablet
-
-            Log.d("AAAAA", "onePaneLayout found");
-
-            citiesListFragment = (CitiesListFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.onePaneLayout);
-        } else { // phone
-
-
-        }
-
-        if (citiesListFragment != null) {
-
-            Log.d("AAAAA", "citiesListFragment != null");
-
-            citiesListFragment.initLoader();
-        }*/
-
-
-    }
-
-
-    // force CitiesListFragment ListView refresh for tablet only
-    private void refreshCityListView() {
-
-        CitiesListFragment citiesListFragment = null;
-
-        if (findViewById(R.id.leftFragment) != null) { // cities fragment layout is present
-
-            Log.d("AAAAA", "leftFragment found");
-
-            citiesListFragment = (CitiesListFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.leftFragment);
-
-            if (citiesListFragment != null) {
-
-                Log.d("AAAAA", "citiesListFragment != null");
-
-                citiesListFragment.refreshCityList();
-            }
-        }
-
-/*        if (findViewById(R.id.citiesContainer) != null) { // is tablet
-
-            citiesListFragment = (CitiesListFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.citiesContainer);
-
-            if (citiesListFragment != null) {
-                citiesListFragment.refreshCityList();
-            }
-        }*/
-    }
-
-
     @Override
     public void onMapClicked() {
 
         hideKeyboard();
-
     }
-
-    //   private CustomBroadcastReceiver customBroadcastReceiver;
 
 
     @Override
@@ -981,29 +759,11 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-    public void syncAllData() {
+    // determine is service running now?
+    public boolean isMyServiceRunning(Class<?> serviceClass) {
 
-        Log.d("AAAAA", "syncAllData()");
-
-        //    scheduleAlarm();
-
-        // run sync single time
-        if (!isMyServiceRunning(GetDataService.class)) {
-
-            // -----------------------------------------------------------
-            // get detailed data for ALL cities
-            Intent intent = new Intent(this, GetDataService.class)
-                    .putExtra(PARAM_TASK, TASK_GET_WEATHER_ALL_CITIES); // get weather data for all cities
-
-            // start service for added a city details and weather data
-            startService(intent);
-            // -----------------------------------------------------------
-        }
-    }
-
-
-    private boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
 
             if (serviceClass.getName().equals(service.service.getClassName())) {
@@ -1012,6 +772,7 @@ public class MainActivity extends AppCompatActivity implements
         }
         return false;
     }
+
 
     private void showMessageBar(String text, boolean showProgressBar) {
 
@@ -1035,9 +796,8 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    // display this fragment's menu items
 
-
+    // display menu items
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -1047,35 +807,6 @@ public class MainActivity extends AppCompatActivity implements
         inflater.inflate(R.menu.main_activity_menu, menu);
         return true;
     }
-
-/*    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-
-        // clear previous menu items
-        menu.clear();
-
-        super.onCreateOptionsMenu(menu, inflater);
-
-        inflater.inflate(R.menu.city_fragment_menu, menu);
-    }*/
-
-
-/*    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-
-        for (int index = 0; index < menu.size(); index++) {
-
-            MenuItem menuItem = menu.getItem(index);
-
-            if (menuItem != null) {
-                // hide the menu items if the drawer is open
-                menuItem.setVisible(mMenuVisible);
-            }
-        }
-
-        super.onPrepareOptionsMenu(menu);
-    }*/
-
 
     // handle choice from options menu
     @Override
@@ -1097,55 +828,56 @@ public class MainActivity extends AppCompatActivity implements
 
             case R.id.action_sync:
 
-                syncAllData();
-
-                ///  activity.syncData();
+                // syncAllData();
+                syncData();
 
                 return true;
-
         }
         return super.onOptionsItemSelected(item);
     }
 
 
-/*    public void showSettings() {
+    // after settings has changed
+    public void onSettingsChanged() {
 
-        int viewID;
+        //   hideMessageBar();
 
+        // determine what is the fragments are in activity?
         if (findViewById(R.id.onePaneLayout) == null) { // tablet
 
-            viewID = R.id.rightFrameLayout;
+            Fragment leftFragment = getSupportFragmentManager().findFragmentById(R.id.citiesContainer);
+            Fragment rightFragment = getSupportFragmentManager().findFragmentById(R.id.rightFrameLayout);
 
-        } else { // phone
+       ///     Log.d("AAAAA", "onSettingsChanged");
+            CitiesListFragment citiesListFragment = (CitiesListFragment) leftFragment;
+            citiesListFragment.initLoader();
 
-            viewID = R.id.onePaneLayout;
-        }
 
 
-        // get settings from DB
-        readSettingsFromDB();
+        }/* else { // phone
 
-        // put settings to SettingsFragment
-        Bundle bundle = new Bundle();
+            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.onePaneLayout);
 
-        bundle.putInt(MainActivity.UNITS_FORMAT, mUnitsFormat);
+            if (fragment instanceof CitiesListFragment) { // refresh details: weather ListView
 
-        SettingsFragment fragment = new SettingsFragment();
+                Log.d("AAAAA", "onSettingsChanged() - refresh cities listView");
 
-        fragment.setArguments(bundle);
+                /// CitiesListFragment citiesListFragment = (CitiesListFragment) fragment;
 
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                CitiesListFragment citiesListFragment = (CitiesListFragment) fragment;
 
-        transaction.replace(viewID, fragment);
-        // .addToBackStack(null)
+                citiesListFragment.initLoader();
 
-        if (findViewById(R.id.onePaneLayout) != null) // phone only
-        {
-            transaction.addToBackStack(null);
-        }
 
-        transaction.commit(); // causes fragment to display
-    }*/
+            } else if (fragment instanceof DetailsFragment) { // refresh cities: cities ListView
+
+                Log.d("AAAAA", "onSettingsChanged() - refresh weather listView");
+
+                DetailsFragment detailsFragment = (DetailsFragment) fragment;
+
+                detailsFragment.initLoader();
+            }*/
+    }
 
 
  /*   public void syncData() {

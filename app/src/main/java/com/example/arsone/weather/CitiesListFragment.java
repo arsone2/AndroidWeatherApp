@@ -74,16 +74,16 @@ public class CitiesListFragment extends Fragment implements
 
      //   void syncData();
 
-        void refreshCitiesListForTabletDevice();
+    ///    void refreshCitiesListForTabletDevice();
     }
 
-    private static Callbacks activity;
+    private Callbacks activity;
 
 /*    // The loader's unique id. Loader ids are specific to the Activity or
     // Fragment in which they reside.
     public static final int LOADER_CITIES_ID = 0;*/
 
-    public static final String TAG = "AAAAA";
+///    public static final String TAG = "AAAAA";
 
     private CursorAdapter cityCursorAdapter;
 
@@ -180,7 +180,6 @@ public class CitiesListFragment extends Fragment implements
 
 
 
-
 /*        // message bar panel
         messageBarLayout = (LinearLayout) view.findViewById(R.id.messageBar);
         messageTextView = (TextView) view.findViewById(R.id.messageTextView);
@@ -190,56 +189,12 @@ public class CitiesListFragment extends Fragment implements
         // uncheck all items for delete
         CityCursorAdapter.setCheckboxesVisibility(false);
 
-
         cityCursorAdapter = new CityCursorAdapter(getContext(), null, 0);
         citiesListView.setAdapter(cityCursorAdapter);
 
      //   Log.d("AAAAA" , "onCreateView() - mUnitsFormat = " + mUnitsFormat);
 
-        // set units format
-        //CityCursorAdapter.setUnitsFormat(mUnitsFormat);
-
-/*
-         // --------------------------------------------------------------
-        // IMPORTANT !!! Change loader for different query
-        Loader loader = getLoaderManager().getLoader(MainActivity.LOADER_CITIES_ID);
-
-        if (loader != null && !loader.isReset()) {
-            getLoaderManager().restartLoader(MainActivity.LOADER_CITIES_ID, null, this);
-        } else {
-            getLoaderManager().initLoader(MainActivity.LOADER_CITIES_ID, null, this);
-        }
-        // --------------------------------------------------------------
-*/
-
-    //    Log.d("AAAAA", "onCreateView() - cityCursorAdapter");
-
         initLoader();
-
-        //    isDeleteMode = false;
-
-
-        // --------------------------------------
-        // tests
-
-        /*Calendar c = Calendar.getInstance();
-        //System.out.println("Current time => " + c.getTime());
-
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-        String formattedDate = df.format(c.getTime());
-        Log.d("AAAAA", "current date = " + formattedDate);*/
-
-/*
-
-SELECT c.entered_city, c._id, w.temp_day, w.description, w.icon_name, w.insert_timestamp
-        FROM cities c LEFT OUTER JOIN weather w ON c._id = w.city_id
-        WHERE strftime('%Y-%m-%d', insert_timestamp) = '2017-07-04'
-        OR c._id > 0
-        GROUP BY entered_city
-        ORDER BY c._id desc
-
- */
-
 
         return view;
     }
@@ -266,7 +221,7 @@ SELECT c.entered_city, c._id, w.temp_day, w.description, w.icon_name, w.insert_t
 
                 mUnitsFormat = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_UNITS_FORMAT));
 
-                Log.d("AAAAA", "readSettingsFromDB - mUnitsFormat = " + mUnitsFormat);
+          //     Log.d("AAAAA", "readSettingsFromDB - mUnitsFormat = " + mUnitsFormat);
 
            //     titleTextView.setText(R.string.cities_title_cities_present);
 
@@ -348,16 +303,16 @@ SELECT c.entered_city, c._id, w.temp_day, w.description, w.icon_name, w.insert_t
     }
     // ------------------------------------------------------------
 
-
+/*
     public void refreshCityList() {
 
-        Log.d("AAAAA", "refreshCityList !!!");
+   //     Log.d("AAAAA", "refreshCityList !!!");
 
         cityCursorAdapter.notifyDataSetChanged();
 
         // scroll ListView to start position
         citiesListView.smoothScrollToPosition(0);
-    }
+    }*/
 
 
     // citiesListView item click
@@ -505,7 +460,7 @@ SELECT c.entered_city, c._id, w.temp_day, w.description, w.icon_name, w.insert_t
 
                       ///  if (cpResults != null) {
 
-                            Log.e("AAAAA", "cpResults[1].count = " + cpResults[1].count);
+                       ///     Log.e("AAAAA", "cpResults[1].count = " + cpResults[1].count);
                             //Log.e("AAAAA","cpResults = " + cpResults.);
                             //Log.e("AAAAA","cpResults = " + cpResults.toString());
 
@@ -530,7 +485,7 @@ SELECT c.entered_city, c._id, w.temp_day, w.description, w.icon_name, w.insert_t
 
                 public void onClick(DialogInterface dialog, int which) {
                     // showMessage("Нажали Нет");
-                    Log.d("AAAAA", "setNegativeButton");
+                ///    Log.d("AAAAA", "setNegativeButton");
                     hide(); // hide delete panel
                 }
             });
@@ -557,7 +512,7 @@ SELECT c.entered_city, c._id, w.temp_day, w.description, w.icon_name, w.insert_t
 
     public void hide() {
 
-        Log.d("AAAAA", "hide()");
+   ///     Log.d("AAAAA", "hide()");
 
         CityCursorAdapter.setCheckboxesVisibility(false);
 
@@ -692,16 +647,16 @@ SELECT c.entered_city, c._id, w.temp_day, w.description, w.icon_name, w.insert_t
 
     private void backupDatabase() {
 
-        Log.d("AAAAA", "backup Database begins");
+   ///     Log.d("AAAAA", "backup Database begins");
 
         Toast.makeText(getContext(), "backupDatabase", Toast.LENGTH_SHORT).show();
 
         String[] dirs = getStorageDirectories();
 
-        for (String dir : dirs) {
+/*        for (String dir : dirs) {
 
             Log.d("AAAAA", "dir = " + dir);
-        }
+        }*/
 
         // dir = /storage/extSdCard
         // dir = /storage/emulated/0
@@ -716,7 +671,7 @@ SELECT c.entered_city, c._id, w.temp_day, w.description, w.icon_name, w.insert_t
                 + getActivity().getApplicationContext().getPackageName()
                 + "/databases/" + DataContract.DATABASE_NAME;
 
-        Log.d("AAAAA", "currentDBPath = " + currentDBPath);
+  ///      Log.d("AAAAA", "currentDBPath = " + currentDBPath);
 
         String backupDBPath = DataContract.DATABASE_NAME;
         File currentDB = new File(data, currentDBPath);

@@ -3,6 +3,8 @@ package com.example.arsone.weather;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.net.Uri;
@@ -51,8 +53,12 @@ import com.example.arsone.weather.data.Weather;
 
 public class DetailsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-/*    // Loader ID
-    public static final int LOADER_WEATHER_ID = 1;*/
+    public interface Callbacks {
+
+        boolean isMyServiceRunning(Class<?> serviceClass);
+    }
+
+    private DetailsFragment.Callbacks activity;
 
     // Fragment view title
     private TextView titleTextView;
@@ -63,19 +69,11 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
     private TextView modeTextView;
     private AppCompatImageView modeImageView;
 
-/*    // message panel
-    private LinearLayout messageBarLayout;
-    private TextView messageTextView;
-    private ProgressBar messageProgressBar;*/
-
     // weather ListView
     private ListView weatherListView;
 
     // weather objects List
     private List<Weather> weatherList = new ArrayList<>();
-
-    // ArrayAdapter between  weather List &&  weather ListView
-    /// private WeatherArrayAdapter weatherArrayAdapter;
 
     private WeatherCursorAdapter weatherCursorAdapter;
 
@@ -85,10 +83,24 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
     // selected city name
     private String mEnteredCity;
 
- //   private RefreshDataTask mRefreshDataTask;
-
-
     private int mUnitsFormat;
+
+
+    @Override
+    public void onAttach(Context context) {
+
+        super.onAttach(context);
+        activity = (DetailsFragment.Callbacks) context;
+    }
+
+
+    @Override
+    public void onDetach() {
+
+        super.onDetach();
+        activity = null;
+    }
+
 
     // ---------------------------------------------------------------
     // LoaderManager.LoaderCallbacks<Cursor> methods:
@@ -96,9 +108,9 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
-     ///   String[] selectionArgs = new String[]{String.valueOf(mID)};
+        ///   String[] selectionArgs = new String[]{String.valueOf(mID)};
 
-     //   Log.d("AAAAA", "onCreateLoader: selectionArgs[0] = " + selectionArgs[0]);
+        //   Log.d("AAAAA", "onCreateLoader: selectionArgs[0] = " + selectionArgs[0]);
 
         return new CursorLoader(getContext(),
                 Uri.parse(DataContentProvider.WEATHER_CONTENT_URI.toString() + "/" + mID),
@@ -114,7 +126,6 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
                 selectionArgs, // selectionArgs
                 DataContract.WeatherEntry._ID // sort order
         );*/
-// return null;
     }
 
 
@@ -123,7 +134,7 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
 
         weatherCursorAdapter.swapCursor(cursor);
 
-  //      Log.d("AAAAA", "onLoadFinished: results count = " + cursor.getCount());
+        //      Log.d("AAAAA", "onLoadFinished: results count = " + cursor.getCount());
 
         if (cursor.getCount() == 0) {
 
@@ -194,7 +205,7 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
             mUnitsFormat = bundle.getInt(MainActivity.UNITS_FORMAT);
             mDataUpdateTime = bundle.getString(City.UPDATE_TIME);
 
-            Log.d("AAAAA", "if (bundle != null) - mUnitsFormat = " + mUnitsFormat);
+       ///     Log.d("AAAAA", "if (bundle != null) - mUnitsFormat = " + mUnitsFormat);
         }
 
 
@@ -216,7 +227,7 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
         weatherListView = (ListView) view.findViewById(R.id.detailsListView);
 
         // Title
-        if(TextUtils.isEmpty(mReturnedCity))
+        if (TextUtils.isEmpty(mReturnedCity))
             titleTextView.setText(mEnteredCity);
         else
             titleTextView.setText(mEnteredCity + "/ " + mReturnedCity);
@@ -243,50 +254,61 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
     }
 
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+    private void showDetails() {
 
-        super.onActivityCreated(savedInstanceState);
+        weatherCursorAdapter = new WeatherCursorAdapter(getContext(), null, 0);
+        weatherListView.setAdapter(weatherCursorAdapter);
 
-/*        // set array adapter to get weather data from server
+        initLoader();
 
-        if (getActivity().findViewById(R.id.onePaneLayout) != null) { // phone
-            weatherArrayAdapter = new WeatherArrayAdapter(getActivity(),
-                    weatherList,
-                    R.layout.list_item_weather // phone layout
-            );
-        } else { // tablet
-            weatherArrayAdapter = new WeatherArrayAdapter(getActivity(),
-                    weatherList,
-                    R.layout.list_item_weather_tablet // tablet layout
-            );
+/*        // --------------------------------------------------------------
+        // IMPORTANT !!! Change loader for different query
+        Loader loader = getLoaderManager().getLoader(MainActivity.LOADER_WEATHER_ID);
+
+        if (loader != null && !loader.isReset()) {
+            getLoaderManager().restartLoader(MainActivity.LOADER_WEATHER_ID, null, DetailsFragment.this);
+        } else {
+            getLoaderManager().initLoader(MainActivity.LOADER_WEATHER_ID, null, DetailsFragment.this);
         }
-
-        weatherListView.setAdapter(weatherArrayAdapter);*/
-
-        // GET ONLINE DATA FROM WEATHER SERVER
-        ////getWeather(); // COMMENTED
-
+        // --------------------------------------------------------------*/
 
     }
 
 
+    public void initLoader() {
 
-    private void showDetails(){
+        Log.d("AAAAA", "DetailsFragment: initLoader");
 
-/*        if (getActivity().findViewById(R.id.onePaneLayout) != null) { // phone
-            weatherCursorAdapter = new WeatherCursorAdapter(getContext(), null, 0,
-                    R.layout.list_item_weather // phone layout
-            );
-        } else { // tablet
-            weatherCursorAdapter = new WeatherCursorAdapter(getContext(), null, 0,
-                    R.layout.list_item_weather_tablet // tablet layout
-            );
-        }*/
+        //  int unitsFormat = 0; // metric/Celsius units format by default
 
+        // read all columns
+        Cursor cursor = getActivity().getContentResolver().query(DataContentProvider.SETTINGS_CONTENT_URI,
+                new String[]{DataContract.SettingsEntry.COLUMN_UNITS_FORMAT},
+                null, // DataContract.CityEntry.COLUMN_ENTERED_CITY + "=?",
+                null, // new String[]{enteredCity},
+                null);
 
-        weatherCursorAdapter = new WeatherCursorAdapter(getContext(), null, 0, mUnitsFormat);
-        weatherListView.setAdapter(weatherCursorAdapter);
+        if (cursor != null) {
+
+            if (cursor.getCount() > 0) { // has cities in DB
+
+                cursor.moveToFirst();
+
+                mUnitsFormat = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_UNITS_FORMAT));
+
+                ///      Log.d("AAAAA", "readSettingsFromDB - mUnitsFormat = " + mUnitsFormat);
+
+                //     titleTextView.setText(R.string.cities_title_cities_present);
+
+            } else { // cities DB empty
+
+                //     titleTextView.setText(R.string.cities_title_cities_empty);
+            }
+            cursor.close();
+        } // if(cursor != null)
+
+        // set units format
+        WeatherCursorAdapter.setUnitsFormat(mUnitsFormat);
 
         // --------------------------------------------------------------
         // IMPORTANT !!! Change loader for different query
@@ -298,26 +320,28 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
             getLoaderManager().initLoader(MainActivity.LOADER_WEATHER_ID, null, DetailsFragment.this);
         }
         // --------------------------------------------------------------
-
     }
 
 
- /*   private void showMessageBar(String text, boolean showProgressBar) {
+    public void syncCurrentCity() {
 
-        messageBarLayout.setVisibility(View.VISIBLE);
-        messageTextView.setText(text);
+        ///    Log.d("AAAAA", "syncCurrentCity()");
 
-        if (showProgressBar)
-            messageProgressBar.setVisibility(View.VISIBLE);
-        else
-            messageProgressBar.setVisibility(View.GONE);
+        // run sync single time
+        /// if (!((MainActivity)getActivity()).isMyServiceRunning(GetDataService.class)) {
+        if (!activity.isMyServiceRunning(GetDataService.class)) {
+            // -----------------------------------------------------------
+            // get detailed data for ONE added city
+            Intent intent = new Intent(getActivity(), GetDataService.class)
+                    .putExtra(MainActivity.PARAM_TASK, MainActivity.TASK_GET_WEATHER_ONE_CITY) // get weather data for one city only!
+                    .putExtra(MainActivity.PARAM_CITY_ID, mID) //  "CITIES" table: column "_id"
+                    .putExtra(MainActivity.PARAM_ENTERED_CITY, mEnteredCity); // "CITIES" table: column "entered_city"
+
+            // start service for added a city details and weather data
+            getActivity().startService(intent);
+            // -----------------------------------------------------------
+        }
     }
-
-
-    private void hideMessageBar() {
-
-        messageBarLayout.setVisibility(View.GONE);
-    }*/
 
 
     private void setModeBar(String text, int color, int image) {
@@ -327,553 +351,4 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
         modeTextView.setTextColor(ContextCompat.getColor(getContext(), color));
         modeImageView.setImageResource(image);
     }
-
-
-/*    private void hideModeBar() {
-
-        modePanelLayout.setVisibility(View.GONE);
-    }*/
-
-
-  /*  private void getWeather() {
-
-        String url = createURL(mEnteredCity);
-
-        Log.d("AAAAA", "URL = " + url);
-
-        if (url != null) {
-
-            getWeatherNew(url);
-        }
-    }
-
-
-    //  create URL for openweathermap.org
-    private String createURL(String city) {
-
-        try {
-            return getString(R.string.web_service_url)
-                    + URLEncoder.encode(city, "UTF-8")
-                    + "&units=metric&lang=ru&cnt=5&APPID="
-                    + getString(R.string.openweathermap_api_key);
-
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        return null; // incorrect URL
-    }
-
-
-    private void getWeatherNew(String url) {
-
-   ///     showMessageBar(getString(R.string.message_wait_for_data), true);
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(url,
-                new Response.Listener<JSONObject>() {
-
-                    @Override
-                    public void onResponse(JSONObject response) {
-
-                        String returnedCityName = "";
-                        long cityID = -1;
-                        String countryCode = "";
-                        double cityLongitude;
-                        double cityLatitude;
-
-                        try {
-                            JSONArray list = null;
-
-                            Log.d("AAAAA", "response = " + response);
-
-                            // set mStatus info
-                            setModeBar(getResources().getText(R.string.online).toString(), R.color.onlineColor, R.drawable.ic_lamp_online);
-
-                            list = response.getJSONArray("list");
-
-                            JSONObject jsonCity = response.getJSONObject("city");
-
-                            ///        Log.d("AAAAA", "city = " + jsonCity);
-
-                            // city info
-                            returnedCityName = jsonCity.getString("name");
-                            cityID = jsonCity.getInt("id");
-                            countryCode = jsonCity.getString("country");
-
-                            // city coordinates
-                            JSONObject jsonCoords = jsonCity.getJSONObject("coord");
-                            cityLongitude = jsonCoords.getDouble("lon");
-                            cityLatitude = jsonCoords.getDouble("lat");
-
-                            // Преобразовать каждый элемент списка в объект Weather
-                            for (int i = 0; i < list.length(); ++i) {
-                                JSONObject day = list.getJSONObject(i); // Данные за день
-
-                                JSONObject temperatures = day.getJSONObject("temp");
-
-                                JSONObject weather = day.getJSONArray("weather").getJSONObject(0);
-
-                                weatherList.add(new Weather(
-
-                                        day.getLong("dt"), // long timeStamp
-                                        temperatures.getDouble("morn"), // double morningTemp
-                                        temperatures.getDouble("day"), // double dayTemp
-                                        temperatures.getDouble("eve"), // double eveningTemp
-                                        temperatures.getDouble("night"), // double nightTemp
-                                        temperatures.getDouble("min"), // double minTemp
-                                        temperatures.getDouble("max"), // double maxTemp
-                                        day.getInt("humidity"), // int humidity
-                                        day.getDouble("pressure"), // double pressure
-                                        day.getDouble("speed"), // double windSpeed
-                                        day.getInt("deg"), // int windDirection
-                                        weather.getString("description"), // String description
-                                        weather.getString("icon"), // String iconName
-                                        weather.getInt("id") // int weatherID
-                                ));
-                            }
-
-                            // database operations transaction:
-                            // 1. update city info
-                            // 2. ic_delete_item previous weather info
-                            // 3. insert new weather info
-                            ContentValues cv = new ContentValues();
-
-                            cv.put(DataContract.CityEntry.COLUMN_RETURNED_CITY, returnedCityName);
-                            cv.put(DataContract.CityEntry.COLUMN_SERVER_CITY_ID, cityID);
-                            cv.put(DataContract.CityEntry.COLUMN_LONGITUDE, cityLongitude);
-                            cv.put(DataContract.CityEntry.COLUMN_LATITUDE, cityLatitude);
-                            cv.put(DataContract.CityEntry.COLUMN_COUNTRY_CODE, countryCode);
-
-                            mRefreshDataTask = new RefreshDataTask();
-                            mRefreshDataTask.execute(cv);
-
-                        } catch (JSONException e) {
-                            Log.d("AAAAA", "JSONException: " + e.getMessage());
-                        } finally {
-                      ///      hideMessageBar();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-
-            // ERROR MODES
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-            ///    hideMessageBar();
-
-                NetworkResponse response = error.networkResponse;
-
-                if (response != null && response.data != null) {
-
-                    if (response.statusCode == 404) {
-
-                        Log.d("AAAA", "onErrorResponse: 404");
-
-                        // set mStatus info
-                        setModeBar(getString(R.string.message_city_not_found),
-                                R.color.nothingColor, R.drawable.ic_lamp_nothing);
-
-                        return;
-                    }
-                }
-
-                // OFFLINE MODE: show database data
-
-                // set offline mode info
-                setModeBar(getString(R.string.offline), R.color.offlineColor, R.drawable.ic_lamp_offline);
-
-                Log.d("AAAAA", "OFF-LINE MODE");
-
-                if (getActivity().findViewById(R.id.onePaneLayout) != null) { // phone
-                    weatherCursorAdapter = new WeatherCursorAdapter(getContext(), null, 0,
-                            R.layout.list_item_weather // phone layout
-                    );
-                } else { // tablet
-                    weatherCursorAdapter = new WeatherCursorAdapter(getContext(), null, 0,
-                            R.layout.list_item_weather_tablet // tablet layout
-                    );
-                }
-
-                weatherListView.setAdapter(weatherCursorAdapter);
-
-                // --------------------------------------------------------------
-                // IMPORTANT !!! Change loader for different query
-                Loader loader = getLoaderManager().getLoader(MainActivity.LOADER_WEATHER_ID);
-
-                if (loader != null && !loader.isReset()) {
-                    getLoaderManager().restartLoader(MainActivity.LOADER_WEATHER_ID, null, DetailsFragment.this);
-                } else {
-                    getLoaderManager().initLoader(MainActivity.LOADER_WEATHER_ID, null, DetailsFragment.this);
-                }
-                // --------------------------------------------------------------
-            }
-        });
-
-        // Defining the Volley request queue that handles the URL request concurrently
-        RequestQueue requestQueue = Volley.newRequestQueue(getContext());
-        requestQueue.add(jsonObjectRequest);
-    }*/
-
- /*   // ---------------------------------------------------------------------------------------------
-    private class RefreshDataTask extends AsyncTask<ContentValues, Void, Void> {
-
-        @Override
-        protected Void doInBackground(ContentValues... params) {
-
-            ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
-
-            String citySelection = DataContract.CityEntry._ID + "=?";
-            String[] selectionArgs = {String.valueOf(mID)};
-
-            String weatherSelection = DataContract.WeatherEntry.COLUMN_CITY_ID_FK + "=?";
-
-            try {
-                // update city data
-                ops.add(ContentProviderOperation.newUpdate(DataContentProvider.CITY_CONTENT_URI)
-                        .withSelection(citySelection, selectionArgs)
-                        .withValues(params[0])
-                        .build());
-
-                // ic_delete_item old data in from weather table
-                ops.add(ContentProviderOperation.newDelete(DataContentProvider.WEATHER_CONTENT_URI)
-                        .withSelection(weatherSelection, selectionArgs)
-                        .build());
-
-                // insert new data in weather table
-                for (int i = 0; i < weatherList.size(); i++) {
-                    ops.add(ContentProviderOperation.newInsert(DataContentProvider.WEATHER_CONTENT_URI)
-                            .withValue(DataContract.WeatherEntry.COLUMN_CITY_ID_FK, mID)                              // "city_id" - foreign key (int/INTEGER)
-                            .withValue(DataContract.WeatherEntry.COLUMN_TIMESTAMP, weatherList.get(i).timeStamp) // day.getLong("dt"))                 // timestamp in seconds (int/INTEGER)
-                            .withValue(DataContract.WeatherEntry.COLUMN_MORNING_TEMP, weatherList.get(i).morningTemp) // temperatures.getDouble("morn"))          // "temp_day"
-                            .withValue(DataContract.WeatherEntry.COLUMN_DAY_TEMP, weatherList.get(i).dayTemp) // temperatures.getDouble("day")) - "temp_day"
-                            .withValue(DataContract.WeatherEntry.COLUMN_EVENING_TEMP, weatherList.get(i).eveningTemp) // temperatures.getDouble("eve")) -"temp_day"
-                            .withValue(DataContract.WeatherEntry.COLUMN_NIGHT_TEMP, weatherList.get(i).nightTemp) // temperatures.getDouble("night"))  - "temp_night"
-                            .withValue(DataContract.WeatherEntry.COLUMN_MIN_TEMP, weatherList.get(i).minTemp) // temperatures.getDouble("min"))      - "temp_min"
-                            .withValue(DataContract.WeatherEntry.COLUMN_MAX_TEMP, weatherList.get(i).maxTemp) //  temperatures.getDouble("max"))      // "temp_max"
-                            .withValue(DataContract.WeatherEntry.COLUMN_HUMIDITY, weatherList.get(i).humidity) // day.getInt("humidity"))          // "humidity"
-                            .withValue(DataContract.WeatherEntry.COLUMN_PRESSURE, weatherList.get(i).pressure) // day.getDouble("pressure"))          // "pressure"
-                            .withValue(DataContract.WeatherEntry.COLUMN_SPEED, weatherList.get(i).windSpeed) // day.getDouble("speed"))          // "windSpeed"
-                            .withValue(DataContract.WeatherEntry.COLUMN_DIRECTION, weatherList.get(i).windDirection) // day.getInt("deg"))          // "windDirection"
-                            .withValue(DataContract.WeatherEntry.COLUMN_DESCRIPTION, weatherList.get(i).description) // weather.getString("description"))// "description"
-                            .withValue(DataContract.WeatherEntry.COLUMN_ICON_NAME, weatherList.get(i).iconName) // weather.getString("icon"))         // "icon_name"
-                            .build());
-
-                    if (isCancelled()) { // cancel AsyncTask job
-                        return null;
-                    }
-                }
-
-                ContentProviderResult[] cpResults = getActivity().getContentResolver()
-                        .applyBatch(DataContentProvider.AUTHORITY, ops);
-
-//               if (cpResults != null) {
-//
-//                    Log.e("AAAAA", "cpResults[1].count = " + cpResults[1].count);
-//                    //Log.e("AAAAA","cpResults = " + cpResults.);
-//                    //Log.e("AAAAA","cpResults = " + cpResults.toString());
-//
-//                    Toast.makeText(getContext(), getString(R.string.rows_deleted)
-//                            + cpResults[1].count, Toast.LENGTH_SHORT).show();
-
-                //}
-            } catch (RemoteException e) {
-                Log.e("AAAAA", "RemoteException " + e.getMessage());
-            } catch (OperationApplicationException e) {
-                Log.e("AAAAA", "OperationApplicationException: " + e.getMessage());
-                ops.clear();
-            }
-            return null;
-        }
-    }*/
 }
-
-
- /*   private class GetWeatherTask extends AsyncTask<URL, Integer, JSONObject> {
-
-        @Override
-        protected void onPreExecute() {
-
-            showMessageBar(getString(R.string.message_wait_for_server), true);
-
-            /// progressDialog = ProgressDialog.show(getContext(), "Загрузка...", "Получение данных с сервера, подождите...", false, false);
-        }
-
-
-        @Override
-        protected JSONObject doInBackground(URL... params) {
-
-            HttpURLConnection connection = null;
-            BufferedReader reader = null;
-
-            try {
-                synchronized (this) {
-
-                    int counter = 0;
-
-                    connection = (HttpURLConnection) params[0].openConnection();
-
-                    // to avoid connection dead hang
-                    connection.setRequestProperty("User-agent", System.getProperty("http.agent"));
-                    connection.addRequestProperty("x-api-key", getResources().getString(R.string.api_key));
-                    // connection.setRequestMethod("GET");
-                    connection.setReadTimeout(2000); // timeout in milliseconds
-                    connection.setConnectTimeout(2000);
-                    connection.setDoInput(true);
-                    connection.setRequestProperty("connection", "close");
-
-                    int response = connection.getResponseCode();
-
-                    if (response == HttpURLConnection.HTTP_OK) {
-
-                        StringBuilder builder = new StringBuilder(1024);
-
-                 //       try {
-                            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-
-                            String line = "";
-
-                            while ((line = reader.readLine()) != null) {
-                                builder.append(line);
-
-                                counter++;
-
-                                if(isCancelled()){ // cancel AsyncTask job
-                                    return null;
-                                }
-
-                                //Set the current progress.
-                                //This value is going to be passed to the onProgressUpdate() method.
-                                ///publishProgress(counter);
-                            }
-
-                            mStatus = messageEnum.OK;
-
-                            JSONObject data = new JSONObject(builder.toString());
-
-                            return data;
-
-               //         }
-
-                    } else {
-                        Log.d("AAAAA", "Exception: city not found.");
-                        mStatus = messageEnum.CITY_NOT_FOUND;
-                    }
-                } // synchronized (this)
-            } // try
-            catch (JSONException e) {
-                Log.d("AAAAA", "JSONException: " + e.getMessage());
-                mStatus = messageEnum.JSON_EXCEPTION;
-            }
-            catch (java.net.SocketTimeoutException e) {
-
-                Log.d("AAAAA", "SocketTimeoutException: " + e.getMessage());
-                mStatus = messageEnum.SOCKET_TIMEOUT;
-            }
-            catch (IOException e) { // no connection to server
-                Log.d("AAAAA", "Exception: reader error: " + e.getMessage());
-                mStatus = messageEnum.IO_EXCEPTION;
-            }
-            finally {
-
-                if (connection != null)
-                    connection.disconnect();
-
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (final IOException e) {
-                        Log.d("AAAAA", "Error closing stream: "  + e.getMessage());
-                    }
-                }
-            }
-            return null;
-        }
-
-
-        //Update the progress
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            //set the current progress of the progress dialog
-            ///progressDialog.setProgress(values[0]);
-        }
-
-
-        @Override
-        protected void onPostExecute(JSONObject forecast) {
-
-            //close the progress dialog
-            /// progressDialog.dismiss();
-
-            hideMessageBar();
-
-            Log.d("AAAAA", "onPostExecute(): mStatus = " + mStatus);
-
-            Log.d("AAAAA", "JSON data: " + forecast);
-
-
-
-            if (mStatus == messageEnum.OK) { //online mode
-
-                // set mStatus info
-                setModeBar(getResources().getText(R.string.online).toString(),
-                        R.color.onlineColor, R.drawable.ic_lamp_online);
-
-                  String returnedCityName = "";
-                long cityID = -1;
-                String countryCode = "";
-                double cityLongitude;
-                double cityLatitude;
-
-                // Получение свойства "list" JSONArray
-                JSONArray list = null;
-                try {
-                    list = forecast.getJSONArray("list");
-
-                    JSONObject jsonCity = forecast.getJSONObject("city");
-
-                    // city info
-                    returnedCityName = jsonCity.getString("name");
-                    cityID = jsonCity.getInt("id");
-                    countryCode = jsonCity.getString("country");
-
-                    // city coordinats
-                    JSONObject jsonCoords = jsonCity.getJSONObject("coord");
-                    cityLongitude = jsonCoords.getDouble("lon");
-                    cityLatitude = jsonCoords.getDouble("lat");
-
-                    if (mID > 0) {
-
-                        // ic_delete_item all previous weather data in database
-                        String selection = DataContract.WeatherEntry.COLUMN_CITY_ID_FK + "=?";
-
-                        String[] selectionArgs = {String.valueOf(mID)};
-
-                        int rowsDeleted = getActivity().getContentResolver()
-                                .ic_delete_item(DataContentProvider.WEATHER_CONTENT_URI, selection, selectionArgs);
-
-                        Log.d("AAAAA", "ic_delete_item all previous weather data: rowsDeleted = " + rowsDeleted);
-
-                        // update city data
-                        Uri uri = ContentUris.withAppendedId(DataContentProvider.CITY_CONTENT_ID_URI, mID);
-
-                        ContentValues values = new ContentValues();
-
-                        values.put(DataContract.CityEntry.COLUMN_RETURNED_CITY, returnedCityName);
-                        values.put(DataContract.CityEntry.COLUMN_SERVER_CITY_ID, cityID);
-                        values.put(DataContract.CityEntry.COLUMN_LONGITUDE, cityLongitude);
-                        values.put(DataContract.CityEntry.COLUMN_LATITUDE, cityLatitude);
-                        values.put(DataContract.CityEntry.COLUMN_COUNTRY_CODE, countryCode);
-
-                        int rowsUpdated = getActivity().getContentResolver().update(uri, values, null, null);
-
-                        Log.d("AAAAA", "City rowsUpdated: " + rowsUpdated);
-                    }
-
-
-                    // Преобразовать каждый элемент списка в объект Weather
-                    for (int i = 0; i < list.length(); ++i) {
-                        JSONObject day = list.getJSONObject(i); // Данные за день
-
-                        JSONObject temperatures = day.getJSONObject("temp");
-
-                        JSONObject weather = day.getJSONArray("weather").getJSONObject(0);
-
-                        weatherList.add(new Weather(
-
-                        day.getLong("dt"), // long timeStamp
-                        temperatures.getDouble("morn"), // double morningTemp
-                        temperatures.getDouble("day"), // double dayTemp
-                        temperatures.getDouble("eve"), // double eveningTemp
-                        temperatures.getDouble("night"), // double nightTemp
-                        temperatures.getDouble("min"), // double minTemp
-                        temperatures.getDouble("max"), // double maxTemp
-                        day.getInt("humidity"), // int humidity
-                        day.getDouble("pressure"), // double pressure
-                        day.getDouble("speed"), // double windSpeed
-                        day.getInt("deg"), // int windDirection
-                        weather.getString("description"), // String description
-                        weather.getString("icon"), // String iconName
-                        weather.getInt("id") // int weatherID
-                        ));
-
-                        if (mID > 0) {
-
-                            // insert new weather data to database
-                            ContentValues values = new ContentValues();
-
-                            values.put(DataContract.WeatherEntry.COLUMN_CITY_ID_FK, mID);                              // "city_id" - foreign key (int/INTEGER)
-                            values.put(DataContract.WeatherEntry.COLUMN_TIMESTAMP, day.getLong("dt"));                 // timestamp in seconds (int/INTEGER)
-                            values.put(DataContract.WeatherEntry.COLUMN_MORNING_TEMP, temperatures.getDouble("morn"));          // "temp_day"
-                            values.put(DataContract.WeatherEntry.COLUMN_DAY_TEMP, temperatures.getDouble("day"));          // "temp_day"
-                            values.put(DataContract.WeatherEntry.COLUMN_EVENING_TEMP, temperatures.getDouble("eve"));          // "temp_day"
-                            values.put(DataContract.WeatherEntry.COLUMN_NIGHT_TEMP, temperatures.getDouble("night"));  // "temp_night"
-                            values.put(DataContract.WeatherEntry.COLUMN_MIN_TEMP, temperatures.getDouble("min"));      // "temp_min"
-                            values.put(DataContract.WeatherEntry.COLUMN_MAX_TEMP, temperatures.getDouble("max"));      // "temp_max"
-                            values.put(DataContract.WeatherEntry.COLUMN_HUMIDITY, day.getInt("humidity"));          // "humidity"
-                            values.put(DataContract.WeatherEntry.COLUMN_PRESSURE, day.getDouble("pressure"));          // "pressure"
-                            values.put(DataContract.WeatherEntry.COLUMN_SPEED, day.getDouble("speed"));          // "windSpeed"
-                            values.put(DataContract.WeatherEntry.COLUMN_DIRECTION, day.getInt("deg"));          // "windDirection"
-                            values.put(DataContract.WeatherEntry.COLUMN_DESCRIPTION, weather.getString("description"));// "description"
-                            values.put(DataContract.WeatherEntry.COLUMN_ICON_NAME, weather.getString("icon"));         // "icon_name"
-
-                            Uri uriInserted = getActivity().getContentResolver().insert(DataContentProvider.WEATHER_CONTENT_URI, values);
-
-                            Log.d("AAAAA", "Inserted = " + uriInserted.getLastPathSegment());
-                        }
-                    }
-
-                    weatherArrayAdapter.notifyDataSetChanged();
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    Log.d("AAAAA", "JSONException: " + e.getMessage());
-                }
-            } // if (mStatus == messageEnum.OK)
-
-            else if (mStatus == messageEnum.CITY_NOT_FOUND) { // city name not found on server
-
-                // set mStatus info
-                setModeBar(getString(R.string.message_city_not_found), R.color.nothingColor, R.drawable.ic_lamp_nothing);
-            }
-
-            // OFFLINE MODE
-            else if (mStatus == messageEnum.SOCKET_TIMEOUT
-                    || mStatus == messageEnum.IO_EXCEPTION
-                    || mStatus == messageEnum.JSON_EXCEPTION
-                    ) {
-
-                // set offline mode info
-                setModeBar(getString(R.string.offline), R.color.offlineColor, R.drawable.ic_lamp_offline);
-
-                Log.d("AAAAA", "OFF-LINE MODE");
-
-             ///   weatherCursorAdapter = new WeatherCursorAdapter(getContext(), null, 0);
-
-                if (getActivity().findViewById(R.id.onePaneLayout) != null) { // phone
-                    weatherCursorAdapter = new WeatherCursorAdapter(getContext(), null,0,
-                            R.layout.list_item_weather // phone layout
-                    );
-                }
-                else { // tablet
-                    weatherCursorAdapter = new WeatherCursorAdapter(getContext(), null,0,
-                            R.layout.list_item_weather_tablet // tablet layout
-                    );
-                }
-
-                weatherListView.setAdapter(weatherCursorAdapter);
-
-                // --------------------------------------------------------------
-                // IMPORTANT !!! Change loader for different query
-                Loader loader = getLoaderManager().getLoader(LOADER_WEATHER_ID);
-
-                if (loader != null && !loader.isReset()) {
-                    getLoaderManager().restartLoader(LOADER_WEATHER_ID, null, DetailsFragment.this);
-                } else {
-                    getLoaderManager().initLoader(LOADER_WEATHER_ID, null, DetailsFragment.this);
-                }
-                // --------------------------------------------------------------
-            }
-        }
-    }*/
-
-

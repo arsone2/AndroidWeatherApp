@@ -20,8 +20,8 @@
 
    <!-- UI text -->
 
-    <string name="cities_title_cities_present">SELECT PLACE</string>
-    <string name="cities_title_cities_empty">ADD PLACE</string>
+    <string name="cities_title_cities_present">SELECT PLACE:</string>
+    <string name="cities_title_cities_empty">NO PLACES FOUND</string>
     <string name="hint_city_add">Enter place name</string>
     <string name="edit_save">Save</string>
     <string name="edit_cancel">Cancel</string>
@@ -38,7 +38,7 @@
     <string name="message_fill_city">Fill place name</string>
     <string name="message_invalid_url">Incorrect URL</string>
     <string name="message_city_not_found">Not found</string>
-    <string name="message_wait_for_data">Getting data, please wait...</string>
+    <string name="message_wait_for_data">Getting data...</string>
 
 
     <!-- ic_delete_item city confirm dialog -->
@@ -57,27 +57,27 @@
     <!-- weather ListView item format -->
 
     <string name="weather_humidity">Humidity: %s</string>
-    <string name="weather_pressure">Atmospheric pressure: %1$.2f hPa/ %2$.2f mmHg</string>
+    <string name="weather_pressure">Atmospheric pressure: %1$.1f hPa/ %2$.1f mmHg</string>
     <string name="weather_wind_direction">Wind direction: %s°</string>
     <string name="weather_data_obtained">Data obtained: %s</string>
 
     <!-- Metric / Celsius -->
 
     <string name="m_weather_wind_speed">Wind speed: %.1f m/s</string>
-    <string name="m_weather_min_max_temp">Min./max. day temperature: %1$s°C/ %2$s°C</string>
-    <string name="m_weather_morning_temp">Morning temperature: %s°C</string>
-    <string name="m_weather_day_temp">Day temperature: %s°C</string>
-    <string name="m_weather_evening_temp">Evening temperature: %s°C</string>
-    <string name="m_weather_night_temp">Night temperature: %s°C</string>
+    <string name="m_weather_min_max_temp">Min./max. day temperature: %1$s °C/ %2$s °C</string>
+    <string name="m_weather_morning_temp">Morning temperature: %s °C</string>
+    <string name="m_weather_day_temp">Day temperature: %s °C</string>
+    <string name="m_weather_evening_temp">Evening temperature: %s °C</string>
+    <string name="m_weather_night_temp">Night temperature: %s °C</string>
 
     <!-- Imperial / Fahrenheit -->
 
     <string name="i_weather_wind_speed">Wind speed: %.1f mph</string>
-    <string name="i_weather_min_max_temp">Min./max. day temperature: %1$s℉/ %2$s℉</string>
-    <string name="i_weather_morning_temp">Morning temperature: %s℉</string>
-    <string name="i_weather_day_temp">Day temperature: %s℉</string>
-    <string name="i_weather_evening_temp">Evening temperature: %s℉</string>
-    <string name="i_weather_night_temp">Night temperature: %s℉</string>
+    <string name="i_weather_min_max_temp">Min./max. day temperature: %1$s ℉/ %2$s ℉</string>
+    <string name="i_weather_morning_temp">Morning temperature: %s ℉</string>
+    <string name="i_weather_day_temp">Day temperature: %s ℉</string>
+    <string name="i_weather_evening_temp">Evening temperature: %s ℉</string>
+    <string name="i_weather_night_temp">Night temperature: %s ℉</string>
 
 
 

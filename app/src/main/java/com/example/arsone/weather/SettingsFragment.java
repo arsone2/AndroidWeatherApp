@@ -1,5 +1,6 @@
 package com.example.arsone.weather;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -7,8 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
@@ -18,18 +17,14 @@ import android.widget.ToggleButton;
 public class SettingsFragment extends Fragment implements
         CompoundButton.OnCheckedChangeListener {
 
-  //  private Switch unitFormatSwitch;
-
-    private ToggleButton unitsFormatToggleButton;
-
-
     public interface Callbacks {
 
-        void writeSettingsToDB(int unitsFormat);
+        void onSettingsChanged();
     }
 
+    private SettingsFragment.Callbacks activity;
 
-    private static SettingsFragment.Callbacks activity;
+    private ToggleButton unitsFormatToggleButton;
 
     private int mUnitsFormat;
 
@@ -61,19 +56,6 @@ public class SettingsFragment extends Fragment implements
     }
 
 
-/*    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-
-        super.onCreate(savedInstanceState);
-
-        Bundle bundle = getArguments();
-
-        if (bundle != null) {
-            mUnitsFormat = bundle.getInt(MainActivity.UNITS_FORMAT);
-        }
-    }*/
-
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -87,9 +69,9 @@ public class SettingsFragment extends Fragment implements
             mUnitsFormat = bundle.getInt(MainActivity.UNITS_FORMAT);
         }*/
 
-        Log.d("AAAAA", "readSettingsFromDB");
+     ///   Log.d("AAAAA", "readSettingsFromDB");
 
-        // read all columns
+        // select all settings frpm DB
         Cursor cursor = getActivity().getContentResolver().query(DataContentProvider.SETTINGS_CONTENT_URI,
                 new String[]{DataContract.SettingsEntry.COLUMN_UNITS_FORMAT},
                 null, // DataContract.CityEntry.COLUMN_ENTERED_CITY + "=?",
@@ -103,7 +85,7 @@ public class SettingsFragment extends Fragment implements
             mUnitsFormat = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_UNITS_FORMAT));
             cursor.close();
 
-            Log.d("AAAAA", "SettingsFragment: readSettingsFromDB - mUnitsFormat = " + mUnitsFormat);
+        ///    Log.d("AAAAA", "SettingsFragment: readSettingsFromDB - mUnitsFormat = " + mUnitsFormat);
         }
 
         unitsFormatToggleButton = (ToggleButton) view.findViewById(R.id.unitsFormatToggleButton);
@@ -118,22 +100,25 @@ public class SettingsFragment extends Fragment implements
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
-        Log.d("AAAAA", "unitsFormatToggleButton.isChecked() ? 1 : 0 = " + (unitsFormatToggleButton.isChecked() ? 1 : 0));
-
+        /// Log.d("AAAAA", "unitsFormatToggleButton.isChecked() ? 1 : 0 = " + (unitsFormatToggleButton.isChecked() ? 1 : 0));
         // transmit data to mainActivity to save it in DB
-        activity.writeSettingsToDB(unitsFormatToggleButton.isChecked() ? 1 : 0);
+       ///  activity.writeSettingsToDB(unitsFormatToggleButton.isChecked() ? 1 : 0);
+
+        writeSettingsToDB();
     }
 
 
-/*    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        // super.onCreateOptionsMenu(menu, inflater);
+    private void writeSettingsToDB(){
 
-        // clear previous menu items
-       /// menu.clear();
+        ContentValues values = new ContentValues();
 
-    }*/
+        values.put(DataContract.SettingsEntry.COLUMN_UNITS_FORMAT, unitsFormatToggleButton.isChecked() ? 1 : 0);
 
+        int updatedRowsCount = getActivity().getContentResolver()
+                .update(DataContentProvider.SETTINGS_CONTENT_URI, values, null, null);
 
+     ///   Log.d("AAAAA", "writeSettingsToDB(): updatedRowsCount = " + updatedRowsCount);
 
+        activity.onSettingsChanged();
+    }
 }

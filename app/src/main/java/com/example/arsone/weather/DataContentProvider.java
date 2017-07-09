@@ -316,7 +316,7 @@ public class DataContentProvider extends ContentProvider {
 
            //     cursor.moveToFirst();
 
-                Log.d("AAAAA", "URI_DATE: " + uri + " cursor.getCount() = " + cursor.getCount());
+         ///       Log.d("AAAAA", "URI_DATE: " + uri + " cursor.getCount() = " + cursor.getCount());
 
                 cursor.setNotificationUri(getContext().getContentResolver(), uri);
 
@@ -325,7 +325,7 @@ public class DataContentProvider extends ContentProvider {
 
             case URI_SETTINGS:
 
-                       Log.d("AAAAA", "URI_SETTINGS: " + uri);
+                ///       Log.d("AAAAA", "URI_SETTINGS: " + uri);
 
 
 /*                // if sort order don`t specified
@@ -388,7 +388,7 @@ public class DataContentProvider extends ContentProvider {
     @Override
     public String getType(@NonNull Uri uri) {
 
-       Log.d("AAAAA", "getType, " + uri.toString());
+  ///     Log.d("AAAAA", "getType, " + uri.toString());
 
         switch (uriMatcher.match(uri)) {
 
@@ -448,7 +448,7 @@ public class DataContentProvider extends ContentProvider {
                     rowUri = ContentUris.withAppendedId(CITY_CONTENT_URI, rowID);
                    /// getContext().getContentResolver().notifyChange(rowUri, null);
                     getContext().getContentResolver().notifyChange(uri, null);
-                    Log.d("AAAAA", "insert: URI_CITIES notifyChange URI_CITIES: " + uri);
+               ///     Log.d("AAAAA", "insert: URI_CITIES notifyChange URI_CITIES: " + uri);
                 }
 
                 break;

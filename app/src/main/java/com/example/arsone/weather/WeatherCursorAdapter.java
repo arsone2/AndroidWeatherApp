@@ -37,21 +37,23 @@ public class WeatherCursorAdapter extends CursorAdapter {
     }
 
  //   private Context context;
-    private LayoutInflater layoutInflater;
-
-    // layout ListView item resource
-    ///private int listViewItemResource;
-
-    private int mUnitsFormat;
+  ///  private LayoutInflater layoutInflater;
 
 
-    ///  public WeatherCursorAdapter(Context context, Cursor c, int flags, int itemResource) {
-    public WeatherCursorAdapter(Context context, Cursor c, int flags, int unitsFormat) {
+    private static int mUnitsFormat;
+
+
+    /// public WeatherCursorAdapter(Context context, Cursor c, int flags, int unitsFormat) {
+    public WeatherCursorAdapter(Context context, Cursor c, int flags) {
 
         super(context, c, flags);
-  //      this.context = context;
-        this.layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        ///   this.listViewItemResource = itemResource;
+    ///    this.layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        /// mUnitsFormat = unitsFormat;
+    }
+
+
+    public static void setUnitsFormat(int unitsFormat){
+
         mUnitsFormat = unitsFormat;
     }
 
@@ -59,7 +61,9 @@ public class WeatherCursorAdapter extends CursorAdapter {
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
 
-        /// View view = layoutInflater.inflate(listViewItemResource, parent, false);
+       // View view = layoutInflater.inflate(R.layout.list_item_weather, parent, false);
+        LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
         View view = layoutInflater.inflate(R.layout.list_item_weather, parent, false);
 
         ViewHolder viewHolder = new ViewHolder();

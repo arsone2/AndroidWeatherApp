@@ -75,7 +75,7 @@ public class GetDataService extends IntentService {
 
             if (city != null && id != -1) {
 
-                Log.d("AAAAA", "Service running for ONE CITY.");
+              //  Log.d("AAAAA", "Service running for ONE CITY.");
 
                 Intent i = new Intent(MainActivity.BROADCAST_ACTION);
 
@@ -94,7 +94,7 @@ public class GetDataService extends IntentService {
             }
         } else if (mTask == MainActivity.TASK_GET_WEATHER_ALL_CITIES) {
 
-            Log.d("AAAAA", "Service running for all cities");
+        //    Log.d("AAAAA", "Service running for all cities");
 
             Intent i = new Intent(MainActivity.BROADCAST_ACTION);
 
@@ -127,7 +127,7 @@ public class GetDataService extends IntentService {
             );
 
             if (cursor.getCount() == 0) {
-                Log.d("AAAAA", "cursor.getCount() = 0");
+              //  Log.d("AAAAA", "cursor.getCount() = 0");
                 return;
             }
 
