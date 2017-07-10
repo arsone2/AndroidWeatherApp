@@ -46,6 +46,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import com.example.arsone.weather.data.City;
 import com.example.arsone.weather.data.Weather;
@@ -56,6 +57,8 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
     public interface Callbacks {
 
         boolean isMyServiceRunning(Class<?> serviceClass);
+
+        MainActivity.Settings readSettingsFromDB();
     }
 
     private DetailsFragment.Callbacks activity;
@@ -84,6 +87,7 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
     private String mEnteredCity;
 
     private int mUnitsFormat;
+    //  private int mSortCities;
 
 
     @Override
@@ -167,7 +171,7 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
         super.onDestroy();
     }
 
-    private String mReturnedCity;
+    ///   private String mReturnedCity;
 
     private String mDataUpdateTime;
 
@@ -199,13 +203,13 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
         Bundle bundle = getArguments();
 
         if (bundle != null) {
-            mID = bundle.getInt(City.CITY_ID);
-            mEnteredCity = bundle.getString(City.ENTERED_CITY);
-            mReturnedCity = bundle.getString(City.RETURNED_CITY);
+            mID = bundle.getInt(MainActivity.CITY_ID);
+            mEnteredCity = bundle.getString(MainActivity.ENTERED_CITY);
+            ///       mReturnedCity = bundle.getString(City.RETURNED_CITY);
             mUnitsFormat = bundle.getInt(MainActivity.UNITS_FORMAT);
-            mDataUpdateTime = bundle.getString(City.UPDATE_TIME);
+            mDataUpdateTime = bundle.getString(MainActivity.UPDATE_TIME);
 
-       ///     Log.d("AAAAA", "if (bundle != null) - mUnitsFormat = " + mUnitsFormat);
+            ///     Log.d("AAAAA", "if (bundle != null) - mUnitsFormat = " + mUnitsFormat);
         }
 
 
@@ -226,15 +230,25 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
         // weather ListView
         weatherListView = (ListView) view.findViewById(R.id.detailsListView);
 
-        // Title
-        if (TextUtils.isEmpty(mReturnedCity))
+
+        weatherCursorAdapter = new WeatherCursorAdapter(getContext(), null, 0);
+        weatherListView.setAdapter(weatherCursorAdapter);
+
+
+        initLoader();
+
+
+/*        // Title
+        titleTextView.setText(mEnteredCity);*/
+
+/*        if (TextUtils.isEmpty(mReturnedCity))
             titleTextView.setText(mEnteredCity);
         else
-            titleTextView.setText(mEnteredCity + "/ " + mReturnedCity);
+            titleTextView.setText(mEnteredCity + "/ " + mReturnedCity);*/
 
 ///        Log.d("AAAAA", "onCreateView: mID = " + mID);
 
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+/*        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         try {
             Date date = format.parse(mDataUpdateTime);
@@ -243,12 +257,11 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
 
             updateTimeTextView.setText(getContext().getString(R.string.weather_data_obtained, stringDate));
 
-            // System.out.println(date);
         } catch (ParseException e) {
             Log.d("AAAAA", "Date ParseException: " + e.getMessage());
-        }
+        }*/
 
-        showDetails();
+        ///    showDetails();
 
         return view;
     }
@@ -256,10 +269,10 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
 
     private void showDetails() {
 
-        weatherCursorAdapter = new WeatherCursorAdapter(getContext(), null, 0);
-        weatherListView.setAdapter(weatherCursorAdapter);
+/*        weatherCursorAdapter = new WeatherCursorAdapter(getContext(), null, 0);
+        weatherListView.setAdapter(weatherCursorAdapter);*/
 
-        initLoader();
+        //      initLoader();
 
 /*        // --------------------------------------------------------------
         // IMPORTANT !!! Change loader for different query
@@ -279,9 +292,59 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
 
         Log.d("AAAAA", "DetailsFragment: initLoader");
 
+        // read entered city name and Data Update Time
+        Cursor cursor = getActivity().getContentResolver()
+                .query(Uri.parse(DataContentProvider.CITY_CONTENT_URI.toString() + "/" + mID),
+                null, null, null, null);
+
+/*        // read entered city name and Data Update Time
+        Cursor cursor = getActivity().getContentResolver().query(DataContentProvider.CITY_CONTENT_URI,
+                new String[]{DataContract.CityEntry.COLUMN_ENTERED_CITY,
+                        DataContract.CityEntry.COLUMN_UPDATE_TIMESTAMP},
+                DataContract.CityEntry._ID + "=?",
+                new String[]{String.valueOf(mID)}, //  new String[]{enteredCity},
+                null);*/
+
+        if (cursor != null && cursor.getCount() > 0) {
+
+            cursor.moveToFirst();
+
+            // sort: by id = 0, alphabetic = 1
+            mEnteredCity = cursor.getString(cursor.getColumnIndex(DataContract.CityEntry.COLUMN_ENTERED_CITY));
+
+            // 0 = English, 1 = Russian
+            mDataUpdateTime = cursor.getString(cursor.getColumnIndex(DataContract.CityEntry.COLUMN_UPDATE_TIMESTAMP));
+
+            cursor.close();
+        }
+
+        // Title
+        titleTextView.setText(mEnteredCity);
+
+
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        try {
+            Date date = format.parse(mDataUpdateTime);
+
+            String stringDate = DateFormat.getDateTimeInstance().format(date);
+
+            updateTimeTextView.setText(getContext().getString(R.string.weather_data_obtained, stringDate));
+
+        } catch (ParseException e) {
+            Log.d("AAAAA", "Date ParseException: " + e.getMessage());
+        }
+
+
         //  int unitsFormat = 0; // metric/Celsius units format by default
 
-        // read all columns
+        // get settings data from DB
+        MainActivity.Settings settings = activity.readSettingsFromDB();
+        mUnitsFormat = settings.getUnitsFormat();
+        // mSortCities = settings.getSortCities();
+
+
+  /*      // read all columns
         Cursor cursor = getActivity().getContentResolver().query(DataContentProvider.SETTINGS_CONTENT_URI,
                 new String[]{DataContract.SettingsEntry.COLUMN_UNITS_FORMAT},
                 null, // DataContract.CityEntry.COLUMN_ENTERED_CITY + "=?",
@@ -305,7 +368,7 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
                 //     titleTextView.setText(R.string.cities_title_cities_empty);
             }
             cursor.close();
-        } // if(cursor != null)
+        } // if(cursor != null)*/
 
         // set units format
         WeatherCursorAdapter.setUnitsFormat(mUnitsFormat);

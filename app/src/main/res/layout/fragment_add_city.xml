@@ -2,7 +2,6 @@
 
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:mapbox="http://schemas.android.com/apk/res-auto"
     android:id="@+id/add_edit_city_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -13,14 +12,13 @@
 
     <EditText
         android:id="@+id/cityEditText"
-        android:layout_width="match_parent"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_marginRight="70dp"
         android:background="@drawable/edittext_background"
         android:elevation="3dp"
         android:hint="@string/hint_city_add"
         android:inputType="textCapWords"
-        android:text="text some"
         />
 
     <TextView
@@ -31,32 +29,7 @@
         android:layout_marginRight="70dp"
         android:background="@color/colorBlue"
         android:elevation="3dp"
-        android:text="messageTextView"/>
-
-<!--        <Button
-            android:id="@+id/editCancelButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginLeft="5dp"
-            android:layout_marginStart="5dp"
-            android:text="@string/edit_cancel"
-            />
-
-    <Button
-        android:id="@+id/saveCityButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="5dp"
-        android:layout_marginRight="5dp"
-        android:text="@string/edit_save"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        />-->
-
+        />
 
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@+id/map"
@@ -64,9 +37,7 @@
         android:layout_height="match_parent"
         >
 
-
     </com.mapbox.mapboxsdk.maps.MapView>
-
 
 </RelativeLayout>
 
@@ -93,6 +64,3 @@
         mapbox:mapbox_cameraZoomMin="6"
         mapbox:mapbox_uiRotateGestures="false"
         />-->
-
-
-

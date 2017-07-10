@@ -3,16 +3,11 @@
     <!-- https://developer.android.com/reference/android/R.styleable.html -->
 
     <!-- Base application theme. -->
+
     <style name="AppBaseTheme" parent="Theme.AppCompat">
-
-        <!--<item name="preferenceTheme">@style/PreferenceThemeOverlay</item>-->
-       <!-- <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>-->
-
     </style>
 
-
-
-    <style name="MyTheme" parent="AppBaseTheme">
+    <style name="DarkBlueTheme" parent="AppBaseTheme">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -20,15 +15,7 @@
         <item name="android:textColor">@color/basicText</item>
         <item name="android:windowBackground">@color/colorPrimary</item>
 
-  <!--      <item name="android:alertDialogTheme">@style/AlertDialog.AppCompat.Light</item>-->
-
-        <!--<style name="SettingsTheme" parent="Theme.AppCompat.NoActionBar">-->
-            <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
-
-        <!--<item name="preferenceTheme">@style/PreferenceThemeOverlay</item>-->
-        <!--<item name="preferenceTheme">@style/Preference</item>-->
-        <!--<item name="preferenceTheme">@style/PreferenceThemeOverlay</item>-->
-        <!--<item name="preferenceTheme">@style/PreferenceThemeOverlay</item>-->
+        <!--      <item name="android:alertDialogTheme">@style/AlertDialog.AppCompat.Light</item>-->
     </style>
 
     <style name="mainTitle">
@@ -62,16 +49,29 @@
         <item name="android:layout_marginTop">15dp</item>
         <!--<item name="android:textSize">30dp</item>-->
         <item name="android:textStyle">bold</item>
-<!--        <item name="android:shadowColor">#000000</item>
-        <item name="android:shadowDx">1</item>
-        <item name="android:shadowDy">1</item>
-        <item name="android:shadowRadius">2</item>
-        <item name="android:padding">2dp</item>-->
-
+        <!--        <item name="android:shadowColor">#000000</item>
+                <item name="android:shadowDx">1</item>
+                <item name="android:shadowDy">1</item>
+                <item name="android:shadowRadius">2</item>
+                <item name="android:padding">2dp</item>-->
         <item name="android:minHeight">0dp</item>
         <item name="android:minWidth">0dp</item>
-
         <item name="android:background">@drawable/button_background</item>
+    </style>
+
+    <style name="ToggleButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/mainTitleColor</item>
+        <!--<item name="android:textSize">30dp</item>-->
+        <!--<item name="android:textStyle">bold</item>-->
+        <!--        <item name="android:shadowColor">#000000</item>
+                <item name="android:shadowDx">1</item>
+                <item name="android:shadowDy">1</item>
+                <item name="android:shadowRadius">2</item>
+                <item name="android:padding">2dp</item>-->
+        <item name="android:minHeight">0dp</item>
+        <item name="android:minWidth">0dp</item>
     </style>
 
     <style name="CustomProgressBarHorizontal" parent="android:Widget.ProgressBar.Horizontal">
@@ -80,12 +80,10 @@
         <item name="android:maxHeight">10dp</item>
     </style>
 
-
-
-
-
+<!--
     <style name="SettingsTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
     </style>
+-->
 
 </resources>

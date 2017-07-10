@@ -91,7 +91,10 @@ public final class DataContract {
         public static final String TABLE_NAME = "settings";
 
         // table 'weather' columns
-        public static final String _ID = BaseColumns._ID;                 // ID (int/INTEGER)
+        public static final String _ID                 = BaseColumns._ID; //  (int/INTEGER)
         public static final String COLUMN_UNITS_FORMAT = "units_format";  //  (int/INTEGER)
+        public static final String COLUMN_SORT_CITIES  = "sort_cities";   //  (int/INTEGER)
+        public static final String COLUMN_MAP_LANGUAGE = "map_language";  //  (int/INTEGER)
+        public static final String COLUMN_MAP_STYLE    = "map_style";     //  (int/INTEGER)
     }
 }

@@ -5,11 +5,11 @@ import android.os.Bundle;
 
 public class City {
 
-    //	constants for field references
+/*    //	constants for field references
     public static final String CITY_ID = "city_id";
     public static final String ENTERED_CITY = "entered_city";
     public static final String RETURNED_CITY = "retutned_city";
-    public static final String UPDATE_TIME = "update_time";
+    public static final String UPDATE_TIME = "update_time";*/
 
 /*    public static final String IMAGE_RESOURCE = "imageResource";
     public static final String PRICE = "price";
@@ -17,18 +17,18 @@ public class City {
 
     private int id;
     private String enteredCity;
-    private String returnedCity;
+   // private String returnedCity;
 
 
-    public City(int id, String enteredCity, String returnedCity) {
+/*    public City(int id, String enteredCity, String returnedCity) {
 
         this.id = id;
         this.enteredCity = enteredCity;
-        this.returnedCity = returnedCity;
-    }
+    //    this.returnedCity = returnedCity;
+    }*/
 
 
-    //	Create from a bundle
+/*    //	Create from a bundle
     public City(Bundle b) {
         if (b != null) {
             this.enteredCity = b.getString(ENTERED_CITY);
@@ -36,10 +36,10 @@ public class City {
 //            this.price = b.getDouble(PRICE);
 //            this.instructions = b.getString(INSTRUCTIONS);
         }
-    }
+    }*/
 
 
-    //	Package data for transfer between activities
+/*    //	Package data for transfer between activities
     public Bundle toBundle() {
 
         Bundle b = new Bundle();
@@ -50,7 +50,7 @@ public class City {
 //        b.putString(INSTRUCTIONS, this.instructions);
 
         return b;
-    }
+    }*/
 
 
 /*    public int getId() {

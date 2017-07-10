@@ -41,9 +41,11 @@
 
         <ImageView
             android:id="@+id/conditionImageView"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:scaleType="fitXY"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
             />
 
         <TextView

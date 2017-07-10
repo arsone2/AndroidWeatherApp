@@ -5,7 +5,7 @@ android {
     buildToolsVersion '26.0.0'
     defaultConfig {
         applicationId "com.example.arsone.weather"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -43,7 +43,7 @@ dependencies {
     //compile 'com.google.android.gms:play-services:11.0.1'
     ///compile 'com.google.android.gms:play-services-maps:11.0.1'
     ///compile 'com.google.android.gms:play-services-places:11.0.1'
-  ///  compile 'com.google.android.gms:play-services-location:11.0.2'
+    ///  compile 'com.google.android.gms:play-services-location:11.0.2'
     compile('com.mapbox.mapboxsdk:mapbox-android-geocoder:1.0.0@aar') {
         transitive = true
     }
@@ -54,7 +54,6 @@ dependencies {
         compile 'com.mapbox.mapboxsdk:mapbox-android-navigation:0.3.1'
     }
     ///compile 'com.android.support:appcompat-v7:26.0.0-alpha1'
-
 }
 
 // INFO !!!

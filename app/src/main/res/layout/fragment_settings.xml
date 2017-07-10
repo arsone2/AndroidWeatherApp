@@ -4,53 +4,116 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:layout_marginLeft="10dp"
-                  android:layout_marginRight="10dp"
-                  android:orientation="vertical"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
         >
 
         <TextView
             android:id="@+id/titleTextView"
+            style="@style/mainTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Settings"
-            style="@style/mainTitle"
             />
 
-<!--        <Switch
-            android:id="@+id/unitFormatSwitch"
+
+     <!--   <TextView
+            android:id="@+id/mapStyleTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Units format"
-            android:textOff="Imperial"
-            android:textOn="Metric"
-            />-->
+            android:text="Map style: "
+            android:layout_below="@+id/titleTextView"
+            android:layout_alignLeft="@+id/titleTextView"
+            android:layout_alignStart="@+id/titleTextView"
+            android:layout_marginTop="20dp"
+            />
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <Spinner
+            android:id="@+id/mapStyleSpinner"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
+            android:entries="@array/map_styles_names"
+            android:padding="2dp"
+            android:layout_alignBaseline="@+id/mapStyleTextView"
+            android:layout_toRightOf="@+id/mapLanguageTextView"
+            android:layout_toEndOf="@+id/mapLanguageTextView"/>-->
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Units format"
-                />
+
+        <TextView
+            android:id="@+id/mapLanguageTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Map language: "
+            android:layout_below="@+id/titleTextView"
+            android:layout_alignLeft="@+id/titleTextView"
+            android:layout_alignStart="@+id/titleTextView"
+            android:layout_marginTop="20dp"
+            />
+
+        <Spinner
+            android:id="@+id/mapLanguageSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:entries="@array/languages_array"
+            android:padding="2dp"
+            android:layout_alignBaseline="@+id/mapLanguageTextView"
+            android:layout_alignBottom="@+id/mapLanguageTextView"
+            android:layout_toRightOf="@+id/mapLanguageTextView"
+            android:layout_toEndOf="@+id/mapLanguageTextView"/>
+
+
+        <TextView
+            android:id="@+id/unitsFormatTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Units format: "
+            android:layout_below="@+id/mapLanguageTextView"
+            android:layout_alignLeft="@+id/titleTextView"
+            android:layout_alignStart="@+id/titleTextView"
+            android:layout_marginTop="20dp"
+
+            />
 
         <ToggleButton
             android:id="@+id/unitsFormatToggleButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/ToggleButton"
             android:textOff="metric"
             android:textOn="imperial"
+            android:layout_alignBaseline="@+id/unitsFormatTextView"
+            android:layout_alignBottom="@+id/unitsFormatTextView"
+            android:layout_alignLeft="@+id/sortCitiesToggleButton"
+            android:layout_alignStart="@+id/sortCitiesToggleButton"/>
+
+
+        <TextView
+            android:id="@+id/sortOrderTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/unitsFormatTextView"
+            android:text="Sort cities: "
+            android:layout_alignLeft="@+id/titleTextView"
+            android:layout_alignStart="@+id/titleTextView"
+            android:layout_marginTop="20dp"
             />
 
-        </LinearLayout>
+        <ToggleButton
+            android:id="@+id/sortCitiesToggleButton"
+            style="@style/ToggleButton"
+            android:textOff="by adding"
+            android:textOn="alphabetically"
+            android:layout_below="@+id/unitsFormatToggleButton"
+            android:layout_alignBaseline="@+id/sortOrderTextView"
+            android:layout_alignLeft="@+id/mapLanguageSpinner"
+            android:layout_alignStart="@+id/mapLanguageSpinner"/>
 
-    </LinearLayout>
+
+
+
+
+
+    </RelativeLayout>
 
 </ScrollView>

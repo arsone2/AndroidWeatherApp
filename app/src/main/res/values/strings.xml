@@ -18,7 +18,7 @@
     <string name="web_service_url">http://api.openweathermap.org/data/2.5/forecast/daily?q=</string>
     <string name="mapbox_api_key">pk.eyJ1IjoiYXJzb25lIiwiYSI6ImNqNGp2NDRoeDBid3YzM3FzaHYwMWdiMzAifQ.mYNMcy5YsMKFRXlEt6jNJw</string>
 
-   <!-- UI text -->
+    <!-- UI text -->
 
     <string name="cities_title_cities_present">SELECT PLACE:</string>
     <string name="cities_title_cities_empty">NO PLACES FOUND</string>
@@ -38,7 +38,8 @@
     <string name="message_fill_city">Fill place name</string>
     <string name="message_invalid_url">Incorrect URL</string>
     <string name="message_city_not_found">Not found</string>
-    <string name="message_wait_for_data">Getting data...</string>
+    <string name="message_wait_for_data">Getting data&#8230;</string>
+    <string name="message_city_has_in_db">Such city already present in database</string>
 
 
     <!-- ic_delete_item city confirm dialog -->
@@ -80,12 +81,100 @@
     <string name="i_weather_night_temp">Night temperature: %s ℉</string>
 
 
+    <!-- The following map styles are available to all accounts using a valid access token: -->
 
-    <!--LanguageSwitchActivity activity-->
-    <string name="language_switch_options_menu_language_english">English</string>
-    <string name="language_switch_options_menu_language_french">Français</string>
-    <string name="language_switch_options_menu_language_russian">Pусский</string>
-    <string name="language_switch_options_menu_language_german">Deutsche</string>
-    <string name="language_switch_options_menu_language_spanish">Español</string>
+<!--    <string-array name="map_styles_array">
+        <item>mapbox://styles/mapbox/light-v9</item>
+        <item>mapbox://styles/mapbox/streets-v10</item>
+        <item>mapbox://styles/mapbox/outdoors-v10</item>
+        <item>mapbox://styles/mapbox/dark-v9</item>
+            <item>mapbox://styles/mapbox/satellite-v9</item>
+                <item>mapbox://styles/mapbox/satellite-streets-v10</item>
+        <item>mapbox://styles/mapbox/traffic-day-v2</item>
+        <item>mapbox://styles/mapbox/traffic-night-v2</item>
+    </string-array>-->
+
+<!--    <string-array name="map_styles_names">
+        <item>light</item>
+        <item>streets</item>
+        <item>outdoors</item>
+        <item>dark</item>
+                <item>satellite</item>
+                <item>satellite-streets</item>
+        <item>traffic-day</item>
+        <item>traffic-night</item>
+    </string-array>-->
+
+    <!-- supported map languages -->
+
+    <string-array name="languages_array">
+        <item>English</item>
+        <item>Pусский</item>
+        <!--
+            <item>Français</item>
+            <item>Deutsche</item>
+            <item>Español</item>
+        -->
+    </string-array>
+
+    <string-array name="language_parameter_array">
+        <item>en</item>
+        <item>ru</item>
+    </string-array>
+
+    <!-- Mapbox map symbol layers -->
+
+    <string-array name="symbol_map_layers_array">
+        <item>country-label-lg</item>
+        <item>country-label-md</item>
+        <item>country-label-sm</item>
+        <item>state-label-lg</item>
+        <item>state-label-md</item>
+        <item>state-label-sm</item>
+        <item>marine-label-lg-pt</item>
+        <item>marine-label-lg-ln</item>
+        <item>marine-label-md-pt</item>
+        <item>marine-label-md-ln</item>
+        <item>marine-label-sm-pt</item>
+        <item>marine-label-sm-ln</item>
+        <item>place-city-lg-n</item>
+        <item>place-city-lg-s</item>
+        <item>place-city-md-n</item>
+        <item>place-city-md-s</item>
+        <item>place-city-sm</item>
+        <!--<item>poi-islands</item>-->
+        <item>place-town</item>
+        <item>place-village</item>
+        <item>place-hamlet</item>
+        <item>place-suburb</item>
+        <item>place-neighbourhood</item>
+        <!--<item>poi-islets</item>-->
+        <item>airport-label</item>
+        <item>poi-scalerank1</item>
+        <item>poi-parks-scalerank1</item>
+        <item>water-label</item>
+        <item>rail-label</item>
+        <item>poi-parks-scalerank2</item>
+        <item>poi-scalerank2</item>
+        <!--<item>interstate_motorway_shields</item>-->
+        <!--<item>other-motorway-shields</item>-->
+        <item>road-label-large</item>
+        <item>road-label-medium</item>
+        <item>road-label-small</item>
+        <item>poi-parks-scalerank3</item>
+        <item>poi-scalerank3</item>
+        <item>poi-parks_scalerank4</item>
+        <item>poi-scalerank4-l1</item>
+        <item>poi-scalerank4-l15</item>
+        <item>waterway-label</item>
+        <!--<item>contour-index-label</item>-->
+        <item>housenum-label</item>
+        <item>bridge-oneway-arrows-white</item>
+        <!--<item>bridge-oneway-arrows-color</item>-->
+        <item>road-oneway-arrows-white</item>
+        <!--<item>road-oneway-arrows-color</item>-->
+        <item>tunnel-oneway-arrows-white</item>
+        <!--<item>tunnel-oneway-arrows-color</item>-->
+    </string-array>
 
 </resources>

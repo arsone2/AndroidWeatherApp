@@ -4,13 +4,11 @@ import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -54,6 +52,15 @@ public class MainActivity extends AppCompatActivity implements
     // Imperial: temperature in "Fahrenheit", wind speed in "miles/hour", pressure in "hPa"
     private int mUnitsFormat;
 
+    // sort cities: 0 = by adding (default), 1 = alphabetically
+    private int mSortCities;
+
+    // 0 = light style, ...
+    //private int mMapStyleIndex;
+
+    // 0 = English(default), 1 = Russian
+    private int mMapLanguageIndex;
+
 
     // message panel
     private LinearLayout messageBarLayout;
@@ -87,6 +94,7 @@ public class MainActivity extends AppCompatActivity implements
     public final static String PARAM_STATUS = "status";
     public final static String PARAM_CITY_ID = "city_id";
     public final static String PARAM_ENTERED_CITY = "city_name";
+    public final static String PARAM_LANG_CODE = "language_index";
 
 
     public final static int TASK_GET_WEATHER_ONE_CITY = 1;
@@ -103,6 +111,9 @@ public class MainActivity extends AppCompatActivity implements
     public final static int STATUS_SETTINGS_CHANGED = 105;
 
 
+    public static final String CITY_ID = "city_id";
+    public static final String ENTERED_CITY = "entered_city";
+    public static final String UPDATE_TIME = "update_time";
     public static final String UNITS_FORMAT = "units_format";
 
 
@@ -283,13 +294,49 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-    private void readSettingsFromDB() {
+    final class Settings {
 
-  ///      Log.d("AAAAA", "readSettingsFromDB");
+        private final int unitsFormat;
+        private final int sortCities;
+     //   private final int mapStyleIndex;
+        private final int mapLanguageIndex;
+
+        public Settings(int unitsFormat, int sortCities, int mapLanguageIndex){
+
+            this.unitsFormat = unitsFormat;
+            this.sortCities = sortCities;
+          //  this.mapStyleIndex = mapStyleIndex;
+            this.mapLanguageIndex = mapLanguageIndex;
+        }
+
+        public int getUnitsFormat(){
+            return unitsFormat;
+        }
+
+        public int getSortCities(){
+            return sortCities;
+        }
+
+/*        public int getMapStyleIndex(){
+            return mapStyleIndex;
+        }*/
+
+        public int getMapLanguageIndex(){
+            return mapLanguageIndex;
+        }
+    }
+
+
+    public Settings readSettingsFromDB() {
+
+        Log.d("AAAAA", "readSettingsFromDB()");
 
         // read all columns
         Cursor cursor = getContentResolver().query(DataContentProvider.SETTINGS_CONTENT_URI,
-                new String[]{DataContract.SettingsEntry.COLUMN_UNITS_FORMAT},
+                new String[]{ DataContract.SettingsEntry.COLUMN_UNITS_FORMAT,
+                        DataContract.SettingsEntry.COLUMN_SORT_CITIES,
+                     //   DataContract.SettingsEntry.COLUMN_MAP_STYLE,
+                        DataContract.SettingsEntry.COLUMN_MAP_LANGUAGE },
                 null, // DataContract.CityEntry.COLUMN_ENTERED_CITY + "=?",
                 null, // new String[]{enteredCity},
                 null);
@@ -298,30 +345,28 @@ public class MainActivity extends AppCompatActivity implements
 
             cursor.moveToFirst();
 
+            // units format: 0 = metric, 1 = imperial
             mUnitsFormat = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_UNITS_FORMAT));
+
+            // sort: by id = 0, alphabetic = 1
+            mSortCities = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_SORT_CITIES));
+
+            // 0 = light style (default)
+           // mMapStyleIndex = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_MAP_STYLE));
+
+            // 0 = English, 1 = Russian
+            mMapLanguageIndex = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_MAP_LANGUAGE));
+
             cursor.close();
 
-       ///     Log.d("AAAAA", "readSettingsFromDB - mUnitsFormat = " + mUnitsFormat);
+            ///     Log.d("AAAAA", "readSettingsFromDB - mUnitsFormat = " + mUnitsFormat);
+            Settings settings = new Settings(mUnitsFormat, mSortCities, mMapLanguageIndex);
+
+            return settings;
+        } else {
+            return null;
         }
     }
-
-
-    public void writeSettingsToDB(int unitsFormat) {
-
-/*        ContentValues values = new ContentValues();
-
-        values.put(DataContract.SettingsEntry.COLUMN_UNITS_FORMAT, unitsFormat);
-
-        int updatedRowsCount = getContentResolver().update(DataContentProvider.SETTINGS_CONTENT_URI, values, null, null);
-
-        //    Log.d("AAAAA", "writeSettingsToDB(): updatedRowsCount = " + updatedRowsCount);*/
-
-        // refresh cities list fragment on tablet devices only!
-        if (findViewById(R.id.onePaneLayout) == null) { // tablet
-            ///  refreshCitiesListForTabletDevice(); // COMMENTED !!!!
-        }
-    }
-
 
 /*
     // Setup a recurring alarm every hour
@@ -375,7 +420,7 @@ public class MainActivity extends AppCompatActivity implements
 
     // CitiesListFragment: ListView -> city selected
     @Override
-    public void onCityItemSelected(int cityID, String enteredName, String returnedName, String dataUpdateTime, int unitsFormat) {
+    public void onCityItemSelected(int cityID, String enteredName, String dataUpdateTime, int unitsFormat) {
 
 //        Log.d("AAAAA", "onCityItemSelected - cityID = " + cityID);
 //        Log.d("AAAAA", "onCityItemSelected - cityName = " + cityName);
@@ -388,10 +433,10 @@ public class MainActivity extends AppCompatActivity implements
         // put data to DetailsFragment
         Bundle bundle = new Bundle();
 
-        bundle.putInt(City.CITY_ID, cityID);
-        bundle.putString(City.ENTERED_CITY, enteredName);
-        bundle.putString(City.RETURNED_CITY, returnedName);
-        bundle.putString(City.UPDATE_TIME, dataUpdateTime);
+        bundle.putInt(MainActivity.CITY_ID, cityID);
+        bundle.putString(MainActivity.ENTERED_CITY, enteredName);
+     ///   bundle.putString(City.RETURNED_CITY, returnedName);
+        bundle.putString(MainActivity.UPDATE_TIME, dataUpdateTime);
         bundle.putInt(MainActivity.UNITS_FORMAT, unitsFormat);
 
         //   Log.d("AAAAA", "MainActivity - putInt - unitsFormat = " + unitsFormat);
@@ -478,7 +523,8 @@ public class MainActivity extends AppCompatActivity implements
         Intent intent = new Intent(this, GetDataService.class)
                 .putExtra(PARAM_TASK, TASK_GET_WEATHER_ONE_CITY) // get weather data for one city only!
                 .putExtra(PARAM_CITY_ID, id) //  "CITIES" table: column "_id"
-                .putExtra(PARAM_ENTERED_CITY, enteredCity); // "CITIES" table: column "entered_city"
+                .putExtra(PARAM_ENTERED_CITY, enteredCity) // "CITIES" table: column "entered_city"
+                .putExtra(PARAM_LANG_CODE, mMapLanguageIndex); // language index
 
         // start service for added a city details and weather data
         startService(intent);
@@ -535,8 +581,16 @@ public class MainActivity extends AppCompatActivity implements
             citiesListFragment.initLoader();
 
 
+            if (rightFragment instanceof DetailsFragment) { // refresh details: weather ListView
 
-            // }
+                //    Log.d("AAAAA", "refreshData: citiesListFragment - initLoader();");
+
+                DetailsFragment detailsFragment = (DetailsFragment) rightFragment;
+                detailsFragment.initLoader();
+            }
+
+
+                // }
 
 /*            switch (taskStatus) {
 
@@ -592,8 +646,8 @@ public class MainActivity extends AppCompatActivity implements
          //   Log.d("AAAAA", "refreshData: citiesListFragment - syncAllData()");
 
             CitiesListFragment citiesListFragment = (CitiesListFragment) leftFragment;
-            syncAllData();
 
+            syncAllData();
 
         } else { // phone
 
@@ -606,6 +660,7 @@ public class MainActivity extends AppCompatActivity implements
                 /// CitiesListFragment citiesListFragment = (CitiesListFragment) fragment;
 
                 syncAllData();
+
             } else if (fragment instanceof DetailsFragment) { // refresh cities: cities ListView
 
            //     Log.d("AAAAA", "refreshData: DetailsFragment - syncData()");
@@ -631,7 +686,8 @@ public class MainActivity extends AppCompatActivity implements
             // -----------------------------------------------------------
             // get detailed data for ALL cities
             Intent intent = new Intent(this, GetDataService.class)
-                    .putExtra(PARAM_TASK, TASK_GET_WEATHER_ALL_CITIES); // get weather data for all cities
+                    .putExtra(PARAM_TASK, TASK_GET_WEATHER_ALL_CITIES) // get weather data for all cities
+                    .putExtra(PARAM_LANG_CODE, mMapLanguageIndex); // language index
 
             // start service for added a city details and weather data
             startService(intent);

@@ -54,7 +54,7 @@ public class CitiesListFragment extends Fragment implements
         View.OnClickListener,
         ///     AdapterView.OnItemLongClickListener,
         LoaderManager.LoaderCallbacks<Cursor> {
-        /// ConfirmDeleteCityItemsDialog.IConfirm {
+    /// ConfirmDeleteCityItemsDialog.IConfirm {
 
 
     private TextView titleTextView;
@@ -66,15 +66,16 @@ public class CitiesListFragment extends Fragment implements
 
     public interface Callbacks {
 
-        void onCityItemSelected(int id, String enteredName, String returnedName,String dataUpdateTime, int unitsFormat);
+        void onCityItemSelected(int id, String enteredName, String dataUpdateTime, int unitsFormat);
 
         void onAddCity();
 
         void onDeleteCity();
 
-     //   void syncData();
+        //   void syncData();
 
-    ///    void refreshCitiesListForTabletDevice();
+        ///    void refreshCitiesListForTabletDevice();
+        MainActivity.Settings readSettingsFromDB();
     }
 
     private Callbacks activity;
@@ -90,7 +91,8 @@ public class CitiesListFragment extends Fragment implements
     private static boolean mMenuVisible = true;
 
 
-   private int mUnitsFormat;
+    private int mUnitsFormat;
+    private int mSortCities;
 
 /*    // message panel
     private LinearLayout messageBarLayout;
@@ -192,7 +194,7 @@ public class CitiesListFragment extends Fragment implements
         cityCursorAdapter = new CityCursorAdapter(getContext(), null, 0);
         citiesListView.setAdapter(cityCursorAdapter);
 
-     //   Log.d("AAAAA" , "onCreateView() - mUnitsFormat = " + mUnitsFormat);
+        //   Log.d("AAAAA" , "onCreateView() - mUnitsFormat = " + mUnitsFormat);
 
         initLoader();
 
@@ -202,39 +204,46 @@ public class CitiesListFragment extends Fragment implements
 
     public void initLoader() {
 
-        Log.d("AAAAA", "CitiesFragment: initLoader");
+        // get settings data from DB
+        MainActivity.Settings settings = activity.readSettingsFromDB();
+        mUnitsFormat = settings.getUnitsFormat();
+        mSortCities = settings.getSortCities();
 
-      //  int unitsFormat = 0; // metric/Celsius units format by default
+   //     Log.d("AAAAA", "CitiesFragment: initLoader - mSortCities = " + mSortCities);
 
+        //  int unitsFormat = 0; // metric/Celsius units format by default
+/*
         // read all columns
         Cursor cursor = getActivity().getContentResolver().query(DataContentProvider.SETTINGS_CONTENT_URI,
-                new String[]{ DataContract.SettingsEntry.COLUMN_UNITS_FORMAT },
+                new String[]{ DataContract.SettingsEntry.COLUMN_UNITS_FORMAT,
+                              DataContract.SettingsEntry.COLUMN_SORT_CITIES },
                 null, // DataContract.CityEntry.COLUMN_ENTERED_CITY + "=?",
                 null, // new String[]{enteredCity},
                 null);
 
-        if(cursor != null) {
+        if (cursor != null) {
 
             if (cursor.getCount() > 0) { // has cities in DB
 
                 cursor.moveToFirst();
 
                 mUnitsFormat = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_UNITS_FORMAT));
+                mSortCities = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_SORT_CITIES));
 
-          //     Log.d("AAAAA", "readSettingsFromDB - mUnitsFormat = " + mUnitsFormat);
+                //     Log.d("AAAAA", "readSettingsFromDB - mUnitsFormat = " + mUnitsFormat);
 
-           //     titleTextView.setText(R.string.cities_title_cities_present);
+                titleTextView.setText(R.string.cities_title_cities_present);
 
             } else { // cities DB empty
 
-           //     titleTextView.setText(R.string.cities_title_cities_empty);
+                titleTextView.setText(R.string.cities_title_cities_empty);
             }
             cursor.close();
-        } // if(cursor != null)
+        } // if(cursor != null)*/
 
-    //    MainActivity a = (MainActivity) getActivity();
+        //    MainActivity a = (MainActivity) getActivity();
 
-    //    Log.d("AAAAA", "CitiesFragment: a.getUnitsFormat() = " + a.getUnitsFormat());
+        //    Log.d("AAAAA", "CitiesFragment: a.getUnitsFormat() = " + a.getUnitsFormat());
 
         // set units format
         CityCursorAdapter.setUnitsFormat(mUnitsFormat);
@@ -262,12 +271,21 @@ public class CitiesListFragment extends Fragment implements
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         String formattedDate = df.format(c.getTime());
 
+        String sortOrder =DataContract.CityEntry._ID; // default sort order: _id
+
+       if(mSortCities == 0)
+           sortOrder = "ORDER BY c." + DataContract.CityEntry._ID + " DESC";
+        else if(mSortCities == 1)
+            sortOrder = "ORDER BY " + DataContract.CityEntry.COLUMN_ENTERED_CITY + " ASC";
+
+    ///    Log.d("AAAAA", "CitiesListFragment: sortOrder = " + sortOrder);
+
         return new CursorLoader(getContext(),
                 Uri.parse(DataContentProvider.CITY_WEATHER_CONTENT_URI.toString() + "/" + formattedDate),
                 null,
                 null, //DataContract.WeatherEntry.COLUMN_CITY_ID_FK + "=?", // selection: city ID
                 null, // new String[]{ formattedDate }, // selectionArgs
-                null // DataContract.WeatherEntry._ID // sort order
+                sortOrder // DataContract.WeatherEntry._ID // sort order
         );
     }
 
@@ -282,11 +300,11 @@ public class CitiesListFragment extends Fragment implements
 
         // set title
 
-        if(cursor.getCount() > 0){
+        if (cursor.getCount() > 0) {
 
-        titleTextView.setText(R.string.cities_title_cities_present);
+            titleTextView.setText(R.string.cities_title_cities_present);
 
-    } else { // cities DB empty
+        } else { // cities DB empty
 
             titleTextView.setText(R.string.cities_title_cities_empty);
         }
@@ -326,11 +344,13 @@ public class CitiesListFragment extends Fragment implements
         Cursor cursor = (Cursor) parent.getItemAtPosition(position);
         int cityID = cursor.getInt(cursor.getColumnIndex(DataContract.CityEntry._ID));
         String enteredCity = cursor.getString(cursor.getColumnIndex(DataContract.CityEntry.COLUMN_ENTERED_CITY));
-        String returnedCity = cursor.getString(cursor.getColumnIndex(DataContract.CityEntry.COLUMN_RETURNED_CITY));
+     ///   String returnedCity = cursor.getString(cursor.getColumnIndex(DataContract.CityEntry.COLUMN_RETURNED_CITY));
 
         String dataUpdateTime = cursor.getString(cursor.getColumnIndex(DataContract.CityEntry.COLUMN_UPDATE_TIMESTAMP));
 
-        activity.onCityItemSelected(cityID, enteredCity, returnedCity, dataUpdateTime, mUnitsFormat); // pass selection to MainActivity
+    ///    Log.d("AAAAA", "dataUpdateTime = " + dataUpdateTime);
+
+        activity.onCityItemSelected(cityID, enteredCity, dataUpdateTime, mUnitsFormat); // pass selection to MainActivity
     }
 
 
@@ -458,20 +478,20 @@ public class CitiesListFragment extends Fragment implements
                         ContentProviderResult[] cpResults = getActivity().getContentResolver()
                                 .applyBatch(DataContentProvider.AUTHORITY, ops);
 
-                      ///  if (cpResults != null) {
+                        ///  if (cpResults != null) {
 
-                       ///     Log.e("AAAAA", "cpResults[1].count = " + cpResults[1].count);
-                            //Log.e("AAAAA","cpResults = " + cpResults.);
-                            //Log.e("AAAAA","cpResults = " + cpResults.toString());
+                        ///     Log.e("AAAAA", "cpResults[1].count = " + cpResults[1].count);
+                        //Log.e("AAAAA","cpResults = " + cpResults.);
+                        //Log.e("AAAAA","cpResults = " + cpResults.toString());
 
     /*                            Toast.makeText(getContext(), getString(R.string.rows_deleted)
                                         + cpResults[1].count, Toast.LENGTH_SHORT).show();*/
 
-                            Toast.makeText(getContext(), getString(R.string.rows_deleted,
-                                    cpResults[1].count.toString()), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), getString(R.string.rows_deleted,
+                                cpResults[1].count.toString()), Toast.LENGTH_SHORT).show();
 
-                            hide(); // hide delete panel
-                     ///   }
+                        hide(); // hide delete panel
+                        ///   }
                     } catch (RemoteException e) {
                         Log.e("AAAAA", "RemoteException " + e.getMessage());
                     } catch (OperationApplicationException e) {
@@ -485,7 +505,7 @@ public class CitiesListFragment extends Fragment implements
 
                 public void onClick(DialogInterface dialog, int which) {
                     // showMessage("Нажали Нет");
-                ///    Log.d("AAAAA", "setNegativeButton");
+                    ///    Log.d("AAAAA", "setNegativeButton");
                     hide(); // hide delete panel
                 }
             });
@@ -512,7 +532,7 @@ public class CitiesListFragment extends Fragment implements
 
     public void hide() {
 
-   ///     Log.d("AAAAA", "hide()");
+        ///     Log.d("AAAAA", "hide()");
 
         CityCursorAdapter.setCheckboxesVisibility(false);
 
@@ -522,7 +542,7 @@ public class CitiesListFragment extends Fragment implements
 
         isDeleteMode = false;
 
-       RelativeLayout hidePanel = (RelativeLayout) getActivity().findViewById(R.id.delete_panel);
+        RelativeLayout hidePanel = (RelativeLayout) getActivity().findViewById(R.id.delete_panel);
 
         hidePanel.setVisibility(View.GONE);
 
@@ -607,7 +627,7 @@ public class CitiesListFragment extends Fragment implements
                     return true;
                 }*/
 
-               activity.onAddCity();
+                activity.onAddCity();
 
                 return true;
 
@@ -647,7 +667,7 @@ public class CitiesListFragment extends Fragment implements
 
     private void backupDatabase() {
 
-   ///     Log.d("AAAAA", "backup Database begins");
+        ///     Log.d("AAAAA", "backup Database begins");
 
         Toast.makeText(getContext(), "backupDatabase", Toast.LENGTH_SHORT).show();
 
@@ -671,7 +691,7 @@ public class CitiesListFragment extends Fragment implements
                 + getActivity().getApplicationContext().getPackageName()
                 + "/databases/" + DataContract.DATABASE_NAME;
 
-  ///      Log.d("AAAAA", "currentDBPath = " + currentDBPath);
+        ///      Log.d("AAAAA", "currentDBPath = " + currentDBPath);
 
         String backupDBPath = DataContract.DATABASE_NAME;
         File currentDB = new File(data, currentDBPath);

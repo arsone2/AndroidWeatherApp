@@ -159,7 +159,7 @@ public class DataContentProvider extends ContentProvider {
 
             case URI_CITIES:
 
-          //      Log.d("AAAAA", "URI_CITIES: " + uri);
+        //        Log.d("AAAAA", "URI_CITIES: " + uri);
 
 
                 // if sort order don`t specified
@@ -184,7 +184,7 @@ public class DataContentProvider extends ContentProvider {
 
                 id = uri.getLastPathSegment();
 
-           //     Log.d("AAAAA", "URI_CITY_ID: " + uri + " id =" + id);
+          //      Log.d("AAAAA", "URI_CITY_ID: " + uri + " id =" + id);
 
                 /// Log.d(LOG_TAG, "URI_CONTACTS_ID, " + id);
 
@@ -303,11 +303,21 @@ public class DataContentProvider extends ContentProvider {
                 + " ORDER BY c._id desc";
 */
 
+                // if sort order don`t specified then set default sort order
+                if (TextUtils.isEmpty(sortOrder)) {
+                    sortOrder = " ORDER BY c." + DataContract.CityEntry._ID + " DESC";
+                }
+
+           ///     Log.d("AAAAA", "URI_DATE : sortOrder = " + sortOrder);
+
                 String query = "SELECT "
                 + " c.entered_city, c.returned_city, c._id, w.temp_day, w.description, w.icon_name, w.insert_timestamp, c.update_timestamp"
                 + " FROM cities c LEFT OUTER JOIN weather w ON c._id = w.city_id"
                 + " AND strftime('%Y-%m-%d',datetime(dt, 'unixepoch', 'localtime')) = '" + date + "'"  //" '2017-07-04'
-                + " ORDER BY c._id desc";
+                ///+ " " + "ORDER BY c." + sortOrder + " ASC"
+                + " " + sortOrder
+                + ";";
+                //+ " ORDER BY c._id desc";
 
                 ///    Log.d("AAAAA", "case URI_DATE: " + uri.getPathSegments().get(DataContract.DATE_PATH_POSITION));
 
@@ -761,8 +771,11 @@ public class DataContentProvider extends ContentProvider {
 
 
             db.execSQL("CREATE TABLE " + DataContract.SettingsEntry.TABLE_NAME + " ("
-                            + DataContract.SettingsEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," // inner data ID
-                            + DataContract.SettingsEntry.COLUMN_UNITS_FORMAT + " INTEGER DEFAULT 0"
+                            + DataContract.SettingsEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                            + DataContract.SettingsEntry.COLUMN_UNITS_FORMAT + " INTEGER DEFAULT 0,"
+                            + DataContract.SettingsEntry.COLUMN_SORT_CITIES + " INTEGER DEFAULT 0,"
+                         //   + DataContract.SettingsEntry.COLUMN_MAP_STYLE + " INTEGER DEFAULT 0,"
+                            + DataContract.SettingsEntry.COLUMN_MAP_LANGUAGE + " INTEGER DEFAULT 0"
                     + ");");
 
             Log.d("AAAAA", "onCreate(): tables CREATED");
@@ -780,7 +793,12 @@ public class DataContentProvider extends ContentProvider {
 
             // add default settings - DO NOT DELETE !!
             ContentValues cvSettings = new ContentValues();
+
             cvSettings.put(DataContract.SettingsEntry.COLUMN_UNITS_FORMAT, 0);
+            cvSettings.put(DataContract.SettingsEntry.COLUMN_SORT_CITIES, 0);
+           // cvSettings.put(DataContract.SettingsEntry.COLUMN_MAP_STYLE, 0);
+            cvSettings.put(DataContract.SettingsEntry.COLUMN_MAP_LANGUAGE, 0);
+
             db.insert(DataContract.SettingsEntry.TABLE_NAME, null, cvSettings);
         }
 

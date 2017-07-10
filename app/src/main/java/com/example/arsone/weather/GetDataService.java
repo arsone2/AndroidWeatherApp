@@ -24,7 +24,10 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 // http://guides.codepath.com/android/Starting-Background-Services#communicating-with-a-broadcastreceiver
@@ -72,6 +75,7 @@ public class GetDataService extends IntentService {
 
             String city = intent.getStringExtra(MainActivity.PARAM_ENTERED_CITY);
             int id = intent.getIntExtra(MainActivity.PARAM_CITY_ID, -1);
+            int languageIndex = intent.getIntExtra(MainActivity.PARAM_LANG_CODE, 0);
 
             if (city != null && id != -1) {
 
@@ -84,7 +88,7 @@ public class GetDataService extends IntentService {
                 i.putExtra(MainActivity.PARAM_STATUS, MainActivity.STATUS_GET_WEATHER_ONE_CITY_START);
                 sendBroadcast(i);
 
-                getWeather(id, city);
+                getWeather(id, city, languageIndex);
 
                 // Inform about task finish
                 Intent newIntent = new Intent(MainActivity.BROADCAST_ACTION);
@@ -148,10 +152,11 @@ public class GetDataService extends IntentService {
                 cursor.moveToNext();
             }
 
+            int languageIndex = intent.getIntExtra(MainActivity.PARAM_LANG_CODE, 0);
 
             for (City c : citiesList) {
 
-                getWeather(c.id, c.city);
+                getWeather(c.id, c.city, languageIndex);
             }
 
             // Inform about task finish
@@ -163,20 +168,25 @@ public class GetDataService extends IntentService {
     }
 
 
-    private void getWeather(final int id, final String city) {
+    private void getWeather(final int id, final String city, final int languageIndex) {
 
    //     final Intent intent = new Intent(MainActivity.BROADCAST_ACTION);
 
         String url;
 
         try {
+            String[] languageCodeArray = getResources().getStringArray(R.array.language_parameter_array);
+
             url = getString(R.string.web_service_url)
                     + URLEncoder.encode(city, "UTF-8")
                     /// + "&units=metric&lang=ru&cnt=5&APPID="
                     + "&units=metric" // default units = metric
                     /// + "&lang=ru"  // default language = English
+                    + "&lang=" + languageCodeArray[languageIndex]
                     + "&cnt=5"        // default for 5 days
                     + "&APPID=" + getString(R.string.openweathermap_api_key);
+
+            Log.d("AAAAA", "getWeather( - url = " + url);
 
         } catch (UnsupportedEncodingException e) {
             Log.d("AAAAA", "UnsupportedEncodingException:" + e.getMessage());
@@ -261,6 +271,16 @@ public class GetDataService extends IntentService {
                             cv.put(DataContract.CityEntry.COLUMN_LONGITUDE, cityLongitude);
                             cv.put(DataContract.CityEntry.COLUMN_LATITUDE, cityLatitude);
                             cv.put(DataContract.CityEntry.COLUMN_COUNTRY_CODE, countryCode);
+
+                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            String currentDateTime = dateFormat.format(new Date()); // Find todays date
+
+                          //  Log.d("AAAAA", "currentDateTime = " + currentDateTime);
+
+                            cv.put(DataContract.CityEntry.COLUMN_UPDATE_TIMESTAMP, currentDateTime);
+
+ /*                           cv.put(DataContract.CityEntry.COLUMN_UPDATE_TIMESTAMP,
+                                    "datetime(CURRENT_TIMESTAMP, 'localtime')");*/
 
     /*                            mRefreshDataTask = new DetailsFragment.RefreshDataTask();
                                 mRefreshDataTask.execute(cv);*/

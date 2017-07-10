@@ -12,9 +12,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,7 +19,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,7 +30,6 @@ import com.mapbox.mapboxsdk.location.LocationSource;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
-import com.mapbox.mapboxsdk.maps.SupportMapFragment;
 import com.mapbox.services.android.telemetry.location.LocationEngine;
 import com.mapbox.services.android.telemetry.location.LocationEngineListener;
 import com.mapbox.services.android.telemetry.permissions.PermissionsListener;
@@ -58,7 +53,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textField;
 
 
 public class AddCityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
- PermissionsListener        {
+        PermissionsListener {
 
     private PermissionsManager permissionsManager;
     private LocationEngine locationEngine;
@@ -88,7 +83,7 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
 
         void onMapClicked();
 
-      ///  void refreshCitiesListForTabletDevice();
+        MainActivity.Settings readSettingsFromDB();
     }
 
     private Callbacks activity;
@@ -103,6 +98,10 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
 
     private MapboxMap mMapboxMap;
 
+   // private int mMapStyleIndex;
+    private int mMapLanguageIndex;
+
+    // IMPORTANT!! Mapbox layer language layers: https://gist.github.com/AlanPew/586715a1ee7a58956575
 
     // ---------------------------------------------------------
     // implements LoaderManager.LoaderCallbacks<Cursor>
@@ -114,7 +113,7 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
                 null, // new String[]{DataContract.CityEntry.COLUMN_LONGITUDE, DataContract.CityEntry.COLUMN_LATITUDE}, // projection
                 null, // DataContract.WeatherEntry.COLUMN_CITY_ID_FK + "=?", // selection:
                 null, // selectionArgs, // selectionArgs
-                null // DataContract.WeatherEntry._ID // sort order
+                DataContract.WeatherEntry._ID // sort order
         );
 
 /*
@@ -132,8 +131,6 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
 
-        //   markerCursorAdapter.swapCursor(cursor);
-
         ///   Log.d("AAAAA", "MARKERS: onLoadFinished: results count = " + cursor.getCount());
 
         cursor.moveToFirst();
@@ -143,17 +140,16 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
             double lat = cursor.getDouble(cursor.getColumnIndex(DataContract.CityEntry.COLUMN_LATITUDE));
             double lon = cursor.getDouble(cursor.getColumnIndex(DataContract.CityEntry.COLUMN_LONGITUDE));
 
-            if(lat != 0 && lon != 0) {
+            if (lat != 0 && lon != 0) {
 
                 LatLng point = new LatLng(lat, lon);
 
                 mMapboxMap.addMarker(new MarkerOptions()
-                                .position(point)
-                                .title(cursor.getString(cursor.getColumnIndex(DataContract.CityEntry.COLUMN_ENTERED_CITY)))
-                                .snippet(cursor.getString(cursor.getColumnIndex(DataContract.CityEntry.COLUMN_RETURNED_CITY)))
+                        .position(point)
+                        .title(cursor.getString(cursor.getColumnIndex(DataContract.CityEntry.COLUMN_ENTERED_CITY)))
+                        .snippet(cursor.getString(cursor.getColumnIndex(DataContract.CityEntry.COLUMN_RETURNED_CITY)))
                 );
             }
-
             cursor.moveToNext();
         }
 
@@ -247,13 +243,13 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
 
 
         cityEditText = (TextView) view.findViewById(R.id.cityEditText);
-      //  Button saveCityButton = (Button) view.findViewById(R.id.saveCityButton);
-     //   Button cancelButton = (Button) view.findViewById(R.id.editCancelButton);
+        //  Button saveCityButton = (Button) view.findViewById(R.id.saveCityButton);
+        //   Button cancelButton = (Button) view.findViewById(R.id.editCancelButton);
         messageTextView = (TextView) view.findViewById(R.id.messageTextView);
 
         // add listeners
-   //     saveCityButton.setOnClickListener(saveCityButtonClicked);
-   //     cancelButton.setOnClickListener(cancelButtonClicked);
+        //     saveCityButton.setOnClickListener(saveCityButtonClicked);
+        //     cancelButton.setOnClickListener(cancelButtonClicked);
 
         // Mapbox access token is configured here. This needs to be called either in your application
         // object or in the same activity which contains the mapview.
@@ -267,9 +263,15 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
         mapView.onCreate(savedInstanceState);
 
 
-   ///     activity.clearPreviousMenu();
 
-      ///  getActivity().invalidateOptionsMenu();
+        // get settings data from DB
+        MainActivity.Settings settings = activity.readSettingsFromDB();
+     //   mMapStyleIndex = settings.getMapStyleIndex();
+        mMapLanguageIndex = settings.getMapLanguageIndex();
+
+        ///     activity.clearPreviousMenu();
+
+        ///  getActivity().invalidateOptionsMenu();
 
 
 
@@ -295,6 +297,81 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
 
                 mMapboxMap = mapboxMap;
 
+                /// mMapboxMap.setStyleUrl("");
+                // L.mapbox.styleLayer('mapbox://styles/mapbox/emerald-v8').addTo(mMapboxMap);
+/*
+                Mapbox styles
+                The following styles are available to all accounts using a valid access token?:
+
+                mapbox://styles/mapbox/streets-v10
+                mapbox://styles/mapbox/outdoors-v10
+                mapbox://styles/mapbox/light-v9
+                mapbox://styles/mapbox/dark-v9
+                mapbox://styles/mapbox/satellite-v9
+                mapbox://styles/mapbox/satellite-streets-v10
+                mapbox://styles/mapbox/traffic-day-v2
+                mapbox://styles/mapbox/traffic-night-v2
+
+*/
+
+                // set map items language
+                setMapLanguage(mMapLanguageIndex);
+
+                // set map style
+              //  setMapStyle(mMapStyleIndex);
+
+                Log.d("AAAAA" , "mMapLanguageIndex = " + mMapLanguageIndex);
+
+
+                // https://github.com/mapbox/mapbox-android-demo/blob/72f1f41346bb34dd300375ef2760a0778a54d757/MapboxAndroidDemo/src/main/java/com/mapbox/mapboxandroiddemo/examples/styles/LanguageSwitchActivity.java
+                // https://www.mapbox.com/studio/tilesets/mapbox.mapbox-streets-v7/
+/*                Layer mapText = mMapboxMap.getLayer("country-label-lg"); // country names
+                mapText.setProperties(textField("{name_ru}"));
+
+
+                Layer mapText1 = mMapboxMap.getLayer("place-city-lg-n"); // large city names
+                mapText1.setProperties(textField("{name_ru}"));*/
+
+
+                // https://gist.github.com/AlanPew/586715a1ee7a58956575
+                // place-city-sm
+                // place-city-lg-n
+                // place-city-lg-s
+                // place-city-md-n
+                // place-city-md-s
+
+
+ /*               Layer mapText2 = mMapboxMap.getLayer("place-city-sm");
+                mapText2.setProperties(textField("{name_ru}"));
+
+                Layer mapText3 = mMapboxMap.getLayer("place-city-md-n");
+                mapText3.setProperties(textField("{name_ru}"));
+
+                Layer mapText4 = mMapboxMap.getLayer("place-city-md-s");
+                mapText4.setProperties(textField("{name_ru}"));
+
+                Layer mapText5 = mMapboxMap.getLayer("place-city-lg-s");
+                mapText5.setProperties(textField("{name_ru}"));
+
+                Layer mapText6 = mMapboxMap.getLayer("place-town"); // small towns
+                mapText6.setProperties(textField("{name_ru}"));
+
+                Layer mapText7 = mMapboxMap.getLayer("place-village"); // villages
+                mapText7.setProperties(textField("{name_ru}"));*/
+
+                // country-label
+                // place_label_city
+                // place_label_other
+                // road_major_label
+                // poi_label
+
+
+                /*
+                Layer mapText2 = mMapboxMap.getLayer("place_label_other");
+                mapText2.setProperties(textField("{name_ru}"));*/
+
+                // mMapboxMap.setLayoutProperty('country-label-lg', 'text-field', '{name_' + language + '}');
+
                 Log.d("AAAAA", "mMapboxMap.isMyLocationEnabled = " + mMapboxMap.isMyLocationEnabled());
 
 
@@ -312,7 +389,7 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
                 mMapboxMap.getMyLocationViewSettings().setAccuracyTintColor(Color.parseColor("#FBB03B"));
 
 
-             //   Log.d("AAAAA", "mMapboxMap.isMyLocationEnabled = ");
+                //   Log.d("AAAAA", "mMapboxMap.isMyLocationEnabled = ");
 
                 //    mapboxMap.setStyleUrl("mapbox://styles/<your-account-name>/<your-style-ID>");
                 //   mapboxMap.setStyleUrl("mapbox://styles/mapbox/streets-v10");
@@ -326,7 +403,7 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
 
 
                 // add markers
-                addMarkers();
+                InitMarkerLoader();
 
                 // Click listener
                 mapboxMap.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
@@ -364,11 +441,57 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
     }
 
 
+    private void setMapLanguage(int index) {
+
+/*        if(language == 0) // If English then do nothing
+            return;*/
+
+        String property = null;
+
+        switch (index) {
+
+            case 0: // English
+
+                property = "{name_en}";
+
+                break;
+
+            case 1: // Russian
+
+                property = "{name_ru}";
+
+                break;
+
+            default:
+                return;
+        }
+
+    //    Log.d("AAAAA", "property = " + property);
+
+        for (String layerName : getResources().getStringArray(R.array.symbol_map_layers_array)) {
+
+            try {
+              //   Log.d("AAAAA", "layerName = " + layerName);
+                mMapboxMap.getLayer(layerName).setProperties(textField(property));
+            } catch (Exception e) {
+                Log.d("AAAAA", "e.getMessage() = " + e.getMessage());
+            }
+        }
+    }
+
+
+/*    private void setMapStyle(int index) {
+
+        String[] stylesArray = getResources().getStringArray(R.array.map_styles_array);
+        mMapboxMap.setStyleUrl(stylesArray[index]);
+    }*/
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
+
 
     private void enableLocation() {
         // https://github.com/mapbox/mapbox-android-demo/blob/master/MapboxAndroidDemo/src/main/java/com/mapbox/mapboxandroiddemo/examples/location/CustomizeUserLocationActivity.java
@@ -405,7 +528,8 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
     }
 
 
-    private void addMarkers() {
+    // add city markers on the map
+    private void InitMarkerLoader() {
 
         // --------------------------------------------------------------
         // IMPORTANT !!! Change loader for different query
@@ -419,14 +543,19 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
         // --------------------------------------------------------------
     }
 
+
     // https://github.com/mapbox/mapbox-java/blob/master/mapbox/app/src/main/java/com/mapbox/services/android/testapp/geocoding/GeocodingReverseActivity.java
+    // geocoding parameters: https://www.mapbox.com/api-documentation/#request-format
     private void geocode(LatLng point) {
 
         Position position = Position.fromCoordinates(point.getLongitude(), point.getLatitude());
 
+        String[] languageCodeArray = getResources().getStringArray(R.array.language_parameter_array);
+
         MapboxGeocoding client = new MapboxGeocoding.Builder()
                 .setAccessToken(getString(R.string.mapbox_api_key))
                 .setCoordinates(position)
+                .setLanguage(languageCodeArray[mMapLanguageIndex])
                 .setGeocodingType(GeocodingCriteria.TYPE_PLACE)
                 .build();
 
@@ -435,7 +564,7 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
             @Override
             public void onResponse(Call<GeocodingResponse> call, Response<GeocodingResponse> response) {
 
-                messageTextView.setText("Getting place name, please wait...");
+                //   messageTextView.setText("Getting place name, please wait...");
 
                 if (response == null) {
 //                    messageTextView.setText(""); // clear city nam
@@ -469,62 +598,8 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
         });
     }
 
-  /*  // "cancel" button clicked
-    View.OnClickListener cancelButtonClicked = new View.OnClickListener() {
 
-        @Override
-        public void onClick(View v) {
-
-            activity.onCancelAddEdit();
-        }
-    };
-
-    // "save" button clicked
-    View.OnClickListener saveCityButtonClicked = new View.OnClickListener() {
-
-        @Override
-        public void onClick(View v) {
-
-            enteredCity = cityEditText.getText().toString().trim();
-
-            if (enteredCity.length() != 0) {
-
-                // check if database has such city?
-                Cursor cursor = getActivity().getContentResolver().query(DataContentProvider.CITY_CONTENT_URI,
-                        new String[]{DataContract.CityEntry.COLUMN_ENTERED_CITY},
-                        DataContract.CityEntry.COLUMN_ENTERED_CITY + "=?",
-                        new String[]{enteredCity},
-                        null);
-
-                if (cursor.getCount() > 0) {
-
-                    Toast.makeText(getActivity(), "Такой город уже есть в списке", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                // save entered city to database
-                ContentValues values = new ContentValues();
-
-                values.put(DataContract.CityEntry.COLUMN_ENTERED_CITY, enteredCity);
-
-                Uri cityUri = getActivity().getContentResolver().insert(DataContentProvider.CITY_CONTENT_URI, values);
-
-                  /// Log.d("AAAAA", "Inserted = " + cityUri.getLastPathSegment());
-                   Log.d("AAAAA", "Inserted ID = " + Integer.parseInt(cityUri.getLastPathSegment()));
-               /// Log.d("AAAAA", "Inserted = " + cityUri);
-
-                activity.onSaveCity(Integer.parseInt(cityUri.getLastPathSegment()), enteredCity);
-
-            } else // required entered_city returned_name is blank, so display error dialog
-            {
-                Toast.makeText(getActivity(), R.string.message_fill_city, Toast.LENGTH_SHORT).show();
-            }
-        }
-    };*/
-
-
-
-    private void saveCity(){
+    private void saveCity() {
 
         enteredCity = cityEditText.getText().toString().trim();
 
@@ -532,15 +607,30 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
 
             // check if database has such city?
             Cursor cursor = getActivity().getContentResolver().query(DataContentProvider.CITY_CONTENT_URI,
+
+                   /* new String[]{ "lower(" + DataContract.CityEntry.COLUMN_ENTERED_CITY
+                            + ")=lower('"+ enteredCity +"')" },*/
+                    new String[]{DataContract.CityEntry.COLUMN_ENTERED_CITY},
+                    DataContract.CityEntry.COLUMN_ENTERED_CITY + "=? COLLATE NOCASE",
+                    new String[]{enteredCity},
+                    null,
+                    null);
+/*
+            Cursor cursor = getActivity().getContentResolver().query(DataContentProvider.CITY_CONTENT_URI,
                     new String[]{DataContract.CityEntry.COLUMN_ENTERED_CITY},
                     DataContract.CityEntry.COLUMN_ENTERED_CITY + "=?",
                     new String[]{enteredCity},
                     null);
+*/
 
-            if (cursor.getCount() > 0) {
+            if (cursor != null) {
 
-                Toast.makeText(getActivity(), "Такой город уже есть в списке", Toast.LENGTH_SHORT).show();
-                return;
+                if (cursor.getCount() > 0) {
+
+                    Toast.makeText(getActivity(), getString(R.string.message_city_has_in_db), Toast.LENGTH_SHORT).show();
+                    cursor.close();
+                    return;
+                }
             }
 
             // INSERT entered city to database
@@ -551,7 +641,7 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
             Uri cityUri = getActivity().getContentResolver().insert(DataContentProvider.CITY_CONTENT_URI, values);
 
             // Log.d("AAAAA", "Inserted = " + cityUri.getLastPathSegment());
-           Log.d("AAAAA", "Inserted to DB city _id = " + Integer.parseInt(cityUri.getLastPathSegment()));
+            // Log.d("AAAAA", "Inserted to DB city _id = " + Integer.parseInt(cityUri.getLastPathSegment()));
             // Log.d("AAAAA", "Inserted = " + cityUri);
 
             activity.onSaveCity(Integer.parseInt(cityUri.getLastPathSegment()), enteredCity);
