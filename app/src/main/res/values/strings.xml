@@ -20,8 +20,8 @@
 
     <!-- UI text -->
 
-    <string name="cities_title_cities_present">SELECT PLACE:</string>
-    <string name="cities_title_cities_empty">NO PLACES FOUND</string>
+    <!--<string name="cities_title_cities_present">SELECT PLACE:</string>-->
+    <string name="cities_title_cities_empty">ADD PLACES TO LIST</string>
     <string name="hint_city_add">Enter place name</string>
     <string name="edit_save">Save</string>
     <string name="edit_cancel">Cancel</string>

@@ -302,10 +302,12 @@ public class CitiesListFragment extends Fragment implements
 
         if (cursor.getCount() > 0) {
 
-            titleTextView.setText(R.string.cities_title_cities_present);
+          //  titleTextView.setText(R.string.cities_title_cities_present);
+            titleTextView.setVisibility(View.GONE);
 
         } else { // cities DB empty
 
+            titleTextView.setVisibility(View.VISIBLE);
             titleTextView.setText(R.string.cities_title_cities_empty);
         }
     }

@@ -10,6 +10,7 @@ import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -106,7 +107,10 @@ public class WeatherCursorAdapter extends CursorAdapter {
         viewHolder.weatherTextView
                 .setText(cursor.getString(cursor.getColumnIndex(DataContract.WeatherEntry.COLUMN_DESCRIPTION)));
 
-        viewHolder.dateTextView.setText(formatter.format(new Date(timeStamp * 1000L)).toString());
+        viewHolder.dateTextView.setText(DateFormat.getDateInstance(DateFormat.MEDIUM).format(timeStamp * 1000L));
+
+       /// viewHolder.dateTextView.setText(formatter.format(new Date(timeStamp * 1000L)));
+        /// viewHolder.dateTextView.setText(formatter.format(new Date(timeStamp * 1000L)));
 
   //      Log.d("AAAAA", "WeatherCursorAdapter: mUnitsFormat = " + mUnitsFormat);
 

@@ -67,10 +67,10 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
     private TextView titleTextView;
     private TextView updateTimeTextView;
 
-    // mode panel
+/*    // mode panel
     private LinearLayout modePanelLayout;
     private TextView modeTextView;
-    private AppCompatImageView modeImageView;
+    private AppCompatImageView modeImageView;*/
 
     // weather ListView
     private ListView weatherListView;
@@ -140,14 +140,14 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
 
         //      Log.d("AAAAA", "onLoadFinished: results count = " + cursor.getCount());
 
-        if (cursor.getCount() == 0) {
+/*        if (cursor.getCount() == 0) {
 
             ///showMessageBar("Данные не найдены", false);
 
             // set mStatus info
             setModeBar(getString(R.string.message_city_not_found),
                     R.color.nothingColor, R.drawable.ic_lamp_nothing);
-        }
+        }*/
     }
 
 
@@ -217,10 +217,10 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
         titleTextView = (TextView) view.findViewById(R.id.titleTextView);
         updateTimeTextView = (TextView) view.findViewById(R.id.updateTimeTextView);
 
-        // mode panel
+/*        // mode panel
         modePanelLayout = (LinearLayout) view.findViewById(R.id.modePanelLayout);
         modeTextView = (TextView) view.findViewById(R.id.modeTextView);
-        modeImageView = (AppCompatImageView) view.findViewById(R.id.modeImage);
+        modeImageView = (AppCompatImageView) view.findViewById(R.id.modeImage);*/
 
 /*        // message bar panel
         messageBarLayout = (LinearLayout) view.findViewById(R.id.messageBar);
@@ -295,7 +295,7 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
         // read entered city name and Data Update Time
         Cursor cursor = getActivity().getContentResolver()
                 .query(Uri.parse(DataContentProvider.CITY_CONTENT_URI.toString() + "/" + mID),
-                null, null, null, null);
+                        null, null, null, null);
 
 /*        // read entered city name and Data Update Time
         Cursor cursor = getActivity().getContentResolver().query(DataContentProvider.CITY_CONTENT_URI,
@@ -304,6 +304,8 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
                 DataContract.CityEntry._ID + "=?",
                 new String[]{String.valueOf(mID)}, //  new String[]{enteredCity},
                 null);*/
+
+        String returnedName = null;
 
         if (cursor != null && cursor.getCount() > 0) {
 
@@ -315,24 +317,41 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
             // 0 = English, 1 = Russian
             mDataUpdateTime = cursor.getString(cursor.getColumnIndex(DataContract.CityEntry.COLUMN_UPDATE_TIMESTAMP));
 
+            returnedName = cursor.getString(cursor.getColumnIndex(DataContract.CityEntry.COLUMN_RETURNED_CITY));
+
             cursor.close();
         }
 
         // Title
         titleTextView.setText(mEnteredCity);
 
+        if (TextUtils.isEmpty(returnedName)) {
 
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            updateTimeTextView.setText("Data not found");
 
-        try {
-            Date date = format.parse(mDataUpdateTime);
+        } else {
 
-            String stringDate = DateFormat.getDateTimeInstance().format(date);
+            if (TextUtils.isEmpty(returnedName)) {
 
-            updateTimeTextView.setText(getContext().getString(R.string.weather_data_obtained, stringDate));
+                titleTextView.setText(mEnteredCity);
 
-        } catch (ParseException e) {
-            Log.d("AAAAA", "Date ParseException: " + e.getMessage());
+            } else {
+
+                titleTextView.setText(mEnteredCity + "/ " + returnedName);
+            }
+
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+            try {
+                Date date = format.parse(mDataUpdateTime);
+
+                String stringDate = DateFormat.getDateTimeInstance().format(date);
+
+                updateTimeTextView.setText(getContext().getString(R.string.weather_data_obtained, stringDate));
+
+            } catch (ParseException e) {
+                Log.d("AAAAA", "Date ParseException: " + e.getMessage());
+            }
         }
 
 
@@ -407,11 +426,11 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
     }
 
 
-    private void setModeBar(String text, int color, int image) {
+/*    private void setModeBar(String text, int color, int image) {
 
         modePanelLayout.setVisibility(View.VISIBLE);
         modeTextView.setText(text);
         modeTextView.setTextColor(ContextCompat.getColor(getContext(), color));
         modeImageView.setImageResource(image);
-    }
+    }*/
 }

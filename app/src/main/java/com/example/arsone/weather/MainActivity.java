@@ -607,6 +607,8 @@ public class MainActivity extends AppCompatActivity implements
 
         } else { // phone
 
+           /// Log.d("AAAAA", "refreshData - phone");
+
             Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.onePaneLayout);
 
             if (fragment instanceof CitiesListFragment) { // refresh details: weather ListView
@@ -616,6 +618,7 @@ public class MainActivity extends AppCompatActivity implements
                 CitiesListFragment citiesListFragment = (CitiesListFragment) fragment;
 
                 citiesListFragment.initLoader();
+
             } else if (fragment instanceof DetailsFragment) { // refresh cities: cities ListView
 
           //      Log.d("AAAAA", "refreshData: DetailsFragment - initLoader()");
@@ -740,7 +743,7 @@ public class MainActivity extends AppCompatActivity implements
         // REMARK:
         // On the phone devices CitiesFragment layout LoadManager reinit itself in "OnCreate" fragment`s method
 
-        // ----------------------------------------------------
+/*        // ----------------------------------------------------
         // remove right pane fragment after delete city in DB
         Fragment rightFragment = getSupportFragmentManager().findFragmentById(R.id.rightFrameLayout);
 
@@ -751,7 +754,7 @@ public class MainActivity extends AppCompatActivity implements
             transaction.remove(rightFragment);
             transaction.commit();
         }
-        // ----------------------------------------------------
+        // ----------------------------------------------------*/
 
         // refresh citiesListView data on the screen
         if (findViewById(R.id.onePaneLayout) == null) { // tablet
@@ -760,6 +763,27 @@ public class MainActivity extends AppCompatActivity implements
                     .findFragmentById(R.id.citiesContainer);
 
             citiesListFragment.initLoader();
+
+            // ----------------------------------------------------
+            // remove right pane fragment after delete city in DB
+            Fragment rightFragment = getSupportFragmentManager().findFragmentById(R.id.rightFrameLayout);
+
+            if (rightFragment != null) {
+
+                ///   Log.d("AAAAA", "rightFragment != null");
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.remove(rightFragment);
+                transaction.commit();
+            }
+            // ----------------------------------------------------
+
+        } else { // phone
+
+            CitiesListFragment citiesListFragment = (CitiesListFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.onePaneLayout);
+
+            if(citiesListFragment != null)
+                citiesListFragment.initLoader();
         }
     }
 

@@ -738,9 +738,9 @@ public class DataContentProvider extends ContentProvider {
 
             db.execSQL("CREATE TABLE " + DataContract.CityEntry.TABLE_NAME + " ("
                     + DataContract.CityEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," // foreign key
-                    + DataContract.CityEntry.COLUMN_ENTERED_CITY + " TEXT DEFAULT '', "
-                    + DataContract.CityEntry.COLUMN_RETURNED_CITY + " TEXT DEFAULT '',"
-                    + DataContract.CityEntry.COLUMN_COUNTRY_CODE + " TEXT DEFAULT '',"
+                    + DataContract.CityEntry.COLUMN_ENTERED_CITY + " TEXT,"
+                    + DataContract.CityEntry.COLUMN_RETURNED_CITY + " TEXT,"
+                    + DataContract.CityEntry.COLUMN_COUNTRY_CODE + " TEXT,"
                     + DataContract.CityEntry.COLUMN_LATITUDE + " DOUBLE,"
                     + DataContract.CityEntry.COLUMN_LONGITUDE + " DOUBLE,"
                     + DataContract.CityEntry.COLUMN_SERVER_CITY_ID + " INTEGER,"
@@ -762,8 +762,8 @@ public class DataContentProvider extends ContentProvider {
                     + DataContract.WeatherEntry.COLUMN_PRESSURE + " DOUBLE,"
                     + DataContract.WeatherEntry.COLUMN_SPEED + " DOUBLE,"
                     + DataContract.WeatherEntry.COLUMN_DIRECTION + " INTEGER,"
-                    + DataContract.WeatherEntry.COLUMN_DESCRIPTION + " TEXT DEFAULT '',"
-                    + DataContract.WeatherEntry.COLUMN_ICON_NAME + " TEXT DEFAULT '',"
+                    + DataContract.WeatherEntry.COLUMN_DESCRIPTION + " TEXT,"
+                    + DataContract.WeatherEntry.COLUMN_ICON_NAME + " TEXT,"
                     + DataContract.WeatherEntry.COLUMN_INSERT_TIMESTAMP + " DATETIME DEFAULT CURRENT_TIMESTAMP,"
                     + "FOREIGN KEY(" + DataContract.WeatherEntry.COLUMN_CITY_ID_FK + ") REFERENCES "
                     + DataContract.CityEntry.TABLE_NAME + "(" + DataContract.CityEntry._ID + ")"
