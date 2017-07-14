@@ -34,7 +34,7 @@ public class SettingsFragment extends Fragment implements
     private ToggleButton unitsFormatToggleButton;
     private ToggleButton sortCitiesToggleButton;
  //   private Spinner mapStyleSpinner;
-    private Spinner mapLanguageSpinner;
+ //   private Spinner mapLanguageSpinner;
 
     private int mUnitsFormat;
     private int mSortCities;
@@ -109,7 +109,7 @@ public class SettingsFragment extends Fragment implements
         mUnitsFormat = settings.getUnitsFormat();
         mSortCities = settings.getSortCities();
   //      mMapStyleIndex = settings.getMapStyleIndex();
-        mMapLanguageIndex = settings.getMapLanguageIndex();
+   //     mMapLanguageIndex = settings.getMapLanguageIndex();
 
         unitsFormatToggleButton = (ToggleButton) view.findViewById(R.id.unitsFormatToggleButton);
         unitsFormatToggleButton.setChecked(mUnitsFormat == 1);
@@ -123,9 +123,9 @@ public class SettingsFragment extends Fragment implements
         mapStyleSpinner.setOnItemSelectedListener(this);
         mapStyleSpinner.setSelection(mMapStyleIndex);*/
 
-        mapLanguageSpinner = (Spinner) view.findViewById(R.id.mapLanguageSpinner);
+/*        mapLanguageSpinner = (Spinner) view.findViewById(R.id.mapLanguageSpinner);
         mapLanguageSpinner.setOnItemSelectedListener(this);
-        mapLanguageSpinner.setSelection(mMapLanguageIndex);
+        mapLanguageSpinner.setSelection(mMapLanguageIndex);*/
 
         return view;
     }
@@ -153,7 +153,7 @@ public class SettingsFragment extends Fragment implements
 
     //    values.put(DataContract.SettingsEntry.COLUMN_MAP_STYLE, mapStyleSpinner.getSelectedItemPosition());
 
-        values.put(DataContract.SettingsEntry.COLUMN_MAP_LANGUAGE, mapLanguageSpinner.getSelectedItemPosition());
+   //     values.put(DataContract.SettingsEntry.COLUMN_MAP_LANGUAGE, mapLanguageSpinner.getSelectedItemPosition());
 
         getActivity().getContentResolver().update(DataContentProvider.SETTINGS_CONTENT_URI, values, null, null);
 

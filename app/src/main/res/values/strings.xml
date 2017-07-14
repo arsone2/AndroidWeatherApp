@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">City weather</string>
+    <string name="app_name">Weather Info</string>
     <!--<string name="action_settings">Settings</string>-->
 
     <!-- Menu items -->
@@ -79,6 +79,7 @@
     <string name="i_weather_day_temp">Day temperature: %s ℉</string>
     <string name="i_weather_evening_temp">Evening temperature: %s ℉</string>
     <string name="i_weather_night_temp">Night temperature: %s ℉</string>
+    <string name="data_not_found">Data not found</string>
 
 
     <!-- The following map styles are available to all accounts using a valid access token: -->

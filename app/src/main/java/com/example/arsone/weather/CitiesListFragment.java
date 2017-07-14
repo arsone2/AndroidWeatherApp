@@ -52,9 +52,7 @@ import java.util.regex.Pattern;
 public class CitiesListFragment extends Fragment implements
         OnItemClickListener,
         View.OnClickListener,
-        ///     AdapterView.OnItemLongClickListener,
         LoaderManager.LoaderCallbacks<Cursor> {
-    /// ConfirmDeleteCityItemsDialog.IConfirm {
 
 
     private TextView titleTextView;
@@ -72,37 +70,17 @@ public class CitiesListFragment extends Fragment implements
 
         void onDeleteCity();
 
-        //   void syncData();
-
-        ///    void refreshCitiesListForTabletDevice();
         MainActivity.Settings readSettingsFromDB();
     }
 
     private Callbacks activity;
 
-/*    // The loader's unique id. Loader ids are specific to the Activity or
-    // Fragment in which they reside.
-    public static final int LOADER_CITIES_ID = 0;*/
-
-///    public static final String TAG = "AAAAA";
-
     private CursorAdapter cityCursorAdapter;
 
     private static boolean mMenuVisible = true;
 
-
     private int mUnitsFormat;
     private int mSortCities;
-
-/*    // message panel
-    private LinearLayout messageBarLayout;
-    private TextView messageTextView;
-    private ProgressBar messageProgressBar;*/
-
-
-/*    // constructor
-    public CitiesListFragment() {
-    }*/
 
 
     @Override
@@ -111,14 +89,6 @@ public class CitiesListFragment extends Fragment implements
         super.onAttach(context);
         activity = (Callbacks) context;
     }
-
-/*
-    @Override
-    public void onAttach(Activity activity) {
-
-        super.onAttach(activity);
-         this.activity = (Callbacks) activity;
-    }*/
 
 
     @Override
@@ -129,40 +99,10 @@ public class CitiesListFragment extends Fragment implements
     }
 
 
-/*    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-
-        super.onCreate(savedInstanceState);
-
-        // get settings
-        Bundle bundle = getArguments();
-
-        if (bundle != null) {
-            mUnitsFormat = bundle.getInt(MainActivity.UNITS_FORMAT);
-         }
-
-        Log.d("AAAAA", "onCreate() - Cities fragment -  mUnitsFormat = " + mUnitsFormat);
-    }*/
-
-
-    //    public final static String BROADCAST_ACTION = "ru.startandroid.develop.p0961servicebackbroadcast";
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_cities, container, false);
-
-
-/*        // get settings
-        Bundle bundle = getArguments();
-
-        if (bundle != null) {
-            mUnitsFormat = bundle.getInt(MainActivity.UNITS_FORMAT);
-        }
-
-        Log.d("AAAAA", "onCreate() - Cities fragment -  mUnitsFormat = " + mUnitsFormat);*/
-
 
         setHasOptionsMenu(true); // show action bar menu
 
@@ -180,21 +120,11 @@ public class CitiesListFragment extends Fragment implements
 
         titleTextView = (TextView) view.findViewById(R.id.titleTextView);
 
-
-
-/*        // message bar panel
-        messageBarLayout = (LinearLayout) view.findViewById(R.id.messageBar);
-        messageTextView = (TextView) view.findViewById(R.id.messageTextView);
-        messageProgressBar = (ProgressBar) view.findViewById(R.id.messageProgressBar);*/
-
-
         // uncheck all items for delete
-        CityCursorAdapter.setCheckboxesVisibility(false);
+        /// CityCursorAdapter.setCheckboxesVisibility(false);
 
         cityCursorAdapter = new CityCursorAdapter(getContext(), null, 0);
         citiesListView.setAdapter(cityCursorAdapter);
-
-        //   Log.d("AAAAA" , "onCreateView() - mUnitsFormat = " + mUnitsFormat);
 
         initLoader();
 
@@ -208,42 +138,6 @@ public class CitiesListFragment extends Fragment implements
         MainActivity.Settings settings = activity.readSettingsFromDB();
         mUnitsFormat = settings.getUnitsFormat();
         mSortCities = settings.getSortCities();
-
-   //     Log.d("AAAAA", "CitiesFragment: initLoader - mSortCities = " + mSortCities);
-
-        //  int unitsFormat = 0; // metric/Celsius units format by default
-/*
-        // read all columns
-        Cursor cursor = getActivity().getContentResolver().query(DataContentProvider.SETTINGS_CONTENT_URI,
-                new String[]{ DataContract.SettingsEntry.COLUMN_UNITS_FORMAT,
-                              DataContract.SettingsEntry.COLUMN_SORT_CITIES },
-                null, // DataContract.CityEntry.COLUMN_ENTERED_CITY + "=?",
-                null, // new String[]{enteredCity},
-                null);
-
-        if (cursor != null) {
-
-            if (cursor.getCount() > 0) { // has cities in DB
-
-                cursor.moveToFirst();
-
-                mUnitsFormat = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_UNITS_FORMAT));
-                mSortCities = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_SORT_CITIES));
-
-                //     Log.d("AAAAA", "readSettingsFromDB - mUnitsFormat = " + mUnitsFormat);
-
-                titleTextView.setText(R.string.cities_title_cities_present);
-
-            } else { // cities DB empty
-
-                titleTextView.setText(R.string.cities_title_cities_empty);
-            }
-            cursor.close();
-        } // if(cursor != null)*/
-
-        //    MainActivity a = (MainActivity) getActivity();
-
-        //    Log.d("AAAAA", "CitiesFragment: a.getUnitsFormat() = " + a.getUnitsFormat());
 
         // set units format
         CityCursorAdapter.setUnitsFormat(mUnitsFormat);
@@ -271,14 +165,12 @@ public class CitiesListFragment extends Fragment implements
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         String formattedDate = df.format(c.getTime());
 
-        String sortOrder =DataContract.CityEntry._ID; // default sort order: _id
+        String sortOrder = DataContract.CityEntry._ID; // default sort order: _id
 
-       if(mSortCities == 0)
-           sortOrder = "ORDER BY c." + DataContract.CityEntry._ID + " DESC";
-        else if(mSortCities == 1)
+        if (mSortCities == 0)
+            sortOrder = "ORDER BY c." + DataContract.CityEntry._ID + " DESC";
+        else if (mSortCities == 1)
             sortOrder = "ORDER BY " + DataContract.CityEntry.COLUMN_ENTERED_CITY + " ASC";
-
-    ///    Log.d("AAAAA", "CitiesListFragment: sortOrder = " + sortOrder);
 
         return new CursorLoader(getContext(),
                 Uri.parse(DataContentProvider.CITY_WEATHER_CONTENT_URI.toString() + "/" + formattedDate),
@@ -297,12 +189,9 @@ public class CitiesListFragment extends Fragment implements
         // old cursor once we return.)
         cityCursorAdapter.swapCursor(cursor);
 
-
         // set title
-
         if (cursor.getCount() > 0) {
 
-          //  titleTextView.setText(R.string.cities_title_cities_present);
             titleTextView.setVisibility(View.GONE);
 
         } else { // cities DB empty
@@ -323,18 +212,6 @@ public class CitiesListFragment extends Fragment implements
     }
     // ------------------------------------------------------------
 
-/*
-    public void refreshCityList() {
-
-   //     Log.d("AAAAA", "refreshCityList !!!");
-
-        cityCursorAdapter.notifyDataSetChanged();
-
-        // scroll ListView to start position
-        citiesListView.smoothScrollToPosition(0);
-    }*/
-
-
     // citiesListView item click
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -346,11 +223,9 @@ public class CitiesListFragment extends Fragment implements
         Cursor cursor = (Cursor) parent.getItemAtPosition(position);
         int cityID = cursor.getInt(cursor.getColumnIndex(DataContract.CityEntry._ID));
         String enteredCity = cursor.getString(cursor.getColumnIndex(DataContract.CityEntry.COLUMN_ENTERED_CITY));
-     ///   String returnedCity = cursor.getString(cursor.getColumnIndex(DataContract.CityEntry.COLUMN_RETURNED_CITY));
-
         String dataUpdateTime = cursor.getString(cursor.getColumnIndex(DataContract.CityEntry.COLUMN_UPDATE_TIMESTAMP));
 
-    ///    Log.d("AAAAA", "dataUpdateTime = " + dataUpdateTime);
+        ///    Log.d("AAAAA", "dataUpdateTime = " + dataUpdateTime);
 
         activity.onCityItemSelected(cityID, enteredCity, dataUpdateTime, mUnitsFormat); // pass selection to MainActivity
     }
@@ -371,7 +246,6 @@ public class CitiesListFragment extends Fragment implements
                 onButtonDelete();
 
                 break;
-
 
             case R.id.button_backup:
 
@@ -444,23 +318,17 @@ public class CitiesListFragment extends Fragment implements
             final String citySelection = TextUtils.join(" OR ", cityWhereList);
             final String weatherSelection = TextUtils.join(" OR ", weatherWhereList);
             //Log.d("AAAAA", "citySelection = " + citySelection);
-
             //   String selectionArgs = TextUtils.join(" ", argsList);
             //   Log.d("AAAAA", "selectionArgs = " + selectionArgs);
 
             final String[] citySelectionArgs = argsList.toArray(new String[argsList.size()]);
 
-
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-
             builder.setTitle(R.string.delete_dialog_question);
-
             builder.setMessage(R.string.delete_dialog_text);
-
             builder.setPositiveButton(R.string.delete_dialog_ok, new DialogInterface.OnClickListener() {
 
                 public void onClick(DialogInterface dialog, int which) {
-                    //  showMessage("Нажали ОК");
 
                     // as has foreign key from "city" table to child table "weather" need
                     // to ic_delete_item data in "weather" table first
@@ -491,9 +359,7 @@ public class CitiesListFragment extends Fragment implements
 
                         Toast.makeText(getContext(), getString(R.string.rows_deleted,
                                 cpResults[1].count.toString()), Toast.LENGTH_SHORT).show();
-
                         hide(); // hide delete panel
-                        ///   }
                     } catch (RemoteException e) {
                         Log.e("AAAAA", "RemoteException " + e.getMessage());
                     } catch (OperationApplicationException e) {
@@ -506,25 +372,11 @@ public class CitiesListFragment extends Fragment implements
             builder.setNegativeButton(R.string.delete_dialog_cancel, new DialogInterface.OnClickListener() {
 
                 public void onClick(DialogInterface dialog, int which) {
-                    // showMessage("Нажали Нет");
-                    ///    Log.d("AAAAA", "setNegativeButton");
                     hide(); // hide delete panel
                 }
             });
 
             builder.show(); // show dialog
-
-/*            ConfirmDeleteCityItemsDialog deleteDialog = new ConfirmDeleteCityItemsDialog();
-            deleteDialog.setTargetFragment(CitiesListFragment.this, 1);
-            Bundle bundle = new Bundle();
-            bundle.putString("citySelection", citySelection);
-            bundle.putString("weatherSelection", weatherSelection);
-            bundle.putStringArray("citySelectionArgs", citySelectionArgs);
-            deleteDialog.setArguments(bundle);
-            deleteDialog.show(getFragmentManager(), "ic_delete_item dialog");
-            */
-
-
         } else {
 
             Toast.makeText(getContext(), "Выберите записи для удаления", Toast.LENGTH_SHORT).show();
@@ -533,8 +385,6 @@ public class CitiesListFragment extends Fragment implements
 
 
     public void hide() {
-
-        ///     Log.d("AAAAA", "hide()");
 
         CityCursorAdapter.setCheckboxesVisibility(false);
 
@@ -550,17 +400,8 @@ public class CitiesListFragment extends Fragment implements
 
         // menu set visible
         mMenuVisible = true;
+
         getActivity().invalidateOptionsMenu();
-
-/*        // run citiesListView refresh on tablet devices only
-        if (getActivity().findViewById(R.id.onePaneLayout) == null) { // tablet
-        //    Log.d("AAAAA", "is tablet");
-
-           //// activity.refreshCitiesListForTabletDevice();
-
-            // refresh  cities ListView data !!
-            initLoader();
-        }*/
 
         activity.onDeleteCity();
     }
@@ -591,9 +432,6 @@ public class CitiesListFragment extends Fragment implements
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
-        // clear previous menu items
-        /// menu.clear();
-
         super.onCreateOptionsMenu(menu, inflater);
 
         inflater.inflate(R.menu.city_fragment_menu, menu);
@@ -608,6 +446,7 @@ public class CitiesListFragment extends Fragment implements
             MenuItem menuItem = menu.getItem(index);
 
             if (menuItem != null) {
+
                 // hide the menu items if the drawer is open
                 menuItem.setVisible(mMenuVisible);
             }
@@ -625,10 +464,6 @@ public class CitiesListFragment extends Fragment implements
 
             case R.id.action_add:
 
-/*                if (isDeleteMode) {
-                    return true;
-                }*/
-
                 activity.onAddCity();
 
                 return true;
@@ -638,34 +473,10 @@ public class CitiesListFragment extends Fragment implements
                 onActionDeleteCity();
 
                 return true;
-
- /*           case R.id.action_sync:
-
-                activity.syncData();
-
-                return true;*/
         }
         return super.onOptionsItemSelected(item);
     }
 
-
- /*   private void showMessageBar(String text, boolean showProgressBar) {
-
-        messageBarLayout.setVisibility(View.VISIBLE);
-        messageTextView.setText(text);
-
-        if (showProgressBar)
-            messageProgressBar.setVisibility(View.VISIBLE);
-        else
-            messageProgressBar.setVisibility(View.GONE);
-    }
-
-
-    private void hideMessageBar() {
-
-        messageBarLayout.setVisibility(View.GONE);
-    }
-    */
 
     private void backupDatabase() {
 
@@ -714,26 +525,11 @@ public class CitiesListFragment extends Fragment implements
 
     }
 
-/*    private File getExternalSDCardDirectory()
-    {
-        File innerDir = Environment.getExternalStorageDirectory();
-        File rootDir = innerDir.getParentFile();
-        File firstExtSdCard = innerDir ;
-        File[] files = rootDir.listFiles();
-        for (File file : files) {
-            if (file.compareTo(innerDir) != 0) {
-                firstExtSdCard = file;
-                break;
-            }
-        }
-        //Log.i("2", firstExtSdCard.getAbsolutePath().toString());
-        return firstExtSdCard;
-    }*/
 
     private static final Pattern DIR_SEPARATOR = Pattern.compile("/");
 
     /**
-     * Raturns all available SD-Cards in the system (include emulated)
+     * Returns all available SD-Cards in the system (include emulated)
      * <p>
      * Warning: Hack! Based on Android source code of version 4.3 (API 18)
      * Because there is no standart way to get it.
@@ -791,48 +587,4 @@ public class CitiesListFragment extends Fragment implements
         }
         return rv.toArray(new String[rv.size()]);
     }
-
-
-    //   private CustomBroadcastReceiver customBroadcastReceiver;
-
-
-
-
-
-
-/*
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_alarm_manager);
-        alarm = new CustomBroadcastReceiver();
-    }
-
-    public void startRepeatingTimer(View view) {
-        Context context = this.getApplicationContext();
-        if(alarm != null){
-            alarm.SetAlarm(context);
-        }else{
-            Toast.makeText(context, 'Alarm is null', Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    public void cancelRepeatingTimer(View view){
-        Context context = this.getApplicationContext();
-        if(alarm != null){
-            alarm.CancelAlarm(context);
-        }else{
-            Toast.makeText(context, 'Alarm is null', Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    public void onetimeTimer(View view){
-        Context context = this.getApplicationContext();
-        if(alarm != null){
-            alarm.setOnetimeTimer(context);
-        }else{
-            Toast.makeText(context, 'Alarm is null', Toast.LENGTH_SHORT).show();
-        }
-    }*/
-
 }

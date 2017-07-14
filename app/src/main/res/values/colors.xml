@@ -7,13 +7,13 @@
 
     <color name="iconColor">#c4cdfe</color>
 
-
     <color name="basicText">#FFFFFF</color>
     <color name="mainTitleColor">#a7fbf1</color>
     <color name="titleColor">#d1dbfc</color>
     <color name="onlineColor">#8bfc89</color>
     <color name="offlineColor">#fbc583</color>
     <color name="nothingColor">#bababa</color>
+    <color name="splashScreenBackground">#4B83B3</color>
 
     <color name="button_pressed_background">#f4adad</color>
     <color name="button_released_background">#c0e1f7</color>

@@ -1,14 +1,19 @@
 package com.example.arsone.weather;
 
+import android.annotation.TargetApi;
 import android.app.IntentService;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.SystemClock;
+import android.os.Build;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.android.volley.NetworkResponse;
@@ -24,11 +29,11 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 // http://guides.codepath.com/android/Starting-Background-Services#communicating-with-a-broadcastreceiver
 
@@ -39,11 +44,32 @@ import java.util.List;
 
 public class GetDataService extends IntentService {
 
+    private final static String PARAM_TASK = "task";
+    private final static String PARAM_STATUS = "status";
+    private final static String PARAM_CITY_ID = "city_id";
+    private final static String PARAM_ENTERED_CITY = "city_name";
+    //private final static String PARAM_LANG_CODE = "language_index";
+    //   private final static String PARAM_TODO = "todo";
+
+    private final static int TASK_GET_WEATHER_ONE_CITY = 1;
+    private final static int TASK_GET_WEATHER_ALL_CITIES = 2;
+    private final static int TASK_GET_DATA_PERIODICALLY = 3;
+
+    private final static int STATUS_GET_WEATHER_ONE_CITY_START = 101;
+    private final static int STATUS_GET_WEATHER_ONE_CITY_FINISH = 102;
+
+    private final static int STATUS_GET_WEATHER_ALL_CITIES_START = 103;
+    private final static int STATUS_GET_WEATHER_ALL_CITIES_FINISH = 104;
+
+    private final String BROADCAST_DYNAMIC_ACTION = "com.example.arsone.weather.dynamic.broadcast";
+
+//    private String mAction = "";
+
 
     class City {
 
-        int id;
-        String city;
+        public int id;
+        public String city;
 
         public City(int id, String city) {
 
@@ -63,66 +89,90 @@ public class GetDataService extends IntentService {
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
 
-        // Do the task here
-        //// Log.i("AAAAA", "Service running");
+        Log.i("AAAAA", "Service running");
 
-        // int time = intent.getIntExtra(MainActivity.PARAM_TIME, 1);
+        if (intent == null)
+            return;
+
+/*        String action = intent.getAction();
+
+        if (action != null && action.equals(BROADCAST_DYNAMIC_ACTION))
+            return;*/
+
+/*
+            if(intent == null)
+            return;
+
+        mAction = intent.getAction();
+
+        if(mAction == null)
+            return;
+*/
+
+        //       Log.d("AAAAA", "GetDataService: action = " + action);
+/*
+       mAction = intent.getStringExtra(PARAM_ACTION);
+        Log.d("AAAAA" , "GetDataService: mAction = " + mAction);
+*/
 
         // get task
-        int mTask = intent.getIntExtra(MainActivity.PARAM_TASK, 0);
+        int mTask = intent.getIntExtra(PARAM_TASK, 0);
 
-        if (mTask == MainActivity.TASK_GET_WEATHER_ONE_CITY) {
+        if (mTask == TASK_GET_WEATHER_ONE_CITY) {
 
-            String city = intent.getStringExtra(MainActivity.PARAM_ENTERED_CITY);
-            int id = intent.getIntExtra(MainActivity.PARAM_CITY_ID, -1);
-            int languageIndex = intent.getIntExtra(MainActivity.PARAM_LANG_CODE, 0);
+            //  String action = intent.getAction();
+            Log.d("AAAAA", "GetDataService: mTask = TASK_GET_WEATHER_ONE_CITY");
+
+            int id = intent.getIntExtra(PARAM_CITY_ID, -1);
+            String city = intent.getStringExtra(PARAM_ENTERED_CITY);
+            //     int languageIndex = intent.getIntExtra(PARAM_LANG_CODE, 0);
+
+
+            Log.d("AAAAA", "GetDataService: city = " + city);
 
             if (city != null && id != -1) {
 
-              //  Log.d("AAAAA", "Service running for ONE CITY.");
-
-                Intent i = new Intent(MainActivity.BROADCAST_ACTION);
+                Log.d("AAAAA", "GetDataService: Service running for ONE CITY.");
 
                 // inform about task starting
-                i.putExtra(MainActivity.PARAM_TASK, mTask);
-                i.putExtra(MainActivity.PARAM_STATUS, MainActivity.STATUS_GET_WEATHER_ONE_CITY_START);
-                sendBroadcast(i);
+                Intent startIntent = new Intent()
+                        .putExtra(PARAM_TASK, mTask)
+                        .putExtra(PARAM_STATUS, STATUS_GET_WEATHER_ONE_CITY_START)
+                        .setAction(BROADCAST_DYNAMIC_ACTION);
 
-                getWeather(id, city, languageIndex);
+                sendBroadcast(startIntent);
 
-                // Inform about task finish
-                Intent newIntent = new Intent(MainActivity.BROADCAST_ACTION);
-                i.putExtra(MainActivity.PARAM_TASK, mTask);
-                newIntent.putExtra(MainActivity.PARAM_STATUS, MainActivity.STATUS_GET_WEATHER_ONE_CITY_FINISH);
-                sendBroadcast(newIntent);
+                getWeather(id, city); //, languageIndex);
+
+                // inform about task finish
+                Intent finishIntent = new Intent()
+                        .putExtra(PARAM_TASK, mTask)
+                        .putExtra(PARAM_STATUS, STATUS_GET_WEATHER_ONE_CITY_FINISH)
+                        .setAction(BROADCAST_DYNAMIC_ACTION);
+
+                sendBroadcast(finishIntent);
             }
-        } else if (mTask == MainActivity.TASK_GET_WEATHER_ALL_CITIES) {
+        } else if (mTask == TASK_GET_WEATHER_ALL_CITIES) {
 
-        //    Log.d("AAAAA", "Service running for all cities");
+            Log.d("AAAAA", "GetDataService: TASK_GET_WEATHER_ALL_CITIES");
 
-            Intent i = new Intent(MainActivity.BROADCAST_ACTION);
+            //   String action = intent.getAction();
+            //    Log.d("AAAAA", "GetDataService: Service running for all cities - action = " + action);
 
             // inform about task starting
-            i.putExtra(MainActivity.PARAM_TASK, mTask);
-            i.putExtra(MainActivity.PARAM_STATUS, MainActivity.STATUS_GET_WEATHER_ALL_CITIES_START);
-            sendBroadcast(i);
+            Intent startIntent = new Intent()
+                    .putExtra(PARAM_TASK, mTask)
+                    .putExtra(PARAM_STATUS, STATUS_GET_WEATHER_ALL_CITIES_START)
+                    .setAction(BROADCAST_DYNAMIC_ACTION);
 
-/*
+            sendBroadcast(startIntent);
 
-        String city = intent.getStringExtra(MainActivity.SERVICE_PARAM_ENTERED_CITY);
-        int id = intent.getIntExtra(MainActivity.SERVICE_PARAM_CITY_ID, -1);
 
-        if(city != null && id != -1){
-            Log.i("AAAAA", "Service running for ONE CITY.");
+            getAllCities();
 
-            getWeather(id, city);
-*/
-/*        }
-        else {*/
-            //          Log.i("AAAAA", "Service running for all cities...");
+           /* ContentResolver contentResolver = getContentResolver();
 
-            ContentResolver contentResolver = getContentResolver();
-
+            // read cities list from DB
             Cursor cursor = contentResolver.query(DataContentProvider.CITY_CONTENT_URI, // @NonNull Uri uri,
                     null,// @Nullable String[] projection,
                     null,//@Nullable String selection,
@@ -131,7 +181,8 @@ public class GetDataService extends IntentService {
             );
 
             if (cursor.getCount() == 0) {
-              //  Log.d("AAAAA", "cursor.getCount() = 0");
+                //  Log.d("AAAAA", "cursor.getCount() = 0");
+                cursor.close();
                 return;
             }
 
@@ -152,41 +203,119 @@ public class GetDataService extends IntentService {
                 cursor.moveToNext();
             }
 
-            int languageIndex = intent.getIntExtra(MainActivity.PARAM_LANG_CODE, 0);
+            cursor.close();
+
+            int languageIndex = intent.getIntExtra(PARAM_LANG_CODE, 0);
 
             for (City c : citiesList) {
 
-                getWeather(c.id, c.city, languageIndex);
-            }
+                getWeather(c.id, c.city); // , languageIndex);
+            }*/
 
             // Inform about task finish
-            Intent newIntent = new Intent(MainActivity.BROADCAST_ACTION);
-            i.putExtra(MainActivity.PARAM_TASK, mTask);
-            newIntent.putExtra(MainActivity.PARAM_STATUS, MainActivity.STATUS_GET_WEATHER_ALL_CITIES_FINISH);
-            sendBroadcast(newIntent);
+            Intent finishIntent = new Intent()
+                    .putExtra(PARAM_TASK, mTask)
+                    .putExtra(PARAM_STATUS, STATUS_GET_WEATHER_ALL_CITIES_FINISH)
+                    .setAction(BROADCAST_DYNAMIC_ACTION);
+
+            sendBroadcast(finishIntent);
+
+        } else if (mTask == TASK_GET_DATA_PERIODICALLY) {
+
+            Log.d("AAAAA", "GetDataService: TASK_GET_DATA_PERIODICALLY");
+
+            // inform about task starting
+            Intent startIntent = new Intent()
+                    .putExtra(PARAM_TASK, mTask)
+                    .putExtra(PARAM_STATUS, STATUS_GET_WEATHER_ALL_CITIES_START)
+                    .setAction(BROADCAST_DYNAMIC_ACTION);
+
+            sendBroadcast(startIntent);
+
+            getAllCities();
+
+            // Inform about task finish
+            Intent finishIntent = new Intent()
+                    .putExtra(PARAM_TASK, mTask)
+                    .putExtra(PARAM_STATUS, STATUS_GET_WEATHER_ALL_CITIES_FINISH)
+                    .setAction(BROADCAST_DYNAMIC_ACTION);
+
+            sendBroadcast(finishIntent);
+        }
+        else {
+            Log.d("AAAAA", "GetDataService: CATCH OTHER TASK FOR TEST !!!");
+
         }
     }
 
 
-    private void getWeather(final int id, final String city, final int languageIndex) {
+    private void getAllCities(){
 
-   //     final Intent intent = new Intent(MainActivity.BROADCAST_ACTION);
+        ContentResolver contentResolver = getContentResolver();
+
+        // read cities list from DB
+        Cursor cursor = contentResolver.query(DataContentProvider.CITY_CONTENT_URI, // @NonNull Uri uri,
+                null,// @Nullable String[] projection,
+                null,//@Nullable String selection,
+                null,//@Nullable String[] selectionArgs,
+                null//@Nullable String sortOrder)
+        );
+
+        if (cursor.getCount() == 0) {
+            //  Log.d("AAAAA", "cursor.getCount() = 0");
+            cursor.close();
+            return;
+        }
+
+        cursor.moveToFirst();
+
+        List<City> citiesList = new ArrayList<City>();
+
+        while (!cursor.isAfterLast()) {
+
+            //   Log.d("AAAAA", "CITY = " + cursor.getString(cursor.getColumnIndex(DataContract.CityEntry.COLUMN_ENTERED_CITY)));
+
+            City newCity = new City(cursor.getInt(cursor.getColumnIndex(DataContract.CityEntry._ID)),
+                    cursor.getString(cursor.getColumnIndex(DataContract.CityEntry.COLUMN_ENTERED_CITY))
+            );
+
+            citiesList.add(newCity);
+
+            cursor.moveToNext();
+        }
+
+        cursor.close();
+
+     //   int languageIndex = intent.getIntExtra(PARAM_LANG_CODE, 0);
+
+        for (City c : citiesList) {
+
+            getWeather(c.id, c.city); // , languageIndex);
+        }
+
+    }
+
+    private void getWeather(final int id, final String city) { //, final int languageIndex) {
 
         String url;
 
         try {
-            String[] languageCodeArray = getResources().getStringArray(R.array.language_parameter_array);
+            //   String[] languageCodeArray = getResources().getStringArray(R.array.language_parameter_array);
+
+            String locale = getCurrentLocale().getCountry().toLowerCase();
+
+            //     Log.d("AAAAA" , "GetDataService: locale = " + locale);
 
             url = getString(R.string.web_service_url)
                     + URLEncoder.encode(city, "UTF-8")
                     /// + "&units=metric&lang=ru&cnt=5&APPID="
                     + "&units=metric" // default units = metric
                     /// + "&lang=ru"  // default language = English
-                    + "&lang=" + languageCodeArray[languageIndex]
+                    + "&lang=" + locale // languageCodeArray[languageIndex]
                     + "&cnt=5"        // default for 5 days
                     + "&APPID=" + getString(R.string.openweathermap_api_key);
 
-            Log.d("AAAAA", "getWeather( - url = " + url);
+            Log.d("AAAAA", "getWeather: url = " + url);
 
         } catch (UnsupportedEncodingException e) {
             Log.d("AAAAA", "UnsupportedEncodingException:" + e.getMessage());
@@ -207,20 +336,15 @@ public class GetDataService extends IntentService {
 
                         List<Weather> weatherList = new ArrayList<Weather>();
                         ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
-                        try {
 
+                        try {
                             JSONArray list = null;
 
-                            Log.d("AAAAA", "city: " + city + " responce = " + response);
-
-                            // set mStatus info
-                            ///     setModeBar(getResources().getText(R.string.online).toString(), R.color.onlineColor, R.drawable.ic_lamp_online);
+                            Log.d("AAAAA", "city: " + city + " response = " + response);
 
                             list = response.getJSONArray("list");
 
                             JSONObject jsonCity = response.getJSONObject("city");
-
-                            ///        Log.d("AAAAA", "city = " + jsonCity);
 
                             // city info
                             returnedCityName = jsonCity.getString("name");
@@ -234,10 +358,9 @@ public class GetDataService extends IntentService {
 
                             // Преобразовать каждый элемент списка в объект Weather
                             for (int i = 0; i < list.length(); ++i) {
+
                                 JSONObject day = list.getJSONObject(i); // Данные за день
-
                                 JSONObject temperatures = day.getJSONObject("temp");
-
                                 JSONObject weather = day.getJSONArray("weather").getJSONObject(0);
 
                                 weatherList.add(new Weather(
@@ -257,7 +380,6 @@ public class GetDataService extends IntentService {
                                         weather.getString("icon"), // String iconName
                                         weather.getInt("id") // int weatherID
                                 ));
-
                             }
 
                             // database operations transaction:
@@ -275,38 +397,19 @@ public class GetDataService extends IntentService {
                             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                             String currentDateTime = dateFormat.format(new Date()); // Find todays date
 
-                          //  Log.d("AAAAA", "currentDateTime = " + currentDateTime);
-
                             cv.put(DataContract.CityEntry.COLUMN_UPDATE_TIMESTAMP, currentDateTime);
-
- /*                           cv.put(DataContract.CityEntry.COLUMN_UPDATE_TIMESTAMP,
-                                    "datetime(CURRENT_TIMESTAMP, 'localtime')");*/
-
-    /*                            mRefreshDataTask = new DetailsFragment.RefreshDataTask();
-                                mRefreshDataTask.execute(cv);*/
-
-
-                            // ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
-
-                            //     String citySelection = DataContract.CityEntry._ID + "=?";
-                            //  String[] selectionArgs = {String.valueOf(id)};
-
-                            //   String weatherSelection = DataContract.WeatherEntry.COLUMN_CITY_ID_FK + "=?";
 
                             Uri updateUri = Uri.parse(DataContentProvider.CITY_CONTENT_URI.toString() + "/" + id);
 
                             // update city data
-                            /// ops.add(ContentProviderOperation.newUpdate(DataContentProvider.CITY_CONTENT_URI)
                             ops.add(ContentProviderOperation.newUpdate(updateUri)
                                     /// .withSelection(citySelection, selectionArgs)
                                     .withValues(cv)
                                     .build());
 
                             // ic_delete_item old data in from weather table
-
                             Uri deleteUri = Uri.parse(DataContentProvider.WEATHER_CONTENT_URI.toString() + "/" + id);
 
-                            /// ops.add(ContentProviderOperation.newDelete(DataContentProvider.WEATHER_CONTENT_URI)
                             ops.add(ContentProviderOperation.newDelete(deleteUri)
                                     // .withSelection(weatherSelection, selectionArgs)
                                     .build());
@@ -330,56 +433,12 @@ public class GetDataService extends IntentService {
                                         .withValue(DataContract.WeatherEntry.COLUMN_DESCRIPTION, weatherList.get(j).description) // weather.getString("description"))// "description"
                                         .withValue(DataContract.WeatherEntry.COLUMN_ICON_NAME, weatherList.get(j).iconName) // weather.getString("icon"))         // "icon_name"
                                         .build());
-
                             }
-
-                            /// ContentProviderResult[] cpResults =
                             getContentResolver().applyBatch(DataContentProvider.AUTHORITY, ops);
 
-
-/*                            Intent i = new Intent(MainActivity.BROADCAST_ACTION);
-
-                            // Inform about task finish
-                            i.putExtra(MainActivity.PARAM_STATUS, MainActivity.STATUS_FINISH);
-                            sendBroadcast(i);*/
-
-//        ContentProviderResult[] cpResults = getActivity().getContentResolver()
-                            //            .applyBatch(DataContentProvider.AUTHORITY, ops);
-
-                            //              if (cpResults != null) {
-
-                            //                  Log.e("AAAAA", "cpResults[1].count = " + cpResults[1].count);
-                            //Log.e("AAAAA","cpResults = " + cpResults.);
-                            //Log.e("AAAAA","cpResults = " + cpResults.toString());
-
-                            //Toast.makeText(getContext(), getString(R.string.rows_deleted)
-//                            + cpResults[1].count, Toast.LENGTH_SHORT).show();
-
-//                }
-                            //     }
-
-/*                            catch (RemoteException e) {
-                                Log.e("AAAAA", "RemoteException " + e.getMessage());
-                            } catch (OperationApplicationException e) {
-                                Log.e("AAAAA", "OperationApplicationException: " + e.getMessage());
-                                ops.clear();
-                            }*/
-
-
-                        }
-/*                        catch (RemoteException e) {
-                            Log.e("AAAAA", "RemoteException " + e.getMessage());
-                        } catch (OperationApplicationException e) {
-                            Log.e("AAAAA", "OperationApplicationException: " + e.getMessage());
-                            ops.clear();
-                        }
-                        */
-/*                        catch (JSONException e) {
-                            Log.d("AAAAA", "JSONException: " + e.getMessage());
-                        } */ catch (Exception e) {
+                        } catch (Exception e) {
                             Log.d("AAAAA", "Exception: " + e.getMessage());
                         } finally {
-                            //   hideMessageBar();
                             ops.clear();
                         }
                     }
@@ -389,8 +448,6 @@ public class GetDataService extends IntentService {
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                //        hideMessageBar();
-
                 NetworkResponse response = error.networkResponse;
 
                 if (response != null && response.data != null) {
@@ -398,57 +455,54 @@ public class GetDataService extends IntentService {
                     if (response.statusCode == 404) {
 
                         Log.d("AAAA", "onErrorResponse: 404");
-
-                        // set mStatus info
-/*                            setModeBar(getString(R.string.message_city_not_found),
-                                    R.color.nothingColor, R.drawable.ic_lamp_nothing);*/
-
-                        ///         return;
                     }
                 }
-
-                // OFFLINE MODE: show database data
-
-                   /* // set offline mode info
-                    setModeBar(getString(R.string.offline), R.color.offlineColor, R.drawable.ic_lamp_offline);
-
-                    Log.d("AAAAA", "OFF-LINE MODE");
-
-                    if (getActivity().findViewById(R.id.onePaneLayout) != null) { // phone
-                        weatherCursorAdapter = new WeatherCursorAdapter(getContext(), null, 0,
-                                R.layout.list_item_weather // phone layout
-                        );
-                    } else { // tablet
-                        weatherCursorAdapter = new WeatherCursorAdapter(getContext(), null, 0,
-                                R.layout.list_item_weather_tablet // tablet layout
-                        );
-                    }
-
-                    weatherListView.setAdapter(weatherCursorAdapter);
-
-                    // --------------------------------------------------------------
-                    // IMPORTANT !!! Change loader for different query
-                    Loader loader = getLoaderManager().getLoader(MainActivity.LOADER_WEATHER_ID);
-
-                    if (loader != null && !loader.isReset()) {
-                        getLoaderManager().restartLoader(MainActivity.LOADER_WEATHER_ID, null, DetailsFragment.this);
-                    } else {
-                        getLoaderManager().initLoader(MainActivity.LOADER_WEATHER_ID, null, DetailsFragment.this);
-                    }
-                    // --------------------------------------------------------------*/
             }
         });
-
-/*        if (url == null)
-            return;*/
 
         // Defining the Volley request queue that handles the URL request concurrently
         RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
         requestQueue.add(jsonObjectRequest);
 
         // Delay for OpenWeatherMap.org limitation (1 query per second)
-        SystemClock.sleep(1000); // 1 second sleep
+        /// SystemClock.sleep(1000); // 1 second sleep
     }
 
 
+    @TargetApi(Build.VERSION_CODES.N)
+    public Locale getCurrentLocale() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+
+            return getResources().getConfiguration().getLocales().get(0);
+
+        } else {
+
+            //noinspection deprecation
+            return getResources().getConfiguration().locale;
+        }
+    }
+
+
+    private void sendNotification(String msg) {
+
+        // NotificationManager class to notify the user of events
+        // that happen. This is how you tell the user that something
+        // has   happened in the background.
+        NotificationManager alarmNotificationManager = (NotificationManager) this
+                .getSystemService(Context.NOTIFICATION_SERVICE);
+
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0);
+
+        // set icon, title and message for notification
+        NotificationCompat.Builder alamNotificationBuilder = new NotificationCompat.Builder(this)
+                .setContentTitle("Alarm")
+                /// .setSmallIcon(R.drawable.ic_launcher)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(msg))
+                .setContentText(msg);
+
+        alamNotificationBuilder.setContentIntent(contentIntent);
+
+        alarmNotificationManager.notify(1, alamNotificationBuilder.build());
+    }
 }

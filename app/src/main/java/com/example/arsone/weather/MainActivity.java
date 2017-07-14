@@ -23,9 +23,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.arsone.weather.data.City;
 import com.mapbox.mapboxsdk.Mapbox;
-
 
 // https://www.thorntech.com/2016/03/parsing-json-android-using-volley-library/
 // https://www.smashingmagazine.com/2017/03/simplify-android-networking-volley-http-library/
@@ -38,6 +36,7 @@ import com.mapbox.mapboxsdk.Mapbox;
 // https://stackoverflow.com/questions/4165414/how-to-hide-soft-keyboard-on-android-after-clicking-outside-edittext
 // https://stackoverflow.com/questions/35496493/getmapasync-in-fragment
 // https://developers.google.com/android/guides/setup
+// http://www.mobilab.ru/androiddev/androidalarmmanagertutorial.html
 
 
 public class MainActivity extends AppCompatActivity implements
@@ -45,7 +44,6 @@ public class MainActivity extends AppCompatActivity implements
         DetailsFragment.Callbacks,
         AddCityFragment.Callbacks,
         SettingsFragment.Callbacks {
-
 
     // 0 = metric (default), 1 = imperial,
     // Metric: temperature in "Celsius", wind speed in "meter/sec", pressure in "hPa"
@@ -55,19 +53,15 @@ public class MainActivity extends AppCompatActivity implements
     // sort cities: 0 = by adding (default), 1 = alphabetically
     private int mSortCities;
 
-    // 0 = light style, ...
-    //private int mMapStyleIndex;
-
     // 0 = English(default), 1 = Russian
-    private int mMapLanguageIndex;
-
 
     // message panel
     private LinearLayout messageBarLayout;
     private TextView messageTextView;
     private ProgressBar messageProgressBar;
 
-
+    // -------------------------------------------
+    // Unique loaders ID:
     // Loader ID: CitiesListFragment
     public static final int LOADER_CITIES_ID = 1;
 
@@ -76,31 +70,21 @@ public class MainActivity extends AppCompatActivity implements
 
     // Loader ID: AddCityFragment
     public static final int LOADER_MARKER_ID = 3;
+    // -------------------------------------------
 
+    private final String BROADCAST_STATIC_ACTION = "com.example.arsone.weather.static.broadcast";
+    private static final String BROADCAST_DYNAMIC_ACTION = "com.example.arsone.weather.dynamic.broadcast";
 
-    public final static String BROADCAST_ACTION = "com.example.arsone.weather.broadcast";
+    private BroadcastReceiver dynamicBroadcastReceiver;
 
-
-    /// public final static String SERVICE_PARAM_TASK = "task";
-
-
-    private BroadcastReceiver broadcastReceiver;
-
-///    private CustomBroadcastReceiver customBroadcastReceiver;
-
-    // public final static String PARAM_TIME = "time";
     public final static String PARAM_TASK = "task";
-    ///    public final static String PARAM_RESULT = "result";
     public final static String PARAM_STATUS = "status";
     public final static String PARAM_CITY_ID = "city_id";
     public final static String PARAM_ENTERED_CITY = "city_name";
-    public final static String PARAM_LANG_CODE = "language_index";
-
 
     public final static int TASK_GET_WEATHER_ONE_CITY = 1;
     public final static int TASK_GET_WEATHER_ALL_CITIES = 2;
-    // final int TASK3_CODE = 3;
-
+//    public final static int TASK_GET_DATA_PERIODICALLY = 3;
 
     public final static int STATUS_GET_WEATHER_ONE_CITY_START = 101;
     public final static int STATUS_GET_WEATHER_ONE_CITY_FINISH = 102;
@@ -108,13 +92,38 @@ public class MainActivity extends AppCompatActivity implements
     public final static int STATUS_GET_WEATHER_ALL_CITIES_START = 103;
     public final static int STATUS_GET_WEATHER_ALL_CITIES_FINISH = 104;
 
-    public final static int STATUS_SETTINGS_CHANGED = 105;
-
+  //  public final static int STATUS_RUN_ALL_CITIES = 106;
 
     public static final String CITY_ID = "city_id";
     public static final String ENTERED_CITY = "entered_city";
     public static final String UPDATE_TIME = "update_time";
     public static final String UNITS_FORMAT = "units_format";
+
+
+    // final static int RQS_1 = 1;
+
+    final class Settings {
+
+        private final int unitsFormat;
+        private final int sortCities;
+
+        public Settings(int unitsFormat, int sortCities){ // , int mapLanguageIndex) {
+
+            this.unitsFormat = unitsFormat;
+            this.sortCities = sortCities;
+        }
+
+        public int getUnitsFormat() {
+            return unitsFormat;
+        }
+
+        public int getSortCities() {
+            return sortCities;
+        }
+    }
+
+
+    // https://dhimitraq.wordpress.com/2012/11/27/using-intentservice-with-alarmmanager-to-schedule-alarms/
 
 
     @Override
@@ -134,92 +143,65 @@ public class MainActivity extends AppCompatActivity implements
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
 
-
         // message bar panel
         messageBarLayout = (LinearLayout) findViewById(R.id.messageBar);
         messageTextView = (TextView) findViewById(R.id.messageTextView);
         messageProgressBar = (ProgressBar) findViewById(R.id.messageProgressBar);
 
-        broadcastReceiver = new BroadcastReceiver() {
 
-            // действия при получении сообщений
+        dynamicBroadcastReceiver = new BroadcastReceiver() {
+
             public void onReceive(Context context, Intent intent) {
 
-                int task = intent.getIntExtra(PARAM_TASK, 0);
-                int status = intent.getIntExtra(PARAM_STATUS, 0);
+                if (intent.getAction().equalsIgnoreCase(BROADCAST_DYNAMIC_ACTION)) {
 
-           ///     Log.d("AAAAA", "MainActivity: onReceive: task = " + task + ", status = " + status);
+                    int status = intent.getIntExtra(PARAM_STATUS, 0);
 
-                // Ловим сообщения о старте задач
-                //   if (status == STATUS_START) {
+                    switch (status) {
 
-                switch (status) {
+                        case STATUS_GET_WEATHER_ONE_CITY_START:
 
-                    case STATUS_GET_WEATHER_ONE_CITY_START:
+                            Log.d("AAAAA", "dynamicBroadcastReceiver GET: STATUS_GET_WEATHER_ONE_CITY_START");
 
-                        Log.d("AAAAA", "GET: STATUS_GET_WEATHER_ONE_CITY_START");
+                            showMessageBar(getString(R.string.message_wait_for_data), true);
 
-                        showMessageBar(getString(R.string.message_wait_for_data), true);
+                            break;
 
-                        break;
+                        case STATUS_GET_WEATHER_ONE_CITY_FINISH:
 
-                    case STATUS_GET_WEATHER_ONE_CITY_FINISH:
+                            Log.d("AAAAA", "dynamicBroadcastReceiver GET: STATUS_GET_WEATHER_ONE_CITY_FINISH");
 
-                        Log.d("AAAAA", "GET: STATUS_GET_WEATHER_ONE_CITY_FINISH");
+                            refreshData();
 
-                        /// reInitCityListViewLoader();
-                        ///refreshCitiesListForTabletDevice();
+                            break;
 
-                        refreshData();
+                        case STATUS_GET_WEATHER_ALL_CITIES_START:
 
-                        //  hideMessageBar();
+                            Log.d("AAAAA", "dynamicBroadcastReceiver GET: STATUS_GET_WEATHER_ALL_CITIES_START");
 
-                        break;
+                            showMessageBar(getString(R.string.message_wait_for_data), true);
 
-                    case STATUS_GET_WEATHER_ALL_CITIES_START:
+                            break;
 
-                        Log.d("AAAAA", "GET: STATUS_GET_WEATHER_ALL_CITIES_START");
+                        case STATUS_GET_WEATHER_ALL_CITIES_FINISH:
 
-                        showMessageBar(getString(R.string.message_wait_for_data), true);
+                            Log.d("AAAAA", "dynamicBroadcastReceiver GET: STATUS_GET_WEATHER_ALL_CITIES_FINISH");
 
-                        break;
+                            refreshData();
 
-                    case STATUS_GET_WEATHER_ALL_CITIES_FINISH:
-
-                        Log.d("AAAAA", "GET: STATUS_GET_WEATHER_ALL_CITIES_FINISH");
-
-                        /// reInitCityListViewLoader();
-
-                        /// refreshCitiesListForTabletDevice();
-                        refreshData();
-
-                        // hideMessageBar();
-
-                        break;
+                            break;
+                    }
                 }
             }
         };
 
-        ///   customBroadcastReceiver = new CustomBroadcastReceiver();
-
         // создаем фильтр для BroadcastReceiver
-        /// IntentFilter intFilt = new IntentFilter(BROADCAST_ACTION);
+        IntentFilter intFilt = new IntentFilter(BROADCAST_DYNAMIC_ACTION);
 
         // регистрируем (включаем) BroadcastReceiver
-        ///  registerReceiver(broadcastReceiver, intFilt);
+        registerReceiver(dynamicBroadcastReceiver, intFilt);
 
-        //    customBroadcastReceiver = new CustomBroadcastReceiver();
-
-        // создаем фильтр для BroadcastReceiver
-        IntentFilter intFilt = new IntentFilter(BROADCAST_ACTION);
-        // регистрируем (включаем) BroadcastReceiver
-        registerReceiver(broadcastReceiver, intFilt);
-
-
-        /// syncData();
-
-        ///  scheduleAlarm(); // COMMENTED !!!
-
+        scheduleAlarm();
 
         // set action bar icon
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -229,16 +211,11 @@ public class MainActivity extends AppCompatActivity implements
         if (savedInstanceState != null) // create activity only one time?
             return;
 
-
-//        scheduleAlarm(); // test commented !!!
-
         readSettingsFromDB();
 
         // ----------------------------------------------------
         // Show CitiesListFragment
         CitiesListFragment citiesFragment = new CitiesListFragment();
-
-        //    Log.d("AAAAA", "bundle.putInt(MainActivity.UNITS_FORMAT, mUnitsFormat) - mUnitsFormat = " + mUnitsFormat);
 
         Bundle bundle = new Bundle();
         bundle.putInt(MainActivity.UNITS_FORMAT, mUnitsFormat);
@@ -248,12 +225,9 @@ public class MainActivity extends AppCompatActivity implements
 
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.onePaneLayout, citiesFragment)
-                    //   .addToBackStack(null)
                     .commit();
 
         } else { // tablet
-
-            //    Log.d("AAAAA", "TABLET !!!");
 
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.citiesContainer, citiesFragment)
@@ -269,12 +243,6 @@ public class MainActivity extends AppCompatActivity implements
         // Show SettingsFragment
         SettingsFragment settingsFragment = new SettingsFragment();
 
-        //    Log.d("AAAAA", "bundle.putInt(MainActivity.UNITS_FORMAT, mUnitsFormat) - mUnitsFormat = " + mUnitsFormat);
-
-/*        Bundle bundle = new Bundle();
-        bundle.putInt(MainActivity.UNITS_FORMAT, mUnitsFormat);
-        settingsFragment.setArguments(bundle);*/
-
         if (findViewById(R.id.onePaneLayout) != null) { // phone
 
             getSupportFragmentManager().beginTransaction()
@@ -284,8 +252,6 @@ public class MainActivity extends AppCompatActivity implements
 
         } else { // tablet
 
-            //    Log.d("AAAAA", "TABLET !!!");
-
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.rightFrameLayout, settingsFragment)
                     .commit();
@@ -293,50 +259,15 @@ public class MainActivity extends AppCompatActivity implements
         // ----------------------------------------------------
     }
 
-
-    final class Settings {
-
-        private final int unitsFormat;
-        private final int sortCities;
-     //   private final int mapStyleIndex;
-        private final int mapLanguageIndex;
-
-        public Settings(int unitsFormat, int sortCities, int mapLanguageIndex){
-
-            this.unitsFormat = unitsFormat;
-            this.sortCities = sortCities;
-          //  this.mapStyleIndex = mapStyleIndex;
-            this.mapLanguageIndex = mapLanguageIndex;
-        }
-
-        public int getUnitsFormat(){
-            return unitsFormat;
-        }
-
-        public int getSortCities(){
-            return sortCities;
-        }
-
-/*        public int getMapStyleIndex(){
-            return mapStyleIndex;
-        }*/
-
-        public int getMapLanguageIndex(){
-            return mapLanguageIndex;
-        }
-    }
-
-
     public Settings readSettingsFromDB() {
 
         Log.d("AAAAA", "readSettingsFromDB()");
 
         // read all columns
         Cursor cursor = getContentResolver().query(DataContentProvider.SETTINGS_CONTENT_URI,
-                new String[]{ DataContract.SettingsEntry.COLUMN_UNITS_FORMAT,
+                new String[]{DataContract.SettingsEntry.COLUMN_UNITS_FORMAT,
                         DataContract.SettingsEntry.COLUMN_SORT_CITIES,
-                     //   DataContract.SettingsEntry.COLUMN_MAP_STYLE,
-                        DataContract.SettingsEntry.COLUMN_MAP_LANGUAGE },
+                        DataContract.SettingsEntry.COLUMN_MAP_LANGUAGE},
                 null, // DataContract.CityEntry.COLUMN_ENTERED_CITY + "=?",
                 null, // new String[]{enteredCity},
                 null);
@@ -351,44 +282,16 @@ public class MainActivity extends AppCompatActivity implements
             // sort: by id = 0, alphabetic = 1
             mSortCities = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_SORT_CITIES));
 
-            // 0 = light style (default)
-           // mMapStyleIndex = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_MAP_STYLE));
-
-            // 0 = English, 1 = Russian
-            mMapLanguageIndex = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_MAP_LANGUAGE));
-
             cursor.close();
 
             ///     Log.d("AAAAA", "readSettingsFromDB - mUnitsFormat = " + mUnitsFormat);
-            Settings settings = new Settings(mUnitsFormat, mSortCities, mMapLanguageIndex);
+            Settings settings = new Settings(mUnitsFormat, mSortCities); //, mMapLanguageIndex);
 
             return settings;
         } else {
             return null;
         }
     }
-
-/*
-    // Setup a recurring alarm every hour
-    public void scheduleAlarm() {
-
-        // Construct an intent that will execute the AlarmReceiver
-        Intent intent = new Intent(getApplicationContext(), CustomBroadcastReceiver.class);
-
-        // Create a PendingIntent to be triggered when the alarm goes off
-        final PendingIntent pIntent = PendingIntent.getBroadcast(this, CustomBroadcastReceiver.REQUEST_CODE,
-                intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        // Setup periodic alarm every every half hour from this point onwards
-        long firstMillis = System.currentTimeMillis(); // alarm is set right away
-
-        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-
-        // First parameter is the type: ELAPSED_REALTIME, ELAPSED_REALTIME_WAKEUP, RTC_WAKEUP
-        // Interval can be INTERVAL_FIFTEEN_MINUTES, INTERVAL_HALF_HOUR, INTERVAL_HOUR, INTERVAL_DAY
-        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMillis,
-                AlarmManager.INTERVAL_HOUR, pIntent);
-    }*/
 
 
     @Override
@@ -398,8 +301,6 @@ public class MainActivity extends AppCompatActivity implements
         // Show AddCityFragment
 
         AddCityFragment addCityFragment = new AddCityFragment();
-
-        //   Log.d("AAAAA", "MainActivity - putInt - unitsFormat = " + unitsFormat);
 
         if (findViewById(R.id.onePaneLayout) != null) { // phone
 
@@ -422,9 +323,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onCityItemSelected(int cityID, String enteredName, String dataUpdateTime, int unitsFormat) {
 
-//        Log.d("AAAAA", "onCityItemSelected - cityID = " + cityID);
-//        Log.d("AAAAA", "onCityItemSelected - cityName = " + cityName);
-
         // ----------------------------------------------------
         // Show DetailsFragment
 
@@ -435,11 +333,8 @@ public class MainActivity extends AppCompatActivity implements
 
         bundle.putInt(MainActivity.CITY_ID, cityID);
         bundle.putString(MainActivity.ENTERED_CITY, enteredName);
-     ///   bundle.putString(City.RETURNED_CITY, returnedName);
         bundle.putString(MainActivity.UPDATE_TIME, dataUpdateTime);
         bundle.putInt(MainActivity.UNITS_FORMAT, unitsFormat);
-
-        //   Log.d("AAAAA", "MainActivity - putInt - unitsFormat = " + unitsFormat);
 
         detailsFragment.setArguments(bundle);
 
@@ -465,8 +360,6 @@ public class MainActivity extends AppCompatActivity implements
 
         hideKeyboard();
 
-        //      this.onBackPressed(); // remove addEditFragment`s activity
-
         // ----------------------------------------------------
         // remove addCityFragment after save added city in DB
         if (findViewById(R.id.onePaneLayout) != null) { // phone
@@ -480,7 +373,6 @@ public class MainActivity extends AppCompatActivity implements
 
             if (addCityFragment != null) {
 
-///                Log.d("AAAAA", "detailsFragment != null");
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 transaction.remove(addCityFragment);
                 transaction.commit();
@@ -488,57 +380,30 @@ public class MainActivity extends AppCompatActivity implements
             // ----------------------------------------------------
         }
 
-
         syncOneCity(id, enteredCity);
-
-
-
- /*       // get data for added city only
-        Log.d("AAAAA", "Sync running after add new city...");
-
-        /// scheduleAlarm();
-
-        // -----------------------------------------------------------
-        // get detailed data for ONE added city
-        Intent intent = new Intent(this, GetDataService.class)
-                .putExtra(PARAM_TASK, TASK_GET_WEATHER_ONE_CITY) // get weather data for one city only!
-                .putExtra(PARAM_CITY_ID, id) //  "CITIES" table: column "_id"
-                .putExtra(PARAM_ENTERED_CITY, enteredCity); // "CITIES" table: column "entered_city"
-
-        // start service for added a city details and weather data
-        startService(intent);
-        // -----------------------------------------------------------*/
     }
 
 
     private void syncOneCity(int id, String enteredCity) {
 
-        // get data for added city only
-     ///   Log.d("AAAAA", "Sync running after add new city...");
-
-        /// scheduleAlarm();
-
         // -----------------------------------------------------------
         // get detailed data for ONE added city
-        Intent intent = new Intent(this, GetDataService.class)
+        Intent oneIntent = new Intent(this, GetDataService.class)
+              //  .setAction(BROADCAST_DYNAMIC_ACTION)
                 .putExtra(PARAM_TASK, TASK_GET_WEATHER_ONE_CITY) // get weather data for one city only!
                 .putExtra(PARAM_CITY_ID, id) //  "CITIES" table: column "_id"
-                .putExtra(PARAM_ENTERED_CITY, enteredCity) // "CITIES" table: column "entered_city"
-                .putExtra(PARAM_LANG_CODE, mMapLanguageIndex); // language index
+                .putExtra(PARAM_ENTERED_CITY, enteredCity); // "CITIES" table: column "entered_city"
+               // .addCategory(Intent.CATEGORY_DEFAULT);
 
         // start service for added a city details and weather data
-        startService(intent);
+        startService(oneIntent);
         // -----------------------------------------------------------
-
-
     }
 
 
     public void onCancelAddEdit() {
 
         hideKeyboard();
-
-        //  this.onBackPressed(); // close addEditFragment
 
         // ----------------------------------------------------
         // remove addCityFragment after save added city in DB
@@ -553,7 +418,6 @@ public class MainActivity extends AppCompatActivity implements
 
             if (addCityFragment != null) {
 
-///                Log.d("AAAAA", "detailsFragment != null");
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 transaction.remove(addCityFragment);
                 transaction.commit();
@@ -573,47 +437,25 @@ public class MainActivity extends AppCompatActivity implements
             Fragment leftFragment = getSupportFragmentManager().findFragmentById(R.id.citiesContainer);
             Fragment rightFragment = getSupportFragmentManager().findFragmentById(R.id.rightFrameLayout);
 
-            // if (fragment instanceof CitiesListFragment) { // refresh details: weather ListView
-
             // show cities fragment
-           // Log.d("AAAAA", "refreshData: citiesListFragment - initLoader();");
             CitiesListFragment citiesListFragment = (CitiesListFragment) leftFragment;
             citiesListFragment.initLoader();
 
 
             if (rightFragment instanceof DetailsFragment) { // refresh details: weather ListView
 
-                //    Log.d("AAAAA", "refreshData: citiesListFragment - initLoader();");
+                    Log.d("AAAAA", "refreshData: citiesListFragment - initLoader();");
 
                 DetailsFragment detailsFragment = (DetailsFragment) rightFragment;
                 detailsFragment.initLoader();
             }
-
-
-                // }
-
-/*            switch (taskStatus) {
-
-                case STATUS_GET_WEATHER_ALL_CITIES_FINISH:
-
-
-                    break;
-
-                case STATUS_GET_WEATHER_ONE_CITY_FINISH:
-
-
-                    break;
-            }*/
-
         } else { // phone
-
-           /// Log.d("AAAAA", "refreshData - phone");
 
             Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.onePaneLayout);
 
             if (fragment instanceof CitiesListFragment) { // refresh details: weather ListView
 
-            //    Log.d("AAAAA", "refreshData: citiesListFragment - initLoader();");
+                    Log.d("AAAAA", "refreshData: citiesListFragment - initLoader();");
 
                 CitiesListFragment citiesListFragment = (CitiesListFragment) fragment;
 
@@ -621,7 +463,7 @@ public class MainActivity extends AppCompatActivity implements
 
             } else if (fragment instanceof DetailsFragment) { // refresh cities: cities ListView
 
-          //      Log.d("AAAAA", "refreshData: DetailsFragment - initLoader()");
+                      Log.d("AAAAA", "refreshData: DetailsFragment - initLoader()");
 
                 DetailsFragment detailsFragment = (DetailsFragment) fragment;
 
@@ -641,14 +483,9 @@ public class MainActivity extends AppCompatActivity implements
         if (findViewById(R.id.onePaneLayout) == null) { // tablet
 
             Fragment leftFragment = getSupportFragmentManager().findFragmentById(R.id.citiesContainer);
-            Fragment rightFragment = getSupportFragmentManager().findFragmentById(R.id.rightFrameLayout);
+         //   Fragment rightFragment = getSupportFragmentManager().findFragmentById(R.id.rightFrameLayout);
 
-            /// if (leftFragment instanceof CitiesListFragment) { // refresh details: weather ListView
-
-            // sync cities Listview data
-         //   Log.d("AAAAA", "refreshData: citiesListFragment - syncAllData()");
-
-            CitiesListFragment citiesListFragment = (CitiesListFragment) leftFragment;
+         //   CitiesListFragment citiesListFragment = (CitiesListFragment) leftFragment;
 
             syncAllData();
 
@@ -658,30 +495,19 @@ public class MainActivity extends AppCompatActivity implements
 
             if (fragment instanceof CitiesListFragment) { // refresh details: weather ListView
 
-           //     Log.d("AAAAA", "refreshData: citiesListFragment - syncAllData()");
-
-                /// CitiesListFragment citiesListFragment = (CitiesListFragment) fragment;
-
                 syncAllData();
 
             } else if (fragment instanceof DetailsFragment) { // refresh cities: cities ListView
-
-           //     Log.d("AAAAA", "refreshData: DetailsFragment - syncData()");
 
                 DetailsFragment detailsFragment = (DetailsFragment) fragment;
 
                 detailsFragment.syncCurrentCity();
             }
-
         }
     }
 
 
     public void syncAllData() {
-
-    ///    Log.d("AAAAA", "syncAllData()");
-
-        //    scheduleAlarm();
 
         // run sync single time
         if (!isMyServiceRunning(GetDataService.class)) {
@@ -689,8 +515,7 @@ public class MainActivity extends AppCompatActivity implements
             // -----------------------------------------------------------
             // get detailed data for ALL cities
             Intent intent = new Intent(this, GetDataService.class)
-                    .putExtra(PARAM_TASK, TASK_GET_WEATHER_ALL_CITIES) // get weather data for all cities
-                    .putExtra(PARAM_LANG_CODE, mMapLanguageIndex); // language index
+                    .putExtra(PARAM_TASK, TASK_GET_WEATHER_ALL_CITIES); // get weather data for all cities
 
             // start service for added a city details and weather data
             startService(intent);
@@ -698,63 +523,75 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-/*
 
-    public void refreshCitiesListForTabletDevice() {
+    // Setup a recurring alarm every half hour
+    public void scheduleAlarm() {
 
-        Log.d("AAAAA", "refreshCitiesListForTabletDevice()");
+        // Construct an intent that will execute the AlarmReceiver
+        Intent intent = new Intent(getApplicationContext(), StaticBroadcastReceiver.class);
 
-        //  Log.d("AAAAA", "refreshCitiesListForTabletDevice() - is tablet!");
+        intent.setAction(BROADCAST_STATIC_ACTION);
 
-        CitiesListFragment citiesListFragment = (CitiesListFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.citiesContainer);
+        // Create a PendingIntent to be triggered when the alarm goes off
+        final PendingIntent pIntent = PendingIntent.getBroadcast(this, StaticBroadcastReceiver.REQUEST_CODE,
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        if (citiesListFragment != null) {
-            // refresh cities ListView
-            Log.d("AAAAA", "citiesListFragment.initLoader()");
-            citiesListFragment.initLoader();
-        }
+        // Setup periodic alarm every every half hour from this point onwards
+        long firstMillis = System.currentTimeMillis(); // alarm is set right away
 
-        Fragment f = getSupportFragmentManager().findFragmentById(R.id.rightFrameLayout);
-        DetailsFragment detailsFragment = null;
+        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
 
-        if (f instanceof DetailsFragment)
-            detailsFragment = (DetailsFragment) f;
-
-        if (detailsFragment != null) {
-
-            Log.d("AAAAA", "detailsFragment != null");
-
-            // remove right DetailsFragment after delete city
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.remove(detailsFragment);
-            transaction.commit();
-        }
+        // First parameter is the type: ELAPSED_REALTIME, ELAPSED_REALTIME_WAKEUP, RTC_WAKEUP
+        // Interval can be INTERVAL_FIFTEEN_MINUTES, INTERVAL_HALF_HOUR, INTERVAL_HOUR, INTERVAL_DAY
+        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMillis,
+                AlarmManager.INTERVAL_FIFTEEN_MINUTES, pIntent);
     }
+
+
+/*
+    private void runAlarmPeriodically() {
+
+        Intent intent = new Intent();
+        intent.setAction(BROADCAST_STATIC_ACTION);
+      //  intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
+        sendBroadcast(intent);
+*/
+ //   }
+
+
+ /*   Параметры
+    Методы set(), setRepeating(), setInexactRepeating() используют следующие параметры:
+    setInexactRepeating(typeOne, triggerTime, interval, operation)
+
+    - typeOne - тип используемого времени (системное или всемирное время UTC), который определяется константами
+    ELAPSED_REALTIME - запускает ожидающее намерение, основываясь на времени,
+    которое прошло с момента загрузки устройства, но не с момента выхода из режима ожидания.
+    Это время включает любой временной промежуток, в котором устройство находилось в данном режиме.
+     Обратите внимание, что прошедшее время вычисляется на основании того, когда устройство было загружено.
+     Используется системное время
+    ELAPSED_REALTIME_WAKEUP - по прошествии указанного промежутка времени с момента загрузки
+    выводит устройство из спящего режима и запускает ожидающее намерение. Используется системное время
+    RTC - запускает ожидающее намерение в указанное время, но не выводит устройство из режима ожидания.
+    Используется всемирное время UTC
+    RTC_WAKEUP - выводит устройство из режима ожидания для запуска ожидающего намерения в указанное время.
+     Используется всемирное время UTC
+
+    - triggerTime - время работы оповещения
+
+    - interval - интервал между отправкой повторных сигнализаций в миллисекундах.
+     Также можно использовать константы:
+    INTERVAL_DAY,I NTERVAL_HALF_DAY, INTERVAL_HOUR, INTERVAL_HALF_HOUR, INTERVAL_FIFTEEN_MINUTES
+
+    - operation - объект PendingIntent, определяющий действие, выполняемое при запуске сигнализации.
+     Можно получить через специальные методы:
+            PendingIntent.getActivities(Context, int, Intent[], int)
+            PendingIntent.getActivity(Context, int, Intent, int)
+            PendingIntent.getService(Context, int, Intent, int)
+            PendingIntent.getBroadcast(Context, int, Intent, int)
 */
 
 
     public void onDeleteCity() {
-
-   ///     Log.d("AAAAA", "onDeleteCity()");
-
-        // refresh cities ListView after city was deleted
-        // reinitialize CitiesFragment LoadManager IN TABLET DEVICES ONLY!
-        // REMARK:
-        // On the phone devices CitiesFragment layout LoadManager reinit itself in "OnCreate" fragment`s method
-
-/*        // ----------------------------------------------------
-        // remove right pane fragment after delete city in DB
-        Fragment rightFragment = getSupportFragmentManager().findFragmentById(R.id.rightFrameLayout);
-
-        if (rightFragment != null) {
-
-         ///   Log.d("AAAAA", "rightFragment != null");
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.remove(rightFragment);
-            transaction.commit();
-        }
-        // ----------------------------------------------------*/
 
         // refresh citiesListView data on the screen
         if (findViewById(R.id.onePaneLayout) == null) { // tablet
@@ -770,7 +607,6 @@ public class MainActivity extends AppCompatActivity implements
 
             if (rightFragment != null) {
 
-                ///   Log.d("AAAAA", "rightFragment != null");
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 transaction.remove(rightFragment);
                 transaction.commit();
@@ -782,7 +618,7 @@ public class MainActivity extends AppCompatActivity implements
             CitiesListFragment citiesListFragment = (CitiesListFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.onePaneLayout);
 
-            if(citiesListFragment != null)
+            if (citiesListFragment != null)
                 citiesListFragment.initLoader();
         }
     }
@@ -811,31 +647,7 @@ public class MainActivity extends AppCompatActivity implements
     protected void onDestroy() {
         super.onDestroy();
 
-        unregisterReceiver(broadcastReceiver);
-    }
-
-
-    // Setup a recurring alarm every half hour
-    public void scheduleAlarm() {
-
-        Log.d("AAAAA", "scheduleAlarm() runnn!");
-
-        // Construct an intent that will execute the AlarmReceiver
-        Intent intent = new Intent(getApplicationContext(), CustomBroadcastReceiver.class);
-
-        // Create a PendingIntent to be triggered when the alarm goes off
-        final PendingIntent pIntent = PendingIntent.getBroadcast(this, CustomBroadcastReceiver.REQUEST_CODE,
-                intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        // Setup periodic alarm every every half hour from this point onwards
-        long firstMillis = System.currentTimeMillis(); // alarm is set right away
-
-        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-
-        // First parameter is the type: ELAPSED_REALTIME, ELAPSED_REALTIME_WAKEUP, RTC_WAKEUP
-        // Interval can be INTERVAL_FIFTEEN_MINUTES, INTERVAL_HALF_HOUR, INTERVAL_HOUR, INTERVAL_DAY
-        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMillis,
-                AlarmManager.INTERVAL_FIFTEEN_MINUTES, pIntent);
+        unregisterReceiver(dynamicBroadcastReceiver);
     }
 
 
@@ -888,6 +700,7 @@ public class MainActivity extends AppCompatActivity implements
         return true;
     }
 
+
     // handle choice from options menu
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -896,19 +709,12 @@ public class MainActivity extends AppCompatActivity implements
 
             case R.id.action_settings:
 
-/*
-                if (isDeleteMode) {
-                    return true;
-                }
-*/
-
                 showSettings();
 
                 return true;
 
             case R.id.action_sync:
 
-                // syncAllData();
                 syncData();
 
                 return true;
@@ -920,19 +726,15 @@ public class MainActivity extends AppCompatActivity implements
     // after settings has changed
     public void onSettingsChanged() {
 
-        //   hideMessageBar();
-
         // determine what is the fragments are in activity?
         if (findViewById(R.id.onePaneLayout) == null) { // tablet
 
             Fragment leftFragment = getSupportFragmentManager().findFragmentById(R.id.citiesContainer);
             Fragment rightFragment = getSupportFragmentManager().findFragmentById(R.id.rightFrameLayout);
 
-       ///     Log.d("AAAAA", "onSettingsChanged");
+            ///     Log.d("AAAAA", "onSettingsChanged");
             CitiesListFragment citiesListFragment = (CitiesListFragment) leftFragment;
             citiesListFragment.initLoader();
-
-
 
         }/* else { // phone
 
@@ -958,55 +760,4 @@ public class MainActivity extends AppCompatActivity implements
                 detailsFragment.initLoader();
             }*/
     }
-
-
- /*   public void syncData() {
-
-        AlarmManager alarmManager=(AlarmManager)getSystemService(Context.ALARM_SERVICE);
-
-        Intent intent = new Intent(this, CustomBroadcastReceiver.class);
-
-        //     intent.putExtra(ONE_TIME, Boolean.FALSE);
-
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent,
-                PendingIntent.FLAG_CANCEL_CURRENT);
-
-
-
-        alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(),
-                AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
-
-
-    }*/
-
-
 }
-
-
-//After 5 seconds
-/// alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 1000 * 5 , pi);
-/// alarmManager.setRepeating(AlarmManager.RTC, System.currentTimeMillis(), 1000 * 5 , pi);
-
-/*        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                SystemClock.elapsedRealtime(), // start after 1 second delay
-                AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);*/
-
-
-
- /*       AlarmManager alarmManager = (AlarmManager)getActivity().getSystemService(Context.ALARM_SERVICE);
-
-        Intent intent = new Intent(getActivity(), CustomBroadcastReceiver.class);
-
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(getContext(), 0,
-                intent, PendingIntent.FLAG_CANCEL_CURRENT);
-
-        // На случай, если мы ранее запускали активити, а потом поменяли время,
-        // откажемся от уведомления
-        alarmManager.cancel(pendingIntent);
-
-        // Устанавливаем разовое напоминание
-        /// alarmManager.set(AlarmManager.RTC_WAKEUP, stamp.getTime(), pendingIntent);
-
-        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                SystemClock.elapsedRealtime(), // start after 1 second delay
-                AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);*/

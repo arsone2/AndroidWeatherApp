@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item
-        android:drawable="@color/colorPrimary"/>
+    <item android:drawable="@color/splashScreenBackground"/>
+
+    <!--        <bitmap
+                android:gravity="center"
+                android:src="@mipmap/ic_launcher"/>-->
 
     <item>
         <bitmap
             android:gravity="center"
-            android:src="@mipmap/ic_launcher"/>
+            android:src="@drawable/city_weather"
+            app:srcCompat="@drawable/city_weather"/>
     </item>
 
 </layer-list>

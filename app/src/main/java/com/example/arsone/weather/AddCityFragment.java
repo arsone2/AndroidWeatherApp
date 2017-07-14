@@ -1,11 +1,13 @@
 package com.example.arsone.weather;
 
+import android.annotation.TargetApi;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -41,6 +43,7 @@ import com.mapbox.services.api.geocoding.v5.models.GeocodingResponse;
 import com.mapbox.services.commons.models.Position;
 
 import java.util.List;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -267,7 +270,7 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
         // get settings data from DB
         MainActivity.Settings settings = activity.readSettingsFromDB();
      //   mMapStyleIndex = settings.getMapStyleIndex();
-        mMapLanguageIndex = settings.getMapLanguageIndex();
+    //    mMapLanguageIndex = settings.getMapLanguageIndex();
 
         ///     activity.clearPreviousMenu();
 
@@ -315,12 +318,13 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
 */
 
                 // set map items language
-                setMapLanguage(mMapLanguageIndex);
+               ///  setMapLanguage(mMapLanguageIndex);
+                setMapLanguage();
 
                 // set map style
               //  setMapStyle(mMapStyleIndex);
 
-                Log.d("AAAAA" , "mMapLanguageIndex = " + mMapLanguageIndex);
+      //          Log.d("AAAAA" , "mMapLanguageIndex = " + mMapLanguageIndex);
 
 
                 // https://github.com/mapbox/mapbox-android-demo/blob/72f1f41346bb34dd300375ef2760a0778a54d757/MapboxAndroidDemo/src/main/java/com/mapbox/mapboxandroiddemo/examples/styles/LanguageSwitchActivity.java
@@ -441,13 +445,37 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
     }
 
 
-    private void setMapLanguage(int index) {
+    /// private void setMapLanguage(int index) {
+    private void setMapLanguage() {
 
 /*        if(language == 0) // If English then do nothing
             return;*/
 
         String property = null;
 
+        String locale = getCurrentLocale().getCountry().toLowerCase();
+
+        switch (locale) {
+
+            case "en": // English
+            case "us": // English
+
+                property = "{name_en}";
+
+                break;
+
+            case "ru": // Russian
+
+                property = "{name_ru}";
+
+                break;
+
+            default:
+                return;
+        }
+
+
+/*
         switch (index) {
 
             case 0: // English
@@ -465,6 +493,7 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
             default:
                 return;
         }
+*/
 
     //    Log.d("AAAAA", "property = " + property);
 
@@ -550,12 +579,26 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
 
         Position position = Position.fromCoordinates(point.getLongitude(), point.getLatitude());
 
-        String[] languageCodeArray = getResources().getStringArray(R.array.language_parameter_array);
+    //    String[] languageCodeArray = getResources().getStringArray(R.array.language_parameter_array);
+
+        String locale = getCurrentLocale().getCountry().toLowerCase();
+
+
+    //    Log.d("AAAAA", "geocode - locale = " + locale);
+
+/*
+        MapboxGeocoding client = new MapboxGeocoding.Builder()
+                .setAccessToken(getString(R.string.mapbox_api_key))
+                .setCoordinates(position)
+                /// .setLanguage(languageCodeArray[mMapLanguageIndex])
+                .setGeocodingType(GeocodingCriteria.TYPE_PLACE)
+                .build();
+*/
 
         MapboxGeocoding client = new MapboxGeocoding.Builder()
                 .setAccessToken(getString(R.string.mapbox_api_key))
                 .setCoordinates(position)
-                .setLanguage(languageCodeArray[mMapLanguageIndex])
+                .setLanguage(locale)
                 .setGeocodingType(GeocodingCriteria.TYPE_PLACE)
                 .build();
 
@@ -596,6 +639,21 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
                 messageTextView.setText("Can`t get place name...");
             }
         });
+    }
+
+
+    @TargetApi(Build.VERSION_CODES.N)
+    public Locale getCurrentLocale(){
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+
+            return getResources().getConfiguration().getLocales().get(0);
+
+        } else{
+
+            //noinspection deprecation
+            return getResources().getConfiguration().locale;
+        }
     }
 
 

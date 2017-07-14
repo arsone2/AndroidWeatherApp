@@ -42,7 +42,7 @@
             android:layout_toEndOf="@+id/mapLanguageTextView"/>-->
 
 
-        <TextView
+  <!--      <TextView
             android:id="@+id/mapLanguageTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -63,14 +63,14 @@
             android:layout_alignBottom="@+id/mapLanguageTextView"
             android:layout_toRightOf="@+id/mapLanguageTextView"
             android:layout_toEndOf="@+id/mapLanguageTextView"/>
-
+-->
 
         <TextView
             android:id="@+id/unitsFormatTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Units format: "
-            android:layout_below="@+id/mapLanguageTextView"
+            android:layout_below="@+id/titleTextView"
             android:layout_alignLeft="@+id/titleTextView"
             android:layout_alignStart="@+id/titleTextView"
             android:layout_marginTop="20dp"
@@ -84,8 +84,8 @@
             android:textOn="imperial"
             android:layout_alignBaseline="@+id/unitsFormatTextView"
             android:layout_alignBottom="@+id/unitsFormatTextView"
-            android:layout_alignLeft="@+id/sortCitiesToggleButton"
-            android:layout_alignStart="@+id/sortCitiesToggleButton"/>
+            android:layout_toRightOf="@+id/unitsFormatTextView"
+            android:layout_toEndOf="@+id/unitsFormatTextView"/>
 
 
         <TextView
@@ -106,8 +106,8 @@
             android:textOn="alphabetically"
             android:layout_below="@+id/unitsFormatToggleButton"
             android:layout_alignBaseline="@+id/sortOrderTextView"
-            android:layout_alignLeft="@+id/mapLanguageSpinner"
-            android:layout_alignStart="@+id/mapLanguageSpinner"/>
+            android:layout_toRightOf="@+id/unitsFormatTextView"
+            android:layout_toEndOf="@+id/unitsFormatTextView"/>
 
 
 
