@@ -18,8 +18,7 @@ public class Weather {
     public final double maxTemp;
     public final int humidity;
     public final String description;
-    public final String iconURL;
-  ///  public final String tempMinMax;
+ //   public final String iconURL;
     public final double windSpeed;
     public final int windDirection;
     public final double pressure;
@@ -27,7 +26,6 @@ public class Weather {
     public final double eveningTemp;
     public final String iconName;
     public final int weatherID;
-
 
     // constructor
     public Weather(long timeStamp,
@@ -57,47 +55,19 @@ public class Weather {
         SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
         this.date = formatter.format(new Date(timeStamp * 1000L)); // convert to milliseconds
 
-        // this.date = DateFormat.getDateInstance().format(timeStamp) + "\u00B0C";
-
-       /// this.tempMinMax = numberFormat.format(minTemp) + "/" + numberFormat.format(maxTemp); // + "\u00B0C";
-
-        ///this.morningTemp = numberFormat.format(morningTemp);// + "\u00B0C";
-        this.morningTemp = morningTemp;// + "\u00B0C";
-
-        /// this.dayTemp = numberFormat.format(dayTemp);// + "\u00B0C";
-        this.dayTemp = dayTemp;// + "\u00B0C";
-
-        /// this.eveningTemp = numberFormat.format(eveningTemp);// + "\u00B0C";
-        this.eveningTemp = eveningTemp;// + "\u00B0C";
-
-        /// this.nightTemp = numberFormat.format(nightTemp);// + "\u00B0C";
-        this.nightTemp = nightTemp;// + "\u00B0C";
-
-        /// this.minTemp = numberFormat.format(minTemp);// + "\u00B0C";
-        this.minTemp = minTemp;// + "\u00B0C";
-
-        /// this.maxTemp = numberFormat.format(maxTemp);// + "\u00B0C";
-        this.maxTemp = maxTemp;// + "\u00B0C";
-
-        /// this.humidity = NumberFormat.getPercentInstance().format(humidity / 100.0);
+        this.morningTemp = morningTemp;
+        this.dayTemp = dayTemp;
+        this.eveningTemp = eveningTemp;
+        this.nightTemp = nightTemp;
+        this.minTemp = minTemp;
+        this.maxTemp = maxTemp;
         this.humidity = humidity;
-
-        /// this.pressure = numberFormat.format(pressure * 0.750063755419211); // в мм ртутного столба
-        /// this.pressure = numberFormat.format(pressure); // hPa
         this.pressure = pressure; // hPa
-
-        /// this.windSpeed = numberFormat.format(windSpeed);
         this.windSpeed = windSpeed;
-
-        /// this.windDirection = numberFormat.format(windDirection);
         this.windDirection = windDirection;
-
         this.description = description;
-
         this.iconName = iconName;
-
-        this.iconURL = "http://openweathermap.org/img/w/" + iconName + ".png";
-
+   //     this.iconURL = "http://openweathermap.org/img/w/" + iconName + ".png";
         this.weatherID = weatherID;
     }
 
@@ -107,7 +77,7 @@ public class Weather {
 
         Calendar calendar = Calendar.getInstance(); // Объект Calendar
 
-        calendar.setTimeInMillis(timeStamp * 1000); // Получение времени
+        calendar.setTimeInMillis(timeStamp * 1000); // get time in milliseconds
 
         TimeZone tz = TimeZone.getDefault(); // Часовой пояс устройства
 

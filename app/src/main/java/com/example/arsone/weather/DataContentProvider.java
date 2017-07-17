@@ -34,8 +34,8 @@ public class DataContentProvider extends ContentProvider {
     private static final int URI_CITY_ID = 2;
     private static final int URI_WEATHERS = 3;
     private static final int URI_WEATHER_ID = 4;
-    public static final int URI_DATE = 5;
-    public static final int URI_SETTINGS = 6;
+    private static final int URI_DATE = 5;
+    private static final int URI_SETTINGS = 6;
 
 
     public static final Uri CITY_CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + CITY_PATH);
@@ -44,44 +44,13 @@ public class DataContentProvider extends ContentProvider {
     public static final Uri SETTINGS_CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + SETTINGS_PATH);
 
     // ----------------------------------------------------
-/*
-    // city
-    private static final String CITY_BASE_PATH = "city";
-    private static final String CITY_BASE_PATH_ID = "city/";
 
-    public static final Uri CITY_CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + CITY_BASE_PATH);
-    public static final Uri CITY_CONTENT_ID_URI = Uri.parse("content://" + AUTHORITY + "/" + CITY_BASE_PATH_ID);
-
-    private static HashMap cityProjectionMap;
-
-    // MIME types
-    public static final String CITY_CONTENT_TYPE = "vnd.android.cursor.dir/com.example.arsone.cities";
-    public static final String CITY_CONTENT_ITEM_TYPE = "vnd.android.cursor.item/com.example.arsone.cities";
-
-    private static HashMap weatherProjectionMap;
-
-    // MIME types
-    public static final String WEATHER_CONTENT_TYPE = "vnd.android.cursor.dir/com.example.arsone.weather";
-    public static final String WEATHER_CONTENT_ITEM_TYPE = "vnd.android.cursor.item/com.example.arsone.weather";
-
-    // current weather info
-    public static final String CURRENT_CITY_WEATHER_BASE_PATH_DATE = "current/";
-
-    public static final String CURRENT_CITY_WEATHER_CONTENT_ITEM_TYPE
-            = "vnd.android.cursor.item/com.example.arsone.current";
-
-    public static final Uri CURRENT_CITY_WEATHER_CONTENT_URI =
-            Uri.parse("content://" + AUTHORITY + "/" + CURRENT_CITY_WEATHER_BASE_PATH_DATE);
-    // ----------------------------------------------------
-    */
-
-    public static final String CITY_CONTENT_TYPE = "vnd.android.cursor.dir/vnd." + AUTHORITY + "." + CITY_PATH;
-    public static final String CITY_CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd." + AUTHORITY + "." + CITY_PATH;
-    public static final String WEATHER_CONTENT_TYPE = "vnd.android.cursor.dir/vnd." + AUTHORITY + "." + WEATHER_PATH;
-    public static final String WEATHER_CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd." + AUTHORITY + "." + WEATHER_PATH;
-    public static final String CITY_WEATHER_CONTENT_ITEM_TYPE = "vnd.android.cursor.dir/vnd." + AUTHORITY + "." + CITY_WEATHER_PATH;
-    public static final String SETTINGS_CONTENT_TYPE = "vnd.android.cursor.dir/vnd." + AUTHORITY + "." + SETTINGS_PATH;
-
+    private static final String CITY_CONTENT_TYPE = "vnd.android.cursor.dir/vnd." + AUTHORITY + "." + CITY_PATH;
+    private static final String CITY_CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd." + AUTHORITY + "." + CITY_PATH;
+    private static final String WEATHER_CONTENT_TYPE = "vnd.android.cursor.dir/vnd." + AUTHORITY + "." + WEATHER_PATH;
+    private static final String WEATHER_CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd." + AUTHORITY + "." + WEATHER_PATH;
+    private static final String CITY_WEATHER_CONTENT_ITEM_TYPE = "vnd.android.cursor.dir/vnd." + AUTHORITY + "." + CITY_WEATHER_PATH;
+    private static final String SETTINGS_CONTENT_TYPE = "vnd.android.cursor.dir/vnd." + AUTHORITY + "." + SETTINGS_PATH;
 
     private static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
@@ -145,22 +114,18 @@ public class DataContentProvider extends ContentProvider {
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection,
                         @Nullable String[] selectionArgs, @Nullable String sortOrder) {
 
-  //      database = dbHelper.getReadableDatabase();
+        //      database = dbHelper.getReadableDatabase();
 
-   //     SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+        //     SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
 
-        String table = "";
-
-        String id = "";
-
-        //  String orderBy = null;
+        String table;
+        String id;
 
         switch (uriMatcher.match(uri)) {
 
             case URI_CITIES:
 
-        //        Log.d("AAAAA", "URI_CITIES: " + uri);
-
+                //        Log.d("AAAAA", "URI_CITIES: " + uri);
 
                 // if sort order don`t specified
                 if (TextUtils.isEmpty(sortOrder)) {
@@ -169,12 +134,7 @@ public class DataContentProvider extends ContentProvider {
 
                 table = DataContract.CityEntry.TABLE_NAME;
 
-            //    qb.setTables(DataContract.CityEntry.TABLE_NAME);
-
-
-            //    qb.setTables(DataContract.CityEntry.TABLE_NAME);
-              //  orderBy = DataContract.CityEntry.DEFAULT_SORT_ORDER;
-
+                //  orderBy = DataContract.CityEntry.DEFAULT_SORT_ORDER;
 
                 // Log.d("AAAAA", "case URI_CITIES");
 
@@ -184,7 +144,7 @@ public class DataContentProvider extends ContentProvider {
 
                 id = uri.getLastPathSegment();
 
-          //      Log.d("AAAAA", "URI_CITY_ID: " + uri + " id =" + id);
+                //      Log.d("AAAAA", "URI_CITY_ID: " + uri + " id =" + id);
 
                 /// Log.d(LOG_TAG, "URI_CONTACTS_ID, " + id);
 
@@ -197,9 +157,9 @@ public class DataContentProvider extends ContentProvider {
                     selection = selection + " AND " + DataContract.CityEntry._ID + "=" + id;
                 }
 
-           //     qb.setTables(DataContract.CityEntry.TABLE_NAME);
+                //     qb.setTables(DataContract.CityEntry.TABLE_NAME);
 
-         //       qb.appendWhere(selection);
+                //       qb.appendWhere(selection);
 
 /*                qb.setTables(DataContract.CityEntry.TABLE_NAME);
                 qb.setProjectionMap(cityProjectionMap);
@@ -211,7 +171,7 @@ public class DataContentProvider extends ContentProvider {
 
             case URI_WEATHERS:
 
-         //       Log.d("AAAAA", "URI_WEATHERS: " + uri);
+                //       Log.d("AAAAA", "URI_WEATHERS: " + uri);
 
                 // if sort order don`t specified
                 if (TextUtils.isEmpty(sortOrder)) {
@@ -232,7 +192,7 @@ public class DataContentProvider extends ContentProvider {
 
                 id = uri.getLastPathSegment();
 
-       //         Log.d("AAAAA", "URI_WEATHER_ID: " + uri + ", id = " + id);
+                //         Log.d("AAAAA", "URI_WEATHER_ID: " + uri + ", id = " + id);
 
                 // добавляем ID к условию выборки
                 if (TextUtils.isEmpty(selection)) {
@@ -266,7 +226,7 @@ public class DataContentProvider extends ContentProvider {
 
                 String date = uri.getLastPathSegment();
 
-           //     Log.d("AAAAA", "URI_DATE: " + uri + " date = " + date);
+                //     Log.d("AAAAA", "URI_DATE: " + uri + " date = " + date);
 
                 /// Log.d(LOG_TAG, "URI_CONTACTS_ID, " + id);
 
@@ -292,43 +252,32 @@ public class DataContentProvider extends ContentProvider {
                         + " GROUP BY c._id"
                         + " ORDER BY c._id DESC";*/
 
-
-/*
-                String query = "SELECT "
-                + " c.entered_city, c.returned_city, c._id, w.temp_day, w.description, w.icon_name, w.insert_timestamp"
-                + " FROM cities c LEFT OUTER JOIN weather w ON c._id = w.city_id"
-                + " WHERE strftime('%Y-%m-%d', insert_timestamp) = '" + date + "'"  //" '2017-07-04'
-                + " OR c._id > 0"
-                + " GROUP BY entered_city"
-                + " ORDER BY c._id desc";
-*/
-
                 // if sort order don`t specified then set default sort order
                 if (TextUtils.isEmpty(sortOrder)) {
                     sortOrder = " ORDER BY c." + DataContract.CityEntry._ID + " DESC";
                 }
 
-           ///     Log.d("AAAAA", "URI_DATE : sortOrder = " + sortOrder);
+                ///     Log.d("AAAAA", "URI_DATE : sortOrder = " + sortOrder);
 
                 String query = "SELECT "
-                + " c.entered_city, c.returned_city, c._id, w.temp_day, w.description, w.icon_name, w.insert_timestamp, c.update_timestamp"
-                + " FROM cities c LEFT OUTER JOIN weather w ON c._id = w.city_id"
-                + " AND strftime('%Y-%m-%d',datetime(dt, 'unixepoch', 'localtime')) = '" + date + "'"  //" '2017-07-04'
-                ///+ " " + "ORDER BY c." + sortOrder + " ASC"
-                + " " + sortOrder
-                + ";";
-                //+ " ORDER BY c._id desc";
+                        + "c.entered_city, c.returned_city, c._id, c.update_timestamp, c.latitude, c.longitude,"
+                        + "w.temp_day, w.description, w.icon_name, w.insert_timestamp"
+                        + " FROM cities c LEFT OUTER JOIN weather w ON c._id = w.city_id"
+                        + " AND strftime('%Y-%m-%d',datetime(dt, 'unixepoch', 'localtime')) = '" + date + "'"  //" '2017-07-04'
+                        ///+ " " + "ORDER BY c." + sortOrder + " ASC"
+                        + " " + sortOrder
+                        + ";";
 
                 ///    Log.d("AAAAA", "case URI_DATE: " + uri.getPathSegments().get(DataContract.DATE_PATH_POSITION));
 
                 /// Cursor cursor = database.rawQuery(query, new String[]{date});// selectionArgs); // new String[]{ "2017-07-04" });
                 Cursor cursor = database.rawQuery(query, null);// selectionArgs); // new String[]{ "2017-07-04" });
 
-           //     cursor.moveToFirst();
+                ///       Log.d("AAAAA", "URI_DATE: " + uri + " cursor.getCount() = " + cursor.getCount());
 
-         ///       Log.d("AAAAA", "URI_DATE: " + uri + " cursor.getCount() = " + cursor.getCount());
-
-                cursor.setNotificationUri(getContext().getContentResolver(), uri);
+                if (cursor != null) {
+                    cursor.setNotificationUri(getContext().getContentResolver(), uri);
+                }
 
                 return cursor;
 
@@ -337,12 +286,10 @@ public class DataContentProvider extends ContentProvider {
 
                 ///       Log.d("AAAAA", "URI_SETTINGS: " + uri);
 
-
 /*                // if sort order don`t specified
                 if (TextUtils.isEmpty(sortOrder)) {
                     sortOrder = DataContract.SettingsEntry._ID + " ASC";
                 }*/
-
 
                 table = DataContract.SettingsEntry.TABLE_NAME;
 
@@ -352,11 +299,7 @@ public class DataContentProvider extends ContentProvider {
                 throw new IllegalArgumentException("query: unknown URI " + uri);
         }
 
-        //       database = dbHelper.getReadableDatabase();
-
-         database = dbHelper.getReadableDatabase();
-
-  //      SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+        database = dbHelper.getReadableDatabase();
 
         Cursor cursor = database.query(table,
                 projection,    // the columns to return from the query
@@ -366,39 +309,22 @@ public class DataContentProvider extends ContentProvider {
                 null,          // don`t filter by row groups
                 sortOrder);      // sort order
 
-
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
+
+//        getContext().getContentResolver().notifyChange(uri, null);
 
         // просим ContentResolver уведомлять этот курсор
         // об изменениях данных в CONTACT_CONTENT_URI
-      //  cursor.setNotificationUri(getContext().getContentResolver(), CONTACT_CONTENT_URI);
+        //  cursor.setNotificationUri(getContext().getContentResolver(), CONTACT_CONTENT_URI);
 
 
         return cursor;
     }
 
 
-    /*                if(projection == null)
-                    qb.setProjectionMap(cityProjectionMap);
-                else {
-                    Cursor cursor = qb.query(database,
-                            projection,    // the columns to return from the query
-                            selection,     // the columns in where clause
-                            selectionArgs, // the values for where clause
-                            null,          // don`t group the rows
-                            null,          // don`t filter by row groups
-                            orderBy);      // sort order
-
-                    cursor.setNotificationUri(getContext().getContentResolver(), uri);
-
-                    return cursor;
-                }*/
-
     @Nullable
     @Override
     public String getType(@NonNull Uri uri) {
-
-  ///     Log.d("AAAAA", "getType, " + uri.toString());
 
         switch (uriMatcher.match(uri)) {
 
@@ -430,7 +356,7 @@ public class DataContentProvider extends ContentProvider {
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
 
-       // can insert only in tables
+        // can insert only in tables
 /*        if (uriMatcher.match(uri) != URI_CITIES && uriMatcher.match(uri) != URI_WEATHERS) {
             throw new IllegalArgumentException("insert: wrong URI " + uri);
         }*/
@@ -450,53 +376,35 @@ public class DataContentProvider extends ContentProvider {
 
             case URI_CITIES:
 
-     ///           Log.d("AAAAA", "insert: URI_CITIES: " + uri);
+                ///           Log.d("AAAAA", "insert: URI_CITIES: " + uri);
 
                 rowID = database.insert(DataContract.CityEntry.TABLE_NAME, null, values);
 
                 if (rowID > 0) {
                     rowUri = ContentUris.withAppendedId(CITY_CONTENT_URI, rowID);
-                   /// getContext().getContentResolver().notifyChange(rowUri, null);
                     getContext().getContentResolver().notifyChange(uri, null);
-               ///     Log.d("AAAAA", "insert: URI_CITIES notifyChange URI_CITIES: " + uri);
                 }
 
                 break;
 
             case URI_WEATHERS:
 
-             //   Log.d("AAAAA", "insert: URI_WEATHERS: " + uri);
+                //   Log.d("AAAAA", "insert: URI_WEATHERS: " + uri);
 
                 rowID = database.insert(DataContract.WeatherEntry.TABLE_NAME, null, values);
 
                 if (rowID > 0) {
                     rowUri = ContentUris.withAppendedId(WEATHER_CONTENT_URI, rowID);
                     getContext().getContentResolver().notifyChange(rowUri, null);
-              //      Log.d("AAAAA", "insert: notifyChange URI_WEATHERS: " + uri);
                 }
 
                 break;
-
-/*            case URI_SETTINGS:
-
-                //   Log.d("AAAAA", "insert: URI_WEATHERS: " + uri);
-
-                rowID = database.insert(DataContract.SettingsEntry.TABLE_NAME, null, values);
-
-                if (rowID > 0) {
-                    rowUri = ContentUris.withAppendedId(SETTINGS_CONTENT_URI, rowID);
-                    getContext().getContentResolver().notifyChange(rowUri, null);
-                     Log.d("AAAAA", "insert: notifyChange URI_SETTINGS: " + uri);
-                }
-
-                break;*/
 
             default:
                 throw new IllegalArgumentException("insert: unknown URI " + uri);
         }
 
-         return rowUri;
-       // return null;
+        return rowUri;
     }
 
 
@@ -535,8 +443,7 @@ public class DataContentProvider extends ContentProvider {
                 // id = uri.getPathSegments().get(DataContract.WeatherEntry.ID_PATH_POSITION);
 
 
-
-          //      Log.d("AAAAA", "delete: URI_CITY_ID: " + uri + " city_id =" + city_id);
+                //      Log.d("AAAAA", "delete: URI_CITY_ID: " + uri + " city_id =" + city_id);
 
 /*                if (TextUtils.isEmpty(selection)) {
                     selection = DataContract.WeatherEntry._ID + "=" + id;
@@ -559,7 +466,7 @@ public class DataContentProvider extends ContentProvider {
                 /// id = uri.getPathSegments().get(DataContract.WeatherEntry.ID_PATH_POSITION);
                 city_id = uri.getLastPathSegment();
 
-        //        Log.d("AAAAA", "delete: URI_WEATHER_ID: " + uri + " city_id =" + city_id);
+                //        Log.d("AAAAA", "delete: URI_WEATHER_ID: " + uri + " city_id =" + city_id);
 
 /*
                 if (TextUtils.isEmpty(selection)) {
@@ -584,8 +491,9 @@ public class DataContentProvider extends ContentProvider {
                 throw new IllegalArgumentException("update: unknown URI " + uri);
         }
 
-        if (count > 0)
+        if (count > 0) {
             getContext().getContentResolver().notifyChange(uri, null);
+        }
 
         return count;
     }
@@ -601,8 +509,8 @@ public class DataContentProvider extends ContentProvider {
             database.execSQL("PRAGMA foreign_keys=ON;");
         }
 
-        int count = 0;
-        String id = "";
+        int count;
+        String id;
 
         switch (uriMatcher.match(uri)) {
 
@@ -617,9 +525,7 @@ public class DataContentProvider extends ContentProvider {
 
                 id = uri.getLastPathSegment();
 
-        //        Log.d("AAAAA", "update: URI_CITY_ID: " + uri + " id =" + id);
-
-                /// Log.d(LOG_TAG, "URI_CONTACTS_ID, " + id);
+                //        Log.d("AAAAA", "update: URI_CITY_ID: " + uri + " id =" + id);
 
                 // добавляем ID к условию выборки
                 if (TextUtils.isEmpty(selection)) {
@@ -629,11 +535,6 @@ public class DataContentProvider extends ContentProvider {
                 }
 
                 count = database.update(DataContract.CityEntry.TABLE_NAME, values, selection, selectionArgs);
-
-                // qb.setTables(DataContract.CityEntry.TABLE_NAME);
-
-           //     qb.appendWhere(selection);
-
 
 /*                id = uri.getPathSegments().get(DataContract.CityEntry.ID_PATH_POSITION);
 
@@ -658,8 +559,7 @@ public class DataContentProvider extends ContentProvider {
                 // id = uri.getPathSegments().get(DataContract.WeatherEntry.ID_PATH_POSITION);
                 id = uri.getLastPathSegment();
 
-          //      Log.d("AAAAA", "update: URI_WEATHER_ID: " + uri + " id =" + id);
-
+                //      Log.d("AAAAA", "update: URI_WEATHER_ID: " + uri + " id =" + id);
 
                 if (TextUtils.isEmpty(selection)) {
                     selection = DataContract.WeatherEntry._ID + "=" + id;
@@ -709,8 +609,6 @@ public class DataContentProvider extends ContentProvider {
 
             database.setTransactionSuccessful();
 
-            /// getContext().getContentResolver().notifyChange(uri, null);
-
             return results;
 
         } catch (OperationApplicationException e) {
@@ -747,7 +645,6 @@ public class DataContentProvider extends ContentProvider {
                     + DataContract.CityEntry.COLUMN_UPDATE_TIMESTAMP + " DATETIME DEFAULT CURRENT_TIMESTAMP"
                     + ");");
 
-
             db.execSQL("CREATE TABLE " + DataContract.WeatherEntry.TABLE_NAME + " ("
                     + DataContract.WeatherEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," // inner data ID
                     + DataContract.WeatherEntry.COLUMN_CITY_ID_FK + " INTEGER," // foreign key
@@ -769,34 +666,26 @@ public class DataContentProvider extends ContentProvider {
                     + DataContract.CityEntry.TABLE_NAME + "(" + DataContract.CityEntry._ID + ")"
                     + ");");
 
-
             db.execSQL("CREATE TABLE " + DataContract.SettingsEntry.TABLE_NAME + " ("
-                            + DataContract.SettingsEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                            + DataContract.SettingsEntry.COLUMN_UNITS_FORMAT + " INTEGER DEFAULT 0,"
-                            + DataContract.SettingsEntry.COLUMN_SORT_CITIES + " INTEGER DEFAULT 0,"
-                         //   + DataContract.SettingsEntry.COLUMN_MAP_STYLE + " INTEGER DEFAULT 0,"
-                            + DataContract.SettingsEntry.COLUMN_MAP_LANGUAGE + " INTEGER DEFAULT 0"
+                    + DataContract.SettingsEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"    //  (int/INTEGER)
+                    + DataContract.SettingsEntry.COLUMN_UNITS_FORMAT + " INTEGER DEFAULT 0,"    //  (int/INTEGER)
+                    + DataContract.SettingsEntry.COLUMN_SORT_CITIES + " INTEGER DEFAULT 0,"     //  (int/INTEGER)
+                    + DataContract.SettingsEntry.COLUMN_MAP_LANGUAGE + " INTEGER DEFAULT 0,"    //  (int/INTEGER)
+
+                    + DataContract.SettingsEntry.COLUMN_CAMERA_LATITUDE + " DOUBLE DEFAULT 0,"  // (double/DOUBLE)
+                    + DataContract.SettingsEntry.COLUMN_CAMERA_LONGITUDE + " DOUBLE DEFAULT 0," // (double/DOUBLE)
+                    + DataContract.SettingsEntry.COLUMN_CAMERA_BEARING + " DOUBLE DEFAULT 0,"   // (double/DOUBLE)
+                    + DataContract.SettingsEntry.COLUMN_CAMERA_TILT + " DOUBLE DEFAULT 0,"      // (double/DOUBLE)
+                    + DataContract.SettingsEntry.COLUMN_CAMERA_ZOOM + " DOUBLE DEFAULT 0"       // (double/DOUBLE)
                     + ");");
 
             Log.d("AAAAA", "onCreate(): tables CREATED");
-
-
-/*            // add initial data
-            ContentValues cv = new ContentValues();
-
-            cv.put(DataContract.CityEntry.COLUMN_ENTERED_CITY, "Moscow");
-            db.insert(DataContract.CityEntry.TABLE_NAME, null, cv);
-
-            cv.put(DataContract.CityEntry.COLUMN_ENTERED_CITY, "Sanct-Petersburg");
-            db.insert(DataContract.CityEntry.TABLE_NAME, null, cv);*/
-
 
             // add default settings - DO NOT DELETE !!
             ContentValues cvSettings = new ContentValues();
 
             cvSettings.put(DataContract.SettingsEntry.COLUMN_UNITS_FORMAT, 0);
             cvSettings.put(DataContract.SettingsEntry.COLUMN_SORT_CITIES, 0);
-           // cvSettings.put(DataContract.SettingsEntry.COLUMN_MAP_STYLE, 0);
             cvSettings.put(DataContract.SettingsEntry.COLUMN_MAP_LANGUAGE, 0);
 
             db.insert(DataContract.SettingsEntry.TABLE_NAME, null, cvSettings);

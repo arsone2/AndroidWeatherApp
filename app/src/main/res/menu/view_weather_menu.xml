@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/action_previous_city"
+        android:icon="@drawable/ic_previous"
+        android:title="@string/action_previous"
+        android:orderInCategory="11"
+        app:showAsAction="always"
+        />
+
+    <item
+        android:id="@+id/action_next_city"
+        android:icon="@drawable/ic_next"
+        android:title="@string/action_next"
+        android:orderInCategory="12"
+        app:showAsAction="always"/>
+
+    <!--  app:showAsAction="ifRoom|withText" -->
+
+    <item
+        android:id="@+id/action_sync_map"
+        android:icon="@drawable/ic_sync"
+        android:title="@string/action_sync"
+        android:orderInCategory="13"
+        app:showAsAction="ifRoom"/>
+
+</menu>

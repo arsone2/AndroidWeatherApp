@@ -121,7 +121,7 @@ public class CitiesListFragment extends Fragment implements
         titleTextView = (TextView) view.findViewById(R.id.titleTextView);
 
         // uncheck all items for delete
-        /// CityCursorAdapter.setCheckboxesVisibility(false);
+         CityCursorAdapter.setCheckboxesVisibility(false);
 
         cityCursorAdapter = new CityCursorAdapter(getContext(), null, 0);
         citiesListView.setAdapter(cityCursorAdapter);
@@ -134,8 +134,11 @@ public class CitiesListFragment extends Fragment implements
 
     public void initLoader() {
 
+        Log.d("AAAAA", "CitiesListFragment - initLoader");
+
         // get settings data from DB
         MainActivity.Settings settings = activity.readSettingsFromDB();
+       // MainActivity.Settings settings = activity.readSettings();
         mUnitsFormat = settings.getUnitsFormat();
         mSortCities = settings.getSortCities();
 
@@ -148,10 +151,14 @@ public class CitiesListFragment extends Fragment implements
 
         if (loader != null && !loader.isReset()) {
             getLoaderManager().restartLoader(MainActivity.LOADER_CITIES_ID, null, this);
+            Log.d("AAAAA", "restartLoader");
         } else {
             getLoaderManager().initLoader(MainActivity.LOADER_CITIES_ID, null, this);
+            Log.d("AAAAA", "initLoader");
         }
         // --------------------------------------------------------------
+
+   //     cityCursorAdapter.notifyDataSetChanged();
     }
 
 

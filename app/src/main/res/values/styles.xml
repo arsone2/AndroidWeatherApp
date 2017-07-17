@@ -17,7 +17,7 @@
         <item name="colorAccent">@color/colorAccent</item>
 
         <item name="android:textColor">@color/basicText</item>
-        <item name="android:windowBackground">@color/colorPrimary</item>
+        <item name="android:windowBackground">@color/windowBackground</item>
 
         <!--      <item name="android:alertDialogTheme">@style/AlertDialog.AppCompat.Light</item>-->
     </style>
@@ -84,10 +84,10 @@
         <item name="android:maxHeight">10dp</item>
     </style>
 
-<!--
-    <style name="SettingsTheme" parent="Theme.AppCompat.NoActionBar">
-        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
-    </style>
--->
+    <!--
+        <style name="SettingsTheme" parent="Theme.AppCompat.NoActionBar">
+            <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+        </style>
+    -->
 
 </resources>

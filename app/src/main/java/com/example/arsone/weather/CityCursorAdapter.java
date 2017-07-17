@@ -124,10 +124,10 @@ public class CityCursorAdapter extends CursorAdapter {
                 viewHolder.dayTempTextView.setText(String.valueOf(dayTemp * 9 / 5 + 32)); // Celsius to Fahrenheit
             }
 
+            viewHolder.dayTempTextView.setVisibility(View.VISIBLE);
+            viewHolder.tempUnitTextView.setVisibility(View.VISIBLE);
             viewHolder.weatherTextView.setVisibility(View.VISIBLE);
             viewHolder.conditionImageView.setVisibility(View.VISIBLE);
-        //    viewHolder.tempUnitTextView.setVisibility(View.VISIBLE);
-            viewHolder.dayTempTextView.setVisibility(View.VISIBLE);
 
         } else {
 
@@ -136,9 +136,9 @@ public class CityCursorAdapter extends CursorAdapter {
 
             viewHolder.tempUnitTextView.setText(R.string.data_not_found);
 
+            viewHolder.dayTempTextView.setVisibility(View.GONE);
             viewHolder.weatherTextView.setVisibility(View.GONE);
             viewHolder.conditionImageView.setVisibility(View.GONE);
-        //    viewHolder.tempUnitTextView.setVisibility(View.GONE);
             viewHolder.dayTempTextView.setVisibility(View.GONE);
         }
 
@@ -165,7 +165,7 @@ public class CityCursorAdapter extends CursorAdapter {
         viewHolder.checkboxForDelete.setChecked(selectedItemsArray.get(position));
 
         // set checkboxes visibility
-       if (checkboxVisibility)
+        if (checkboxVisibility)
             viewHolder.checkboxForDelete.setVisibility(View.VISIBLE);
         else
             viewHolder.checkboxForDelete.setVisibility(View.GONE);

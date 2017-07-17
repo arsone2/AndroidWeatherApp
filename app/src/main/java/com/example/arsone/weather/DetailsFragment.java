@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
@@ -110,8 +111,8 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
         if (bundle != null) {
             mID = bundle.getInt(MainActivity.CITY_ID);
             mEnteredCity = bundle.getString(MainActivity.ENTERED_CITY);
-            mUnitsFormat = bundle.getInt(MainActivity.UNITS_FORMAT);
-            mDataUpdateTime = bundle.getString(MainActivity.UPDATE_TIME);
+            //     mUnitsFormat = bundle.getInt(MainActivity.UNITS_FORMAT);
+            //   mDataUpdateTime = bundle.getString(MainActivity.UPDATE_TIME);
         }
 
         // Title
@@ -167,14 +168,31 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
 
             titleTextView.setText(mEnteredCity);
 
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat updateTimeDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+            Log.d("AAAAA", "mDataUpdateTime = " + mDataUpdateTime);
 
             try {
-                Date date = format.parse(mDataUpdateTime);
+                Date today = new Date();
+                Date date = updateTimeDate.parse(mDataUpdateTime);
+
+                long diff =  today.getTime() - updateTimeDate.parse(mDataUpdateTime).getTime();
+
+                // difference between dates in days
+               // int numOfDays = (int) (diff / (1000 * 60 * 60 * 24));
+                int hours = (int) (diff / (1000 * 60 * 60));
+
+                Log.d("AAAAA", "hours = " + hours);
 
                 String stringDate = DateFormat.getDateTimeInstance().format(date);
 
                 updateTimeTextView.setText(getContext().getString(R.string.weather_data_obtained, stringDate));
+
+                // if obtained data get older then 3 hours!!
+                if(hours >= 3){
+
+                    updateTimeTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.colorOrange));
+                }
 
             } catch (ParseException e) {
                 Log.d("AAAAA", "Date ParseException: " + e.getMessage());
@@ -183,7 +201,11 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
 
         //  int unitsFormat = 0; // metric/Celsius units format by default
         // get settings data from DB
+        /// MainActivity.Settings settings = activity.readSettingsFromDB();
+
         MainActivity.Settings settings = activity.readSettingsFromDB();
+        mUnitsFormat = settings.getUnitsFormat();
+        //mSortCities = settings.getSortCities();
 
         mUnitsFormat = settings.getUnitsFormat();
 

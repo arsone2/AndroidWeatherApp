@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -36,9 +37,7 @@ import java.util.List;
 import java.util.Locale;
 
 // http://guides.codepath.com/android/Starting-Background-Services#communicating-with-a-broadcastreceiver
-
 // https://github.com/loopj/android-async-http/blob/master/sample/src/main/java/com/loopj/android/http/sample/services/ExampleIntentService.java
-
 // https://github.com/loopj/android-async-http/blob/master/sample/src/main/java/com/loopj/android/http/sample/IntentServiceSample.java
 
 
@@ -48,8 +47,6 @@ public class GetDataService extends IntentService {
     private final static String PARAM_STATUS = "status";
     private final static String PARAM_CITY_ID = "city_id";
     private final static String PARAM_ENTERED_CITY = "city_name";
-    //private final static String PARAM_LANG_CODE = "language_index";
-    //   private final static String PARAM_TODO = "todo";
 
     private final static int TASK_GET_WEATHER_ONE_CITY = 1;
     private final static int TASK_GET_WEATHER_ALL_CITIES = 2;
@@ -63,8 +60,9 @@ public class GetDataService extends IntentService {
 
     private final String BROADCAST_DYNAMIC_ACTION = "com.example.arsone.weather.dynamic.broadcast";
 
-//    private String mAction = "";
+    private final int TIME_TO_WAIT = 800; // time to wait in milliseconds
 
+    private int mTask;
 
     class City {
 
@@ -116,7 +114,7 @@ public class GetDataService extends IntentService {
 */
 
         // get task
-        int mTask = intent.getIntExtra(PARAM_TASK, 0);
+        mTask = intent.getIntExtra(PARAM_TASK, 0);
 
         if (mTask == TASK_GET_WEATHER_ONE_CITY) {
 
@@ -125,8 +123,6 @@ public class GetDataService extends IntentService {
 
             int id = intent.getIntExtra(PARAM_CITY_ID, -1);
             String city = intent.getStringExtra(PARAM_ENTERED_CITY);
-            //     int languageIndex = intent.getIntExtra(PARAM_LANG_CODE, 0);
-
 
             Log.d("AAAAA", "GetDataService: city = " + city);
 
@@ -134,15 +130,21 @@ public class GetDataService extends IntentService {
 
                 Log.d("AAAAA", "GetDataService: Service running for ONE CITY.");
 
-                // inform about task starting
+                sendBroadcastData(STATUS_GET_WEATHER_ONE_CITY_START);
+
+/*                // inform about task starting
                 Intent startIntent = new Intent()
                         .putExtra(PARAM_TASK, mTask)
                         .putExtra(PARAM_STATUS, STATUS_GET_WEATHER_ONE_CITY_START)
                         .setAction(BROADCAST_DYNAMIC_ACTION);
 
-                sendBroadcast(startIntent);
+                sendBroadcast(startIntent);*/
 
-                getWeather(id, city); //, languageIndex);
+                getWeather(id, city);
+
+                sendBroadcastData(STATUS_GET_WEATHER_ONE_CITY_FINISH);
+
+/*                SystemClock.sleep(TIME_TO_WAIT); // wait to update data in database!!
 
                 // inform about task finish
                 Intent finishIntent = new Intent()
@@ -150,7 +152,7 @@ public class GetDataService extends IntentService {
                         .putExtra(PARAM_STATUS, STATUS_GET_WEATHER_ONE_CITY_FINISH)
                         .setAction(BROADCAST_DYNAMIC_ACTION);
 
-                sendBroadcast(finishIntent);
+                sendBroadcast(finishIntent);*/
             }
         } else if (mTask == TASK_GET_WEATHER_ALL_CITIES) {
 
@@ -159,58 +161,21 @@ public class GetDataService extends IntentService {
             //   String action = intent.getAction();
             //    Log.d("AAAAA", "GetDataService: Service running for all cities - action = " + action);
 
-            // inform about task starting
+            sendBroadcastData(STATUS_GET_WEATHER_ALL_CITIES_START);
+
+/*            // inform about task starting
             Intent startIntent = new Intent()
                     .putExtra(PARAM_TASK, mTask)
                     .putExtra(PARAM_STATUS, STATUS_GET_WEATHER_ALL_CITIES_START)
                     .setAction(BROADCAST_DYNAMIC_ACTION);
 
-            sendBroadcast(startIntent);
-
+            sendBroadcast(startIntent);*/
 
             getAllCities();
 
-           /* ContentResolver contentResolver = getContentResolver();
+            sendBroadcastData(STATUS_GET_WEATHER_ALL_CITIES_FINISH);
 
-            // read cities list from DB
-            Cursor cursor = contentResolver.query(DataContentProvider.CITY_CONTENT_URI, // @NonNull Uri uri,
-                    null,// @Nullable String[] projection,
-                    null,//@Nullable String selection,
-                    null,//@Nullable String[] selectionArgs,
-                    null//@Nullable String sortOrder)
-            );
-
-            if (cursor.getCount() == 0) {
-                //  Log.d("AAAAA", "cursor.getCount() = 0");
-                cursor.close();
-                return;
-            }
-
-            cursor.moveToFirst();
-
-            List<City> citiesList = new ArrayList<City>();
-
-            while (!cursor.isAfterLast()) {
-
-                //   Log.d("AAAAA", "CITY = " + cursor.getString(cursor.getColumnIndex(DataContract.CityEntry.COLUMN_ENTERED_CITY)));
-
-                City newCity = new City(cursor.getInt(cursor.getColumnIndex(DataContract.CityEntry._ID)),
-                        cursor.getString(cursor.getColumnIndex(DataContract.CityEntry.COLUMN_ENTERED_CITY))
-                );
-
-                citiesList.add(newCity);
-
-                cursor.moveToNext();
-            }
-
-            cursor.close();
-
-            int languageIndex = intent.getIntExtra(PARAM_LANG_CODE, 0);
-
-            for (City c : citiesList) {
-
-                getWeather(c.id, c.city); // , languageIndex);
-            }*/
+/*            SystemClock.sleep(TIME_TO_WAIT); // wait to update data in database!!
 
             // Inform about task finish
             Intent finishIntent = new Intent()
@@ -218,21 +183,27 @@ public class GetDataService extends IntentService {
                     .putExtra(PARAM_STATUS, STATUS_GET_WEATHER_ALL_CITIES_FINISH)
                     .setAction(BROADCAST_DYNAMIC_ACTION);
 
-            sendBroadcast(finishIntent);
+            sendBroadcast(finishIntent);*/
 
         } else if (mTask == TASK_GET_DATA_PERIODICALLY) {
 
             Log.d("AAAAA", "GetDataService: TASK_GET_DATA_PERIODICALLY");
 
-            // inform about task starting
+            sendBroadcastData(STATUS_GET_WEATHER_ALL_CITIES_START);
+
+/*            // inform about task starting
             Intent startIntent = new Intent()
                     .putExtra(PARAM_TASK, mTask)
                     .putExtra(PARAM_STATUS, STATUS_GET_WEATHER_ALL_CITIES_START)
                     .setAction(BROADCAST_DYNAMIC_ACTION);
 
-            sendBroadcast(startIntent);
+            sendBroadcast(startIntent);*/
 
             getAllCities();
+
+            sendBroadcastData(STATUS_GET_WEATHER_ALL_CITIES_FINISH);
+
+/*            SystemClock.sleep(TIME_TO_WAIT); // wait to update data in database!!
 
             // Inform about task finish
             Intent finishIntent = new Intent()
@@ -240,16 +211,28 @@ public class GetDataService extends IntentService {
                     .putExtra(PARAM_STATUS, STATUS_GET_WEATHER_ALL_CITIES_FINISH)
                     .setAction(BROADCAST_DYNAMIC_ACTION);
 
-            sendBroadcast(finishIntent);
-        }
-        else {
+            sendBroadcast(finishIntent);*/
+        } else {
             Log.d("AAAAA", "GetDataService: CATCH OTHER TASK FOR TEST !!!");
-
         }
     }
 
 
-    private void getAllCities(){
+    // Inform about task status
+    private void sendBroadcastData(int status){
+
+        SystemClock.sleep(TIME_TO_WAIT); // wait to update data in database!!
+
+        Intent finishIntent = new Intent()
+                .putExtra(PARAM_TASK, mTask)
+                .putExtra(PARAM_STATUS, status)
+                .setAction(BROADCAST_DYNAMIC_ACTION);
+
+        sendBroadcast(finishIntent);
+    }
+
+
+    private void getAllCities() {
 
         ContentResolver contentResolver = getContentResolver();
 
@@ -260,6 +243,9 @@ public class GetDataService extends IntentService {
                 null,//@Nullable String[] selectionArgs,
                 null//@Nullable String sortOrder)
         );
+
+        if(cursor == null)
+            return;
 
         if (cursor.getCount() == 0) {
             //  Log.d("AAAAA", "cursor.getCount() = 0");
@@ -286,22 +272,18 @@ public class GetDataService extends IntentService {
 
         cursor.close();
 
-     //   int languageIndex = intent.getIntExtra(PARAM_LANG_CODE, 0);
-
         for (City c : citiesList) {
 
-            getWeather(c.id, c.city); // , languageIndex);
+            getWeather(c.id, c.city);
         }
-
     }
 
-    private void getWeather(final int id, final String city) { //, final int languageIndex) {
+
+    private void getWeather(final int id, final String city) {
 
         String url;
 
         try {
-            //   String[] languageCodeArray = getResources().getStringArray(R.array.language_parameter_array);
-
             String locale = getCurrentLocale().getCountry().toLowerCase();
 
             //     Log.d("AAAAA" , "GetDataService: locale = " + locale);

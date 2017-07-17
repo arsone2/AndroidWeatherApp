@@ -43,15 +43,16 @@ public class MainActivity extends AppCompatActivity implements
         CitiesListFragment.Callbacks,
         DetailsFragment.Callbacks,
         AddCityFragment.Callbacks,
-        SettingsFragment.Callbacks {
+        SettingsFragment.Callbacks,
+        ViewWeatherFragment.Callbacks {
 
     // 0 = metric (default), 1 = imperial,
     // Metric: temperature in "Celsius", wind speed in "meter/sec", pressure in "hPa"
     // Imperial: temperature in "Fahrenheit", wind speed in "miles/hour", pressure in "hPa"
-    private int mUnitsFormat;
+    //   private int mUnitsFormat;
 
     // sort cities: 0 = by adding (default), 1 = alphabetically
-    private int mSortCities;
+    //   private int mSortCities;
 
     // 0 = English(default), 1 = Russian
 
@@ -84,7 +85,6 @@ public class MainActivity extends AppCompatActivity implements
 
     public final static int TASK_GET_WEATHER_ONE_CITY = 1;
     public final static int TASK_GET_WEATHER_ALL_CITIES = 2;
-//    public final static int TASK_GET_DATA_PERIODICALLY = 3;
 
     public final static int STATUS_GET_WEATHER_ONE_CITY_START = 101;
     public final static int STATUS_GET_WEATHER_ONE_CITY_FINISH = 102;
@@ -92,22 +92,18 @@ public class MainActivity extends AppCompatActivity implements
     public final static int STATUS_GET_WEATHER_ALL_CITIES_START = 103;
     public final static int STATUS_GET_WEATHER_ALL_CITIES_FINISH = 104;
 
-  //  public final static int STATUS_RUN_ALL_CITIES = 106;
-
     public static final String CITY_ID = "city_id";
     public static final String ENTERED_CITY = "entered_city";
     public static final String UPDATE_TIME = "update_time";
     public static final String UNITS_FORMAT = "units_format";
 
 
-    // final static int RQS_1 = 1;
-
     final class Settings {
 
         private final int unitsFormat;
         private final int sortCities;
 
-        public Settings(int unitsFormat, int sortCities){ // , int mapLanguageIndex) {
+        public Settings(int unitsFormat, int sortCities) { // , int mapLanguageIndex) {
 
             this.unitsFormat = unitsFormat;
             this.sortCities = sortCities;
@@ -203,23 +199,21 @@ public class MainActivity extends AppCompatActivity implements
 
         scheduleAlarm();
 
-        // set action bar icon
+/*        // set action bar icon
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setIcon(R.drawable.white_balance_sunny);
+        getSupportActionBar().setIcon(R.drawable.white_balance_sunny);*/
 
 
         if (savedInstanceState != null) // create activity only one time?
             return;
 
-        readSettingsFromDB();
-
         // ----------------------------------------------------
         // Show CitiesListFragment
         CitiesListFragment citiesFragment = new CitiesListFragment();
 
-        Bundle bundle = new Bundle();
+/*        Bundle bundle = new Bundle();
         bundle.putInt(MainActivity.UNITS_FORMAT, mUnitsFormat);
-        citiesFragment.setArguments(bundle);
+        citiesFragment.setArguments(bundle);*/
 
         if (findViewById(R.id.onePaneLayout) != null) { // phone
 
@@ -277,17 +271,14 @@ public class MainActivity extends AppCompatActivity implements
             cursor.moveToFirst();
 
             // units format: 0 = metric, 1 = imperial
-            mUnitsFormat = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_UNITS_FORMAT));
+            int unitsFormat = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_UNITS_FORMAT));
 
             // sort: by id = 0, alphabetic = 1
-            mSortCities = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_SORT_CITIES));
+            int sortCities = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_SORT_CITIES));
 
             cursor.close();
 
-            ///     Log.d("AAAAA", "readSettingsFromDB - mUnitsFormat = " + mUnitsFormat);
-            Settings settings = new Settings(mUnitsFormat, mSortCities); //, mMapLanguageIndex);
-
-            return settings;
+            return new Settings(unitsFormat, sortCities);
         } else {
             return null;
         }
@@ -333,8 +324,8 @@ public class MainActivity extends AppCompatActivity implements
 
         bundle.putInt(MainActivity.CITY_ID, cityID);
         bundle.putString(MainActivity.ENTERED_CITY, enteredName);
-        bundle.putString(MainActivity.UPDATE_TIME, dataUpdateTime);
-        bundle.putInt(MainActivity.UNITS_FORMAT, unitsFormat);
+/*        bundle.putString(MainActivity.UPDATE_TIME, dataUpdateTime);
+        bundle.putInt(MainActivity.UNITS_FORMAT, unitsFormat);*/
 
         detailsFragment.setArguments(bundle);
 
@@ -389,11 +380,11 @@ public class MainActivity extends AppCompatActivity implements
         // -----------------------------------------------------------
         // get detailed data for ONE added city
         Intent oneIntent = new Intent(this, GetDataService.class)
-              //  .setAction(BROADCAST_DYNAMIC_ACTION)
+                //  .setAction(BROADCAST_DYNAMIC_ACTION)
                 .putExtra(PARAM_TASK, TASK_GET_WEATHER_ONE_CITY) // get weather data for one city only!
                 .putExtra(PARAM_CITY_ID, id) //  "CITIES" table: column "_id"
                 .putExtra(PARAM_ENTERED_CITY, enteredCity); // "CITIES" table: column "entered_city"
-               // .addCategory(Intent.CATEGORY_DEFAULT);
+        // .addCategory(Intent.CATEGORY_DEFAULT);
 
         // start service for added a city details and weather data
         startService(oneIntent);
@@ -444,9 +435,10 @@ public class MainActivity extends AppCompatActivity implements
 
             if (rightFragment instanceof DetailsFragment) { // refresh details: weather ListView
 
-                    Log.d("AAAAA", "refreshData: citiesListFragment - initLoader();");
+                Log.d("AAAAA", "tablet = refreshData: citiesListFragment - initLoader();");
 
                 DetailsFragment detailsFragment = (DetailsFragment) rightFragment;
+
                 detailsFragment.initLoader();
             }
         } else { // phone
@@ -455,7 +447,7 @@ public class MainActivity extends AppCompatActivity implements
 
             if (fragment instanceof CitiesListFragment) { // refresh details: weather ListView
 
-                    Log.d("AAAAA", "refreshData: citiesListFragment - initLoader();");
+                Log.d("AAAAA", "phone = refreshData: citiesListFragment - initLoader();");
 
                 CitiesListFragment citiesListFragment = (CitiesListFragment) fragment;
 
@@ -463,29 +455,36 @@ public class MainActivity extends AppCompatActivity implements
 
             } else if (fragment instanceof DetailsFragment) { // refresh cities: cities ListView
 
-                      Log.d("AAAAA", "refreshData: DetailsFragment - initLoader()");
+                Log.d("AAAAA", "phone = refreshData: DetailsFragment - initLoader()");
 
                 DetailsFragment detailsFragment = (DetailsFragment) fragment;
 
                 detailsFragment.initLoader();
-            }
 
+            } else if (fragment instanceof ViewWeatherFragment) { // refresh cities: cities ListView
+
+                Log.d("AAAAA", "phone = refreshData: ViewWeatherFragment - initLoader()");
+
+                ViewWeatherFragment viewWeatherFragment = (ViewWeatherFragment) fragment;
+
+                viewWeatherFragment.initLoader();
+            }
         }
     }
 
 
     // icon "sync" pressed
-    private void syncData() {
+    public void syncData() {
 
         //   hideMessageBar();
 
         // determine what is the fragments are in activity?
         if (findViewById(R.id.onePaneLayout) == null) { // tablet
 
-            Fragment leftFragment = getSupportFragmentManager().findFragmentById(R.id.citiesContainer);
-         //   Fragment rightFragment = getSupportFragmentManager().findFragmentById(R.id.rightFrameLayout);
+            //Fragment leftFragment = getSupportFragmentManager().findFragmentById(R.id.citiesContainer);
+            //   Fragment rightFragment = getSupportFragmentManager().findFragmentById(R.id.rightFrameLayout);
 
-         //   CitiesListFragment citiesListFragment = (CitiesListFragment) leftFragment;
+            //   CitiesListFragment citiesListFragment = (CitiesListFragment) leftFragment;
 
             syncAllData();
 
@@ -556,7 +555,7 @@ public class MainActivity extends AppCompatActivity implements
       //  intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
         sendBroadcast(intent);
 */
- //   }
+    //   }
 
 
  /*   Параметры
@@ -718,6 +717,12 @@ public class MainActivity extends AppCompatActivity implements
                 syncData();
 
                 return true;
+
+            case R.id.action_view:
+
+                viewData();
+
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -730,7 +735,7 @@ public class MainActivity extends AppCompatActivity implements
         if (findViewById(R.id.onePaneLayout) == null) { // tablet
 
             Fragment leftFragment = getSupportFragmentManager().findFragmentById(R.id.citiesContainer);
-            Fragment rightFragment = getSupportFragmentManager().findFragmentById(R.id.rightFrameLayout);
+            //      Fragment rightFragment = getSupportFragmentManager().findFragmentById(R.id.rightFrameLayout);
 
             ///     Log.d("AAAAA", "onSettingsChanged");
             CitiesListFragment citiesListFragment = (CitiesListFragment) leftFragment;
@@ -759,5 +764,28 @@ public class MainActivity extends AppCompatActivity implements
 
                 detailsFragment.initLoader();
             }*/
+    }
+
+    // icon "view" pressed
+    private void viewData() {
+
+        // ----------------------------------------------------
+        // Show ViewWeatherFragment
+        ViewWeatherFragment viewWeatherFragment = new ViewWeatherFragment();
+
+        if (findViewById(R.id.onePaneLayout) != null) { // phone
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.onePaneLayout, viewWeatherFragment)
+                    .addToBackStack(null)
+                    .commit();
+
+        } else { // tablet
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.rightFrameLayout, viewWeatherFragment)
+                    .commit();
+        }
+        // ----------------------------------------------------
     }
 }

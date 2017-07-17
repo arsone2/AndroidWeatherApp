@@ -2,11 +2,9 @@ package com.example.arsone.weather;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +25,7 @@ public class SettingsFragment extends Fragment implements
         void onSettingsChanged();
 
         MainActivity.Settings readSettingsFromDB();
+      //  MainActivity.Settings readSettings();
     }
 
     private SettingsFragment.Callbacks activity;
@@ -39,7 +38,7 @@ public class SettingsFragment extends Fragment implements
     private int mUnitsFormat;
     private int mSortCities;
  //   private int mMapStyleIndex;
-    private int mMapLanguageIndex;
+//    private int mMapLanguageIndex;
 
 
     @Override
@@ -55,17 +54,6 @@ public class SettingsFragment extends Fragment implements
 
         super.onDetach();
         activity = null;
-    }
-
-
-    @Override
-    public void onPause() {
-
-        super.onPause();
-
-        // transmit data to mainActivity to save it in DB
-     //   activity.writeSettingsToDB(unitsFormatToggleButton.isChecked() ? 1 : 0);
-
     }
 
 
@@ -105,6 +93,7 @@ public class SettingsFragment extends Fragment implements
 
         // get settings data from DB
         MainActivity.Settings settings = activity.readSettingsFromDB();
+       // MainActivity.Settings settings = activity.readSettings();
 
         mUnitsFormat = settings.getUnitsFormat();
         mSortCities = settings.getSortCities();
@@ -170,24 +159,6 @@ public class SettingsFragment extends Fragment implements
      //   Log.d("AAAAA", "onItemSelected - position = " + position);
 
         writeSettingsToDB();
-
-       /* switch (view.getId()){
-
-            case R.id.mapLanguageSpinner:
-
-                Log.d("AAAAA", "onItemSelected - mapLanguageSpinner position = " + position);
-
-                writeSettingsToDB();
-
-                break;
-
-            case R.id.mapStyleSpinner:
-
-                Log.d("AAAAA", "onItemSelected - mapStyleSpinner position = " + position);
-                writeSettingsToDB();
-
-                break;
-        }*/
     }
 
 

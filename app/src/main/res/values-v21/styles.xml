@@ -7,13 +7,17 @@
     <style name="AppBaseTheme" parent="Theme.AppCompat">
     </style>
 
+    <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">@drawable/background_splash</item>
+    </style>
+
     <style name="DarkBlueTheme" parent="AppBaseTheme">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
 
         <item name="android:textColor">@color/basicText</item>
-        <item name="android:windowBackground">@color/colorPrimary</item>
+        <item name="android:windowBackground">@color/windowBackground</item>
 
         <!--      <item name="android:alertDialogTheme">@style/AlertDialog.AppCompat.Light</item>-->
     </style>
@@ -27,7 +31,7 @@
     </style>
 
     <style name="titleText">
-        <item name="android:textSize">27sp</item>
+        <item name="android:textSize">23sp</item>
         <item name="android:textColor">@color/titleColor</item>
         <item name="android:textStyle">bold</item>
     </style>

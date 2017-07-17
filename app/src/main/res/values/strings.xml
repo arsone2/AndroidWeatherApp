@@ -1,37 +1,35 @@
 <resources>
     <string name="app_name">Weather Info</string>
-    <!--<string name="action_settings">Settings</string>-->
 
     <!-- Menu items -->
 
-    <string name="action_add">Add record</string>
-    <string name="action_delete">Delete record</string>
+    <string name="action_add">Add place</string>
+    <string name="action_view">View on map</string>
     <string name="action_sync">Sync with server</string>
+    <string name="action_delete">Delete record</string>
     <string name="action_settings">Settings</string>
     <string name="action_cancel">Cancel</string>
     <string name="action_save">Save</string>
+    <string name="action_previous">Previous place</string>
+    <string name="action_next">Next place</string>
 
     <!-- openweathermap.org parameters -->
 
     <string name="openweathermap_api_key">f4178cee3f64ae240a7cc0a602369fb2</string>
-    <string name="google_maps_api_key">AIzaSyAgkApUvzu_0MwjHfbvoee8SmFTyPhIreg</string>
+    <!--    <string name="google_maps_api_key">AIzaSyAgkApUvzu_0MwjHfbvoee8SmFTyPhIreg</string>-->
     <string name="web_service_url">http://api.openweathermap.org/data/2.5/forecast/daily?q=</string>
     <string name="mapbox_api_key">pk.eyJ1IjoiYXJzb25lIiwiYSI6ImNqNGp2NDRoeDBid3YzM3FzaHYwMWdiMzAifQ.mYNMcy5YsMKFRXlEt6jNJw</string>
 
     <!-- UI text -->
 
-    <!--<string name="cities_title_cities_present">SELECT PLACE:</string>-->
     <string name="cities_title_cities_empty">ADD PLACES TO LIST</string>
-    <string name="hint_city_add">Enter place name</string>
+    <string name="hint_city_add">Pick or enter place name</string>
     <string name="edit_save">Save</string>
     <string name="edit_cancel">Cancel</string>
     <string name="text_city">Place</string>
     <string name="ok">OK</string>
     <string name="button_delete_city_cancel">Cancel</string>
     <string name="button_delete_city">Delete</string>
-
-    <string name="offline">данные оффлайн</string>
-    <string name="online">данные онлайн</string>
 
     <!--  messages  -->
 
@@ -40,9 +38,16 @@
     <string name="message_city_not_found">Not found</string>
     <string name="message_wait_for_data">Getting data&#8230;</string>
     <string name="message_city_has_in_db">Such city already present in database</string>
+    <string name="no_results">No result</string>
+    <string name="cannot_get_place_name">Can`t get place name</string>
+    <string name="data_not_found">Data not found</string>
 
+    <!--Basic user location permission toasts-->
 
-    <!-- ic_delete_item city confirm dialog -->
+    <string name="user_location_permission_explanation">This app needs location permissions in order to show its functionality.</string>
+    <string name="user_location_permission_not_granted">You didn\'t grant location permissions.</string>
+
+    <!-- delete city item confirm dialog -->
 
     <string name="delete_dialog_question">Confirm</string>
     <string name="delete_dialog_text">Do you want delete record(s)?</string>
@@ -58,7 +63,7 @@
     <!-- weather ListView item format -->
 
     <string name="weather_humidity">Humidity: %s</string>
-    <string name="weather_pressure">Atmospheric pressure: %1$.1f hPa/ %2$.1f mmHg</string>
+    <string name="weather_pressure">Pressure: %1$.1f hPa/ %2$.1f mmHg</string>
     <string name="weather_wind_direction">Wind direction: %s°</string>
     <string name="weather_data_obtained">Data obtained: %s</string>
 
@@ -79,32 +84,30 @@
     <string name="i_weather_day_temp">Day temperature: %s ℉</string>
     <string name="i_weather_evening_temp">Evening temperature: %s ℉</string>
     <string name="i_weather_night_temp">Night temperature: %s ℉</string>
-    <string name="data_not_found">Data not found</string>
-
 
     <!-- The following map styles are available to all accounts using a valid access token: -->
 
-<!--    <string-array name="map_styles_array">
-        <item>mapbox://styles/mapbox/light-v9</item>
-        <item>mapbox://styles/mapbox/streets-v10</item>
-        <item>mapbox://styles/mapbox/outdoors-v10</item>
-        <item>mapbox://styles/mapbox/dark-v9</item>
-            <item>mapbox://styles/mapbox/satellite-v9</item>
-                <item>mapbox://styles/mapbox/satellite-streets-v10</item>
-        <item>mapbox://styles/mapbox/traffic-day-v2</item>
-        <item>mapbox://styles/mapbox/traffic-night-v2</item>
-    </string-array>-->
+    <!--    <string-array name="map_styles_array">
+            <item>mapbox://styles/mapbox/light-v9</item>
+            <item>mapbox://styles/mapbox/streets-v10</item>
+            <item>mapbox://styles/mapbox/outdoors-v10</item>
+            <item>mapbox://styles/mapbox/dark-v9</item>
+                <item>mapbox://styles/mapbox/satellite-v9</item>
+                    <item>mapbox://styles/mapbox/satellite-streets-v10</item>
+            <item>mapbox://styles/mapbox/traffic-day-v2</item>
+            <item>mapbox://styles/mapbox/traffic-night-v2</item>
+        </string-array>-->
 
-<!--    <string-array name="map_styles_names">
-        <item>light</item>
-        <item>streets</item>
-        <item>outdoors</item>
-        <item>dark</item>
-                <item>satellite</item>
-                <item>satellite-streets</item>
-        <item>traffic-day</item>
-        <item>traffic-night</item>
-    </string-array>-->
+    <!--    <string-array name="map_styles_names">
+            <item>light</item>
+            <item>streets</item>
+            <item>outdoors</item>
+            <item>dark</item>
+                    <item>satellite</item>
+                    <item>satellite-streets</item>
+            <item>traffic-day</item>
+            <item>traffic-night</item>
+        </string-array>-->
 
     <!-- supported map languages -->
 
@@ -116,11 +119,6 @@
             <item>Deutsche</item>
             <item>Español</item>
         -->
-    </string-array>
-
-    <string-array name="language_parameter_array">
-        <item>en</item>
-        <item>ru</item>
     </string-array>
 
     <!-- Mapbox map symbol layers -->
