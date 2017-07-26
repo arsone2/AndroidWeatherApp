@@ -19,6 +19,7 @@
     <!--    <string name="google_maps_api_key">AIzaSyAgkApUvzu_0MwjHfbvoee8SmFTyPhIreg</string>-->
     <string name="web_service_url">http://api.openweathermap.org/data/2.5/forecast/daily?q=</string>
     <string name="mapbox_api_key">pk.eyJ1IjoiYXJzb25lIiwiYSI6ImNqNGp2NDRoeDBid3YzM3FzaHYwMWdiMzAifQ.mYNMcy5YsMKFRXlEt6jNJw</string>
+    <string name="admob_publisher_id">ca-app-pub-1425799219086321~9883810492</string>
 
     <!-- UI text -->
 
@@ -41,6 +42,10 @@
     <string name="no_results">No result</string>
     <string name="cannot_get_place_name">Can`t get place name</string>
     <string name="data_not_found">Data not found</string>
+    <string name="no_data">no data</string>
+
+    <string name="service_get_data_error">Get weather data error.</string>
+    <string name="service_get_data_success">Weather data successfully obtained.</string>
 
     <!--Basic user location permission toasts-->
 
@@ -67,47 +72,33 @@
     <string name="weather_wind_direction">Wind direction: %s°</string>
     <string name="weather_data_obtained">Data obtained: %s</string>
 
+    <!-- Settings fragment-->
+
+    <string name="settings_title">Settings</string>
+    <string name="settings_units_format">Units format:</string>
+    <string name="settings_sort_cities">Sort cities:</string>
+    <string name="sort_by_adding">by adding</string>
+    <string name="sort_alphabetically">alphabetically</string>
+    <string name="units_metric">metric</string>
+    <string name="units_imperial">imperial</string>
+
     <!-- Metric / Celsius -->
 
     <string name="m_weather_wind_speed">Wind speed: %.1f m/s</string>
-    <string name="m_weather_min_max_temp">Min./max. day temperature: %1$s °C/ %2$s °C</string>
-    <string name="m_weather_morning_temp">Morning temperature: %s °C</string>
-    <string name="m_weather_day_temp">Day temperature: %s °C</string>
-    <string name="m_weather_evening_temp">Evening temperature: %s °C</string>
-    <string name="m_weather_night_temp">Night temperature: %s °C</string>
+    <string name="m_weather_min_max_temp">Day min/max: %1$s °C/ %2$s °C</string>
+    <string name="m_weather_morning_temp">Morning: %s °C</string>
+    <string name="m_weather_day_temp">Day: %s °C</string>
+    <string name="m_weather_evening_temp">Evening: %s °C</string>
+    <string name="m_weather_night_temp">Night: %s °C</string>
 
     <!-- Imperial / Fahrenheit -->
 
     <string name="i_weather_wind_speed">Wind speed: %.1f mph</string>
-    <string name="i_weather_min_max_temp">Min./max. day temperature: %1$s ℉/ %2$s ℉</string>
-    <string name="i_weather_morning_temp">Morning temperature: %s ℉</string>
-    <string name="i_weather_day_temp">Day temperature: %s ℉</string>
-    <string name="i_weather_evening_temp">Evening temperature: %s ℉</string>
-    <string name="i_weather_night_temp">Night temperature: %s ℉</string>
-
-    <!-- The following map styles are available to all accounts using a valid access token: -->
-
-    <!--    <string-array name="map_styles_array">
-            <item>mapbox://styles/mapbox/light-v9</item>
-            <item>mapbox://styles/mapbox/streets-v10</item>
-            <item>mapbox://styles/mapbox/outdoors-v10</item>
-            <item>mapbox://styles/mapbox/dark-v9</item>
-                <item>mapbox://styles/mapbox/satellite-v9</item>
-                    <item>mapbox://styles/mapbox/satellite-streets-v10</item>
-            <item>mapbox://styles/mapbox/traffic-day-v2</item>
-            <item>mapbox://styles/mapbox/traffic-night-v2</item>
-        </string-array>-->
-
-    <!--    <string-array name="map_styles_names">
-            <item>light</item>
-            <item>streets</item>
-            <item>outdoors</item>
-            <item>dark</item>
-                    <item>satellite</item>
-                    <item>satellite-streets</item>
-            <item>traffic-day</item>
-            <item>traffic-night</item>
-        </string-array>-->
+    <string name="i_weather_min_max_temp">Day min/max: %1$s ℉/ %2$s ℉</string>
+    <string name="i_weather_morning_temp">Morning: %s ℉</string>
+    <string name="i_weather_day_temp">Day: %s ℉</string>
+    <string name="i_weather_evening_temp">Evening: %s ℉</string>
+    <string name="i_weather_night_temp">Night: %s ℉</string>
 
     <!-- supported map languages -->
 

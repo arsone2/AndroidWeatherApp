@@ -25,7 +25,7 @@ public class CityCursorAdapter extends CursorAdapter {
 
     private static boolean checkboxVisibility = false;
 
-    private static SparseBooleanArray selectedItemsArray;
+    public static SparseBooleanArray selectedItemsArray;
 
     private static int mUnitsFormat;
 
@@ -96,7 +96,7 @@ public class CityCursorAdapter extends CursorAdapter {
         String returnedCity = cursor.getString(returnedCityColumnIndex);
 
         int enteredCityColumnIndex = cursor.getColumnIndex(DataContract.CityEntry.COLUMN_ENTERED_CITY);
-        String enteredCity = cursor.getString(enteredCityColumnIndex);
+  ///      String enteredCity = cursor.getString(enteredCityColumnIndex);
 
         if (returnedCity != null) { // full
 
@@ -120,8 +120,8 @@ public class CityCursorAdapter extends CursorAdapter {
             } else if (mUnitsFormat == 1) { // imperial == Fahrenheit
 
                 viewHolder.tempUnitTextView.setText("\u2109"); // Fahrenheit sign
-                int dayTemp = cursor.getInt(cursor.getColumnIndex(DataContract.WeatherEntry.COLUMN_DAY_TEMP));
-                viewHolder.dayTempTextView.setText(String.valueOf(dayTemp * 9 / 5 + 32)); // Celsius to Fahrenheit
+                double dayTemp = cursor.getDouble(cursor.getColumnIndex(DataContract.WeatherEntry.COLUMN_DAY_TEMP));
+                viewHolder.dayTempTextView.setText(CelsiusToFahrenheit(dayTemp)); // Celsius to Fahrenheit
             }
 
             viewHolder.dayTempTextView.setVisibility(View.VISIBLE);
@@ -142,9 +142,13 @@ public class CityCursorAdapter extends CursorAdapter {
             viewHolder.dayTempTextView.setVisibility(View.GONE);
         }
 
-        final int position = cursor.getPosition();
-        int id = cursor.getInt(cursor.getColumnIndex(DataContract.CityEntry._ID));
+   //     final int position = cursor.getPosition();
+
+        final int id = cursor.getInt(cursor.getColumnIndex(DataContract.CityEntry._ID));
+
         viewHolder.checkboxForDelete.setTag(id);
+
+        viewHolder.id = id; // add
 
         viewHolder.checkboxForDelete.setOnClickListener(new View.OnClickListener() {
 
@@ -153,21 +157,31 @@ public class CityCursorAdapter extends CursorAdapter {
 
                 if (viewHolder.checkboxForDelete.isChecked()) {
 
-                    selectedItemsArray.put(position, true);
+                    ///selectedItemsArray.put(position, true);
+                    selectedItemsArray.put(id, true);
 
                 } else if (!viewHolder.checkboxForDelete.isChecked()) {
 
-                    selectedItemsArray.put(position, false);
+                 ///   selectedItemsArray.put(position, false);
+                    selectedItemsArray.put(id, false);
                 }
             }
         });
 
-        viewHolder.checkboxForDelete.setChecked(selectedItemsArray.get(position));
+      ///  viewHolder.checkboxForDelete.setChecked(selectedItemsArray.get(position));
+        viewHolder.checkboxForDelete.setChecked(selectedItemsArray.get(id));
 
         // set checkboxes visibility
         if (checkboxVisibility)
             viewHolder.checkboxForDelete.setVisibility(View.VISIBLE);
         else
             viewHolder.checkboxForDelete.setVisibility(View.GONE);
+    }
+
+
+    private String CelsiusToFahrenheit(double temp) {
+
+        // return (int) (temp * 9 / 5 + 32);
+        return String.valueOf((int)(temp * 9 / 5 + 32));
     }
 }

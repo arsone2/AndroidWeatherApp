@@ -25,20 +25,17 @@ public class SettingsFragment extends Fragment implements
         void onSettingsChanged();
 
         MainActivity.Settings readSettingsFromDB();
-      //  MainActivity.Settings readSettings();
     }
 
     private SettingsFragment.Callbacks activity;
 
     private ToggleButton unitsFormatToggleButton;
     private ToggleButton sortCitiesToggleButton;
- //   private Spinner mapStyleSpinner;
- //   private Spinner mapLanguageSpinner;
+    private ToggleButton sendNotificationsToggleButton;
 
     private int mUnitsFormat;
     private int mSortCities;
- //   private int mMapStyleIndex;
-//    private int mMapLanguageIndex;
+    private int mSendNotifications;
 
 
     @Override
@@ -64,41 +61,12 @@ public class SettingsFragment extends Fragment implements
 
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
 
-/*        Bundle bundle = getArguments();
-
-        if (bundle != null) {
-            mUnitsFormat = bundle.getInt(MainActivity.UNITS_FORMAT);
-        }*/
-
-     ///   Log.d("AAAAA", "readSettingsFromDB");
-
- /*       // read all settings from DB
-        Cursor cursor = getActivity().getContentResolver().query(DataContentProvider.SETTINGS_CONTENT_URI,
-                new String[]{ DataContract.SettingsEntry.COLUMN_UNITS_FORMAT,
-                              DataContract.SettingsEntry.COLUMN_SORT_CITIES },
-                null, // DataContract.CityEntry.COLUMN_ENTERED_CITY + "=?",
-                null, // new String[]{enteredCity},
-                null);
-
-        if (cursor != null && cursor.getCount() > 0) {
-
-            cursor.moveToFirst();
-
-            mUnitsFormat = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_UNITS_FORMAT));
-            mSortCities = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_SORT_CITIES));
-            cursor.close();
-
-        ///    Log.d("AAAAA", "SettingsFragment: readSettingsFromDB - mUnitsFormat = " + mUnitsFormat);
-        }*/
-
         // get settings data from DB
         MainActivity.Settings settings = activity.readSettingsFromDB();
-       // MainActivity.Settings settings = activity.readSettings();
 
         mUnitsFormat = settings.getUnitsFormat();
         mSortCities = settings.getSortCities();
-  //      mMapStyleIndex = settings.getMapStyleIndex();
-   //     mMapLanguageIndex = settings.getMapLanguageIndex();
+        mSendNotifications = settings.getSendNotifications();
 
         unitsFormatToggleButton = (ToggleButton) view.findViewById(R.id.unitsFormatToggleButton);
         unitsFormatToggleButton.setChecked(mUnitsFormat == 1);
@@ -108,13 +76,9 @@ public class SettingsFragment extends Fragment implements
         sortCitiesToggleButton.setChecked(mSortCities == 1);
         sortCitiesToggleButton.setOnCheckedChangeListener(this);
 
-/*        mapStyleSpinner = (Spinner) view.findViewById(R.id.mapStyleSpinner);
-        mapStyleSpinner.setOnItemSelectedListener(this);
-        mapStyleSpinner.setSelection(mMapStyleIndex);*/
-
-/*        mapLanguageSpinner = (Spinner) view.findViewById(R.id.mapLanguageSpinner);
-        mapLanguageSpinner.setOnItemSelectedListener(this);
-        mapLanguageSpinner.setSelection(mMapLanguageIndex);*/
+        sendNotificationsToggleButton = (ToggleButton) view.findViewById(R.id.sendNotificationsToggleButton);
+        sendNotificationsToggleButton.setChecked(mSendNotifications == 1);
+        sendNotificationsToggleButton.setOnCheckedChangeListener(this);
 
         return view;
     }
@@ -137,16 +101,10 @@ public class SettingsFragment extends Fragment implements
         // sort: by id = 0, alphabetic = 1
         values.put(DataContract.SettingsEntry.COLUMN_SORT_CITIES, sortCitiesToggleButton.isChecked() ? 1 : 0);
 
-     //   Log.d("AAAAA", "mapStyleSpinner.getSelectedItemPosition() = " + mapStyleSpinner.getSelectedItemPosition());
-      //  Log.d("AAAAA", "mapLanguageSpinner.getSelectedItemPosition() = " + mapLanguageSpinner.getSelectedItemPosition());
-
-    //    values.put(DataContract.SettingsEntry.COLUMN_MAP_STYLE, mapStyleSpinner.getSelectedItemPosition());
-
-   //     values.put(DataContract.SettingsEntry.COLUMN_MAP_LANGUAGE, mapLanguageSpinner.getSelectedItemPosition());
+        // send notifications: 0 = no, 1 = yes
+        values.put(DataContract.SettingsEntry.COLUMN_SEND_NOTIFY, sendNotificationsToggleButton.isChecked() ? 1 : 0);
 
         getActivity().getContentResolver().update(DataContentProvider.SETTINGS_CONTENT_URI, values, null, null);
-
-     ///   Log.d("AAAAA", "writeSettingsToDB(): updatedRowsCount = " + updatedRowsCount);
 
         activity.onSettingsChanged();
     }

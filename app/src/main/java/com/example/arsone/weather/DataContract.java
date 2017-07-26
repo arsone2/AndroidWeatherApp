@@ -6,7 +6,7 @@ import android.provider.BaseColumns;
 public final class DataContract {
 
     public static final String DATABASE_NAME = "weather.db";
-    public static final int DATABASE_VERSION = 3;
+    public static final int DATABASE_VERSION = 2;
 
     // private constructor
     private DataContract(){}
@@ -26,14 +26,6 @@ public final class DataContract {
         public static final String COLUMN_LONGITUDE         = "longitude";        // double/DOUBLE
         public static final String COLUMN_SERVER_CITY_ID    = "server_city_id";   // int/INTEGER
         public static final String COLUMN_UPDATE_TIMESTAMP  = "update_timestamp"; // timestamp, when data was added
-
-/*        public static final String[] DEFAULT_PROJECTION = new String[]{
-                DataContract.CityEntry._ID,
-                DataContract.CityEntry.COLUMN_ENTERED_CITY,
-                DataContract.CityEntry.COLUMN_RETURNED_CITY
-        };
-
-        public static final String DEFAULT_SORT_ORDER = _ID + " DESC";*/
     }
 
 
@@ -62,26 +54,6 @@ public final class DataContract {
         public static final String COLUMN_DESCRIPTION  = "description";   // String/TEXT
         public static final String COLUMN_ICON_NAME    = "icon_name";     // String/TEXT
         public static final String COLUMN_INSERT_TIMESTAMP  = "insert_timestamp"; // timestamp, when weather data was added
-
-/*        public static final String[] DEFAULT_PROJECTION = new String[]{
-                WeatherEntry._ID,
-                WeatherEntry.COLUMN_CITY_ID_FK,
-                WeatherEntry.COLUMN_TIMESTAMP,
-                WeatherEntry.COLUMN_MORNING_TEMP,
-                WeatherEntry.COLUMN_DAY_TEMP,
-                WeatherEntry.COLUMN_EVENING_TEMP,
-                WeatherEntry.COLUMN_NIGHT_TEMP,
-                WeatherEntry.COLUMN_MIN_TEMP,
-                WeatherEntry.COLUMN_MAX_TEMP,
-                WeatherEntry.COLUMN_HUMIDITY,
-                WeatherEntry.COLUMN_PRESSURE,
-                WeatherEntry.COLUMN_SPEED,
-                WeatherEntry.COLUMN_DIRECTION,
-                WeatherEntry.COLUMN_DESCRIPTION,
-                WeatherEntry.COLUMN_ICON_NAME
-        };
-
-        public static final String DEFAULT_SORT_ORDER = DataContract.WeatherEntry._ID + " ASC";*/
     }
 
 
@@ -100,5 +72,6 @@ public final class DataContract {
         public static final String COLUMN_CAMERA_BEARING   = "camera_bearing";   // (double/DOUBLE)
         public static final String COLUMN_CAMERA_TILT      = "camera_tilt";      // (double/DOUBLE)
         public static final String COLUMN_CAMERA_ZOOM      = "camera_zoom";      // (double/DOUBLE)
+        public static final String COLUMN_SEND_NOTIFY      = "send_notify";      //  (int/INTEGER)
     }
 }

@@ -13,6 +13,9 @@ import android.support.v4.content.Loader;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -31,6 +34,8 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
         boolean isMyServiceRunning(Class<?> serviceClass);
 
         MainActivity.Settings readSettingsFromDB();
+
+        void onViewCity(int id, String city);
     }
 
     private DetailsFragment.Callbacks activity;
@@ -50,10 +55,14 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
     // selected city name
     private String mEnteredCity;
 
+    private boolean mHideActionViewMenuItem;
+
     private int mUnitsFormat;
 
     private String mDataUpdateTime;
 
+    // obtained data old period = 20 minutes
+    private final int DATA_OLD_PERIOD = 20;
 
     @Override
     public void onAttach(Context context) {
@@ -106,13 +115,14 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
 
         View view = inflater.inflate(R.layout.fragment_details, container, false);
 
+        setHasOptionsMenu(true); // show action bar menu
+
         Bundle bundle = getArguments();
 
         if (bundle != null) {
             mID = bundle.getInt(MainActivity.CITY_ID);
             mEnteredCity = bundle.getString(MainActivity.ENTERED_CITY);
-            //     mUnitsFormat = bundle.getInt(MainActivity.UNITS_FORMAT);
-            //   mDataUpdateTime = bundle.getString(MainActivity.UPDATE_TIME);
+            mHideActionViewMenuItem = bundle.getBoolean(MainActivity.HIDE_MENU_ITEM);
         }
 
         // Title
@@ -176,21 +186,25 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
                 Date today = new Date();
                 Date date = updateTimeDate.parse(mDataUpdateTime);
 
-                long diff =  today.getTime() - updateTimeDate.parse(mDataUpdateTime).getTime();
+                long diff = today.getTime() - updateTimeDate.parse(mDataUpdateTime).getTime();
 
                 // difference between dates in days
-               // int numOfDays = (int) (diff / (1000 * 60 * 60 * 24));
-                int hours = (int) (diff / (1000 * 60 * 60));
+                // int numOfDays = (int) (diff / (1000 * 60 * 60 * 24));
+                /// int hours = (int) (diff / (1000 * 60 * 60));
+                int minutes = (int) (diff / (1000 * 60));
 
-                Log.d("AAAAA", "hours = " + hours);
+                Log.d("AAAAA", "minutes = " + minutes);
 
                 String stringDate = DateFormat.getDateTimeInstance().format(date);
 
                 updateTimeTextView.setText(getContext().getString(R.string.weather_data_obtained, stringDate));
 
-                // if obtained data get older then 3 hours!!
-                if(hours >= 3){
+                // if obtained data get old
+                if (minutes <= DATA_OLD_PERIOD) {
 
+                    updateTimeTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.colorBlack));
+
+                } else {
                     updateTimeTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.colorOrange));
                 }
 
@@ -199,15 +213,12 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
             }
         }
 
-        //  int unitsFormat = 0; // metric/Celsius units format by default
         // get settings data from DB
-        /// MainActivity.Settings settings = activity.readSettingsFromDB();
-
+        //  int unitsFormat = 0; // metric/Celsius units format by default
         MainActivity.Settings settings = activity.readSettingsFromDB();
         mUnitsFormat = settings.getUnitsFormat();
-        //mSortCities = settings.getSortCities();
 
-        mUnitsFormat = settings.getUnitsFormat();
+        Log.d("AAAAA" , "mUnitsFormat = " + mUnitsFormat);
 
         // set units format
         WeatherCursorAdapter.setUnitsFormat(mUnitsFormat);
@@ -241,4 +252,98 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
             // -----------------------------------------------------------
         }
     }
+
+    // display this fragment's menu items
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+
+        // clear previous menu items
+       ///  menu.clear();
+
+        super.onCreateOptionsMenu(menu, inflater);
+
+        inflater.inflate(R.menu.details_fragment_menu, menu);
+    }
+
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+
+        if(menu != null && mHideActionViewMenuItem)
+            menu.findItem(R.id.action_view_city).setVisible(false);
+
+        super.onPrepareOptionsMenu(menu);
+    }
+
+
+    // handle choice from options menu
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+
+            case R.id.action_view_city:
+
+                activity.onViewCity(mID, mEnteredCity);
+
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+/*    // display this fragment's menu items
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+
+        // clear previous menu items
+        menu.clear();
+
+
+     for (int index = 0; index < menu.size(); index++) {
+
+            MenuItem menuItem = menu.getItem(index);
+
+            if (menuItem != null) {
+
+                int id = menuItem.getItemId();
+
+                // hide "view" icon
+                if (id == R.id.action_view) {
+
+                    menuItem.setVisible(false);
+                }
+            }
+        }
+
+        super.onCreateOptionsMenu(menu, inflater);
+
+        inflater.inflate(R.menu.view_weather_menu, menu);
+    }*/
+
+
+/*    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+
+        //      menu.clear();
+
+       for (int index = 0; index < menu.size(); index++) {
+
+            MenuItem menuItem = menu.getItem(index);
+
+            if (menuItem != null) {
+
+                int id = menuItem.getItemId();
+
+                // hide "view" icon
+                if (id == R.id.action_view ) {
+
+                    menuItem.setVisible(false);
+                }
+            }
+        }
+
+        super.onPrepareOptionsMenu(menu);
+    }*/
+
+
 }

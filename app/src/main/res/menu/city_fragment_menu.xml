@@ -4,6 +4,13 @@
       xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/action_view"
+        android:icon="@drawable/ic_view"
+        android:title="@string/action_view"
+        android:orderInCategory="1"
+        app:showAsAction="always"/>
+
+    <item
         android:id="@+id/action_add"
         android:icon="@drawable/ic_add_location"
         android:title="@string/action_add"

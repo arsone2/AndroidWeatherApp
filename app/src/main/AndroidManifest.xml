@@ -3,6 +3,10 @@
           package="com.example.arsone.weather"
           android:installLocation="internalOnly">
 
+    <uses-sdk
+        android:minSdkVersion="16"
+        android:targetSdkVersion="25" />
+
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -37,7 +41,7 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/DarkBlueTheme"
+        android:theme="@style/LightTheme"
         >
 
         <activity
@@ -53,6 +57,7 @@
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:windowSoftInputMode="adjustPan|adjustResize"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
             >
             <!--            <intent-filter>
                             <action android:name="android.intent.action.MAIN"/>
@@ -90,11 +95,11 @@
             android:name=".StaticBroadcastReceiver">
 
             <intent-filter>
-                <category android:name="android.intent.category.DEFAULT"/>
+               <!-- <category android:name="android.intent.category.DEFAULT"/>-->
                 <action android:name="com.example.arsone.weather.static.broadcast"/>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <action android:name="android.intent.action.QUICKBOOT_POWERON"/> <!-- For HTC devices -->
-                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/> <!--https://github.com/AdguardTeam/AdguardForAndroid/issues/183-->
+               <!-- <action android:name="android.intent.action.BOOT_COMPLETED"/>-->
+               <!-- <action android:name="android.intent.action.QUICKBOOT_POWERON"/> --><!-- For HTC devices -->
+               <!-- <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>--> <!--https://github.com/AdguardTeam/AdguardForAndroid/issues/183-->
             </intent-filter>
         </receiver>
 

@@ -12,7 +12,11 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,7 +27,11 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.mapbox.mapboxsdk.Mapbox;
+
 
 // https://www.thorntech.com/2016/03/parsing-json-android-using-volley-library/
 // https://www.smashingmagazine.com/2017/03/simplify-android-networking-volley-http-library/
@@ -49,17 +57,15 @@ public class MainActivity extends AppCompatActivity implements
     // 0 = metric (default), 1 = imperial,
     // Metric: temperature in "Celsius", wind speed in "meter/sec", pressure in "hPa"
     // Imperial: temperature in "Fahrenheit", wind speed in "miles/hour", pressure in "hPa"
-    //   private int mUnitsFormat;
 
     // sort cities: 0 = by adding (default), 1 = alphabetically
-    //   private int mSortCities;
-
-    // 0 = English(default), 1 = Russian
 
     // message panel
     private LinearLayout messageBarLayout;
     private TextView messageTextView;
     private ProgressBar messageProgressBar;
+
+    private AdView mAdView;
 
     // -------------------------------------------
     // Unique loaders ID:
@@ -82,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements
     public final static String PARAM_STATUS = "status";
     public final static String PARAM_CITY_ID = "city_id";
     public final static String PARAM_ENTERED_CITY = "city_name";
+//    public final static String PARAM_SEND_NOTIFICATIONS = "notifications";
 
     public final static int TASK_GET_WEATHER_ONE_CITY = 1;
     public final static int TASK_GET_WEATHER_ALL_CITIES = 2;
@@ -94,19 +101,19 @@ public class MainActivity extends AppCompatActivity implements
 
     public static final String CITY_ID = "city_id";
     public static final String ENTERED_CITY = "entered_city";
-    public static final String UPDATE_TIME = "update_time";
-    public static final String UNITS_FORMAT = "units_format";
-
+    public static final String HIDE_MENU_ITEM = "entered_city";
 
     final class Settings {
 
         private final int unitsFormat;
         private final int sortCities;
+        private final int sendNotifications;
 
-        public Settings(int unitsFormat, int sortCities) { // , int mapLanguageIndex) {
+        public Settings(int unitsFormat, int sortCities, int sendNotifications) {
 
             this.unitsFormat = unitsFormat;
             this.sortCities = sortCities;
+            this.sendNotifications = sendNotifications;
         }
 
         public int getUnitsFormat() {
@@ -115,6 +122,10 @@ public class MainActivity extends AppCompatActivity implements
 
         public int getSortCities() {
             return sortCities;
+        }
+
+        public int getSendNotifications() {
+            return sendNotifications;
         }
     }
 
@@ -126,8 +137,25 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
+
+        // Sample AdMob app ID: ca-app-pub-1425799219086321~9883810492
+        ///MobileAds.initialize(this, getResources().getString(R.string.admob_publisher_id));
+
+        /// https://developers.google.com/admob/android/test-ads#enable_test_devices
+        // test banner
+        MobileAds.initialize(this, "ca-app-pub-3940256099942544/6300978111");
+
+        mAdView = (AdView) findViewById(R.id.adView);
+
+        // Use AdRequest.Builder.addTestDevice("DAA423565A27FA89F79E8F5698DC18DD") to get test ads on this device.
+        AdRequest adRequest = new AdRequest.Builder()
+                //.addTestDevice(AdRequest.TEST_EMULATOR)
+                .addTestDevice("DAA423565A27FA89F79E8F5698DC18DD")
+                .build();
+
+        mAdView.loadAd(adRequest);
+
 
         Mapbox.getInstance(this, getString(R.string.mapbox_api_key));
 
@@ -144,6 +172,7 @@ public class MainActivity extends AppCompatActivity implements
         messageTextView = (TextView) findViewById(R.id.messageTextView);
         messageProgressBar = (ProgressBar) findViewById(R.id.messageProgressBar);
 
+        findViewById(R.id.messageBar).bringToFront();
 
         dynamicBroadcastReceiver = new BroadcastReceiver() {
 
@@ -204,16 +233,21 @@ public class MainActivity extends AppCompatActivity implements
         getSupportActionBar().setIcon(R.drawable.white_balance_sunny);*/
 
 
+        // set action bar text color
+        String title = getSupportActionBar().getTitle().toString();
+        Spannable spannablerTitle = new SpannableString(title);
+        spannablerTitle.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getApplicationContext(),
+                R.color.colorWhite)),
+                0, spannablerTitle.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        getSupportActionBar().setTitle(spannablerTitle);
+
+
         if (savedInstanceState != null) // create activity only one time?
             return;
 
         // ----------------------------------------------------
         // Show CitiesListFragment
         CitiesListFragment citiesFragment = new CitiesListFragment();
-
-/*        Bundle bundle = new Bundle();
-        bundle.putInt(MainActivity.UNITS_FORMAT, mUnitsFormat);
-        citiesFragment.setArguments(bundle);*/
 
         if (findViewById(R.id.onePaneLayout) != null) { // phone
 
@@ -228,6 +262,28 @@ public class MainActivity extends AppCompatActivity implements
                     .commit();
         }
         // ----------------------------------------------------
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mAdView.resume();
+    }
+
+
+    @Override
+    protected void onPause() {
+        mAdView.pause();
+        super.onPause();
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        mAdView.destroy();
+        unregisterReceiver(dynamicBroadcastReceiver);
+        super.onDestroy();
     }
 
 
@@ -259,9 +315,10 @@ public class MainActivity extends AppCompatActivity implements
 
         // read all columns
         Cursor cursor = getContentResolver().query(DataContentProvider.SETTINGS_CONTENT_URI,
-                new String[]{DataContract.SettingsEntry.COLUMN_UNITS_FORMAT,
-                        DataContract.SettingsEntry.COLUMN_SORT_CITIES,
-                        DataContract.SettingsEntry.COLUMN_MAP_LANGUAGE},
+                new String[]{ DataContract.SettingsEntry.COLUMN_UNITS_FORMAT,
+                              DataContract.SettingsEntry.COLUMN_SORT_CITIES,
+                              DataContract.SettingsEntry.COLUMN_MAP_LANGUAGE,
+                              DataContract.SettingsEntry.COLUMN_SEND_NOTIFY },
                 null, // DataContract.CityEntry.COLUMN_ENTERED_CITY + "=?",
                 null, // new String[]{enteredCity},
                 null);
@@ -276,9 +333,11 @@ public class MainActivity extends AppCompatActivity implements
             // sort: by id = 0, alphabetic = 1
             int sortCities = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_SORT_CITIES));
 
+            int sendNotifications = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_SEND_NOTIFY));
+
             cursor.close();
 
-            return new Settings(unitsFormat, sortCities);
+            return new Settings(unitsFormat, sortCities, sendNotifications);
         } else {
             return null;
         }
@@ -324,8 +383,9 @@ public class MainActivity extends AppCompatActivity implements
 
         bundle.putInt(MainActivity.CITY_ID, cityID);
         bundle.putString(MainActivity.ENTERED_CITY, enteredName);
-/*        bundle.putString(MainActivity.UPDATE_TIME, dataUpdateTime);
-        bundle.putInt(MainActivity.UNITS_FORMAT, unitsFormat);*/
+
+        // hide "action_view" menu item on tablets
+        bundle.putBoolean(MainActivity.HIDE_MENU_ITEM, true);
 
         detailsFragment.setArguments(bundle);
 
@@ -380,11 +440,10 @@ public class MainActivity extends AppCompatActivity implements
         // -----------------------------------------------------------
         // get detailed data for ONE added city
         Intent oneIntent = new Intent(this, GetDataService.class)
-                //  .setAction(BROADCAST_DYNAMIC_ACTION)
                 .putExtra(PARAM_TASK, TASK_GET_WEATHER_ONE_CITY) // get weather data for one city only!
                 .putExtra(PARAM_CITY_ID, id) //  "CITIES" table: column "_id"
                 .putExtra(PARAM_ENTERED_CITY, enteredCity); // "CITIES" table: column "entered_city"
-        // .addCategory(Intent.CATEGORY_DEFAULT);
+             //   .putExtra(PARAM_SEND_NOTIFICATIONS, 1); // TEST
 
         // start service for added a city details and weather data
         startService(oneIntent);
@@ -515,6 +574,7 @@ public class MainActivity extends AppCompatActivity implements
             // get detailed data for ALL cities
             Intent intent = new Intent(this, GetDataService.class)
                     .putExtra(PARAM_TASK, TASK_GET_WEATHER_ALL_CITIES); // get weather data for all cities
+             //       .putExtra(PARAM_SEND_NOTIFICATIONS, 1); // TEST
 
             // start service for added a city details and weather data
             startService(intent);
@@ -531,6 +591,9 @@ public class MainActivity extends AppCompatActivity implements
 
         intent.setAction(BROADCAST_STATIC_ACTION);
 
+    //    intent.putExtra(PARAM_SEND_NOTIFICATIONS, 1); // TEST
+
+
         // Create a PendingIntent to be triggered when the alarm goes off
         final PendingIntent pIntent = PendingIntent.getBroadcast(this, StaticBroadcastReceiver.REQUEST_CODE,
                 intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -545,18 +608,6 @@ public class MainActivity extends AppCompatActivity implements
         alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMillis,
                 AlarmManager.INTERVAL_FIFTEEN_MINUTES, pIntent);
     }
-
-
-/*
-    private void runAlarmPeriodically() {
-
-        Intent intent = new Intent();
-        intent.setAction(BROADCAST_STATIC_ACTION);
-      //  intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
-        sendBroadcast(intent);
-*/
-    //   }
-
 
  /*   Параметры
     Методы set(), setRepeating(), setInexactRepeating() используют следующие параметры:
@@ -642,14 +693,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        unregisterReceiver(dynamicBroadcastReceiver);
-    }
-
-
     // determine is service running now?
     public boolean isMyServiceRunning(Class<?> serviceClass) {
 
@@ -672,6 +715,7 @@ public class MainActivity extends AppCompatActivity implements
 
         messageBarLayout.setVisibility(View.VISIBLE);
         messageTextView.setText(text);
+        messageTextView.setTextColor(ContextCompat.getColor(this, R.color.colorGray));
 
         if (showProgressBar)
             messageProgressBar.setVisibility(View.VISIBLE);
@@ -715,12 +759,6 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.action_sync:
 
                 syncData();
-
-                return true;
-
-            case R.id.action_view:
-
-                viewData();
 
                 return true;
         }
@@ -767,11 +805,41 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     // icon "view" pressed
-    private void viewData() {
+    public void viewData() {
 
         // ----------------------------------------------------
         // Show ViewWeatherFragment
         ViewWeatherFragment viewWeatherFragment = new ViewWeatherFragment();
+
+        if (findViewById(R.id.onePaneLayout) != null) { // phone
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.onePaneLayout, viewWeatherFragment)
+                    .addToBackStack(null)
+                    .commit();
+
+        } else { // tablet
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.rightFrameLayout, viewWeatherFragment)
+                    .commit();
+        }
+        // ----------------------------------------------------
+    }
+
+
+    public void onViewCity(int id, String city) {
+
+        // put data to DetailsFragment
+        Bundle bundle = new Bundle();
+
+        bundle.putInt(MainActivity.CITY_ID, id);
+        bundle.putString(MainActivity.ENTERED_CITY, city);
+
+        // ----------------------------------------------------
+        // Show ViewWeatherFragment
+        ViewWeatherFragment viewWeatherFragment = new ViewWeatherFragment();
+        viewWeatherFragment.setArguments(bundle);
 
         if (findViewById(R.id.onePaneLayout) != null) { // phone
 

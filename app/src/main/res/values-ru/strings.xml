@@ -1,0 +1,170 @@
+<resources>
+    <string name="app_name">Weather Info</string>
+
+    <!-- Menu items -->
+
+    <string name="action_add">Добавить город</string>
+    <string name="action_view">Посмотреть на карте</string>
+    <string name="action_sync">Получить данные</string>
+    <string name="action_delete">Удалить запись</string>
+    <string name="action_settings">Настройки</string>
+    <string name="action_cancel">Отмена</string>
+    <string name="action_save">Сохранить</string>
+    <string name="action_previous">Предыдущее место</string>
+    <string name="action_next">Следующее место</string>
+
+    <!-- openweathermap.org parameters -->
+
+    <string name="openweathermap_api_key">f4178cee3f64ae240a7cc0a602369fb2</string>
+    <!--    <string name="google_maps_api_key">AIzaSyAgkApUvzu_0MwjHfbvoee8SmFTyPhIreg</string>-->
+    <string name="web_service_url">http://api.openweathermap.org/data/2.5/forecast/daily?q=</string>
+    <string name="mapbox_api_key">pk.eyJ1IjoiYXJzb25lIiwiYSI6ImNqNGp2NDRoeDBid3YzM3FzaHYwMWdiMzAifQ.mYNMcy5YsMKFRXlEt6jNJw</string>
+    <string name="admob_publisher_id">ca-app-pub-1425799219086321~9883810492</string>
+
+    <!-- UI text -->
+
+    <string name="cities_title_cities_empty">ДОБАВЬТЕ ГОРОД</string>
+    <string name="hint_city_add">Выберите или введите город</string>
+    <string name="edit_save">Сохранить</string>
+    <string name="edit_cancel">Отмена</string>
+    <string name="text_city">Город</string>
+    <string name="ok">OK</string>
+    <string name="button_delete_city_cancel">Отмена</string>
+    <string name="button_delete_city">Удалить</string>
+
+    <!--  messages  -->
+
+    <string name="message_fill_city">Заполните название города</string>
+    <string name="message_invalid_url">Некорректный URL</string>
+    <string name="message_city_not_found">Не найдено</string>
+    <string name="message_wait_for_data">Получение данных&#8230;</string>
+    <string name="message_city_has_in_db">Такой город уже есть в базе данных</string>
+    <string name="no_results">Нет результата</string>
+    <string name="cannot_get_place_name">Не получилось определить название города</string>
+    <string name="data_not_found">данные не найдены</string>
+    <string name="no_data">нет данных</string>
+
+    <string name="service_get_data_error">Данные получить не удалось.</string>
+    <string name="service_get_data_success">Данные успешно получены.</string>
+
+    <!--Basic user location permission toasts-->
+
+    <string name="user_location_permission_explanation">Приложению необходимо разрешение на определение локации</string>
+    <string name="user_location_permission_not_granted">Отсутствует разрешение на определение местонахождения</string>
+
+    <!-- delete city item confirm dialog -->
+
+    <string name="delete_dialog_question">Подтвердите</string>
+    <string name="delete_dialog_text">Хотите удалить запись(и)?</string>
+    <string name="delete_dialog_ok">Удалить</string>
+    <string name="delete_dialog_cancel">Отмена</string>
+    <string name="rows_deleted">%s записей удалено</string>
+
+    <!-- city ListView item format -->
+
+    <string name="entered_city">%s</string>
+    <string name="returned_city">/%s</string>
+
+    <!-- weather ListView item format -->
+
+    <string name="weather_humidity">Влажность: %s</string>
+    <string name="weather_pressure">Давление: %1$.1f гПа/ %2$.1f мм рт.ст.</string>
+    <string name="weather_wind_direction">Направление ветра: %s°</string>
+    <string name="weather_data_obtained">Данные получены: %s</string>
+
+    <!-- Settings fragment-->
+
+    <string name="settings_title">Настройки</string>
+    <string name="settings_units_format">Формат единиц:</string>
+    <string name="settings_sort_cities">Сортировка городов:</string>
+    <string name="sort_by_adding">по добавлению</string>
+    <string name="sort_alphabetically">по алфавиту</string>
+    <string name="units_metric">метрический</string>
+    <string name="units_imperial">английский</string>
+
+    <!-- Metric / Celsius -->
+
+    <string name="m_weather_min_max_temp">Днём мин./макс.:  %1$s °C/ %2$s °C</string>
+    <string name="m_weather_morning_temp">Утром:  %s °C</string>
+    <string name="m_weather_day_temp">Днём:  %s °C</string>
+    <string name="m_weather_evening_temp">Вечером:  %s °C</string>
+    <string name="m_weather_night_temp">Ночью:  %s °C</string>
+    <string name="m_weather_wind_speed">Скорость ветра:  %.1f м/с</string>
+
+    <!-- Imperial / Fahrenheit -->
+
+    <string name="i_weather_wind_speed">Скорость ветра:  %.1f миль/ч</string>
+    <string name="i_weather_min_max_temp">Днём минимум/максимум:  %1$s ℉/ %2$s ℉</string>
+    <string name="i_weather_morning_temp">Утром:  %s ℉</string>
+    <string name="i_weather_day_temp">Днём:  %s ℉</string>
+    <string name="i_weather_evening_temp">Вечером:  %s ℉</string>
+    <string name="i_weather_night_temp">Ночью:  %s ℉</string>
+
+     <!-- supported map languages -->
+
+    <string-array name="languages_array">
+        <item>English</item>
+        <item>Pусский</item>
+        <!--
+            <item>Français</item>
+            <item>Deutsche</item>
+            <item>Español</item>
+        -->
+    </string-array>
+
+    <!-- Mapbox map symbol layers -->
+
+    <string-array name="symbol_map_layers_array">
+        <item>country-label-lg</item>
+        <item>country-label-md</item>
+        <item>country-label-sm</item>
+        <item>state-label-lg</item>
+        <item>state-label-md</item>
+        <item>state-label-sm</item>
+        <item>marine-label-lg-pt</item>
+        <item>marine-label-lg-ln</item>
+        <item>marine-label-md-pt</item>
+        <item>marine-label-md-ln</item>
+        <item>marine-label-sm-pt</item>
+        <item>marine-label-sm-ln</item>
+        <item>place-city-lg-n</item>
+        <item>place-city-lg-s</item>
+        <item>place-city-md-n</item>
+        <item>place-city-md-s</item>
+        <item>place-city-sm</item>
+        <!--<item>poi-islands</item>-->
+        <item>place-town</item>
+        <item>place-village</item>
+        <item>place-hamlet</item>
+        <item>place-suburb</item>
+        <item>place-neighbourhood</item>
+        <!--<item>poi-islets</item>-->
+        <item>airport-label</item>
+        <item>poi-scalerank1</item>
+        <item>poi-parks-scalerank1</item>
+        <item>water-label</item>
+        <item>rail-label</item>
+        <item>poi-parks-scalerank2</item>
+        <item>poi-scalerank2</item>
+        <!--<item>interstate_motorway_shields</item>-->
+        <!--<item>other-motorway-shields</item>-->
+        <item>road-label-large</item>
+        <item>road-label-medium</item>
+        <item>road-label-small</item>
+        <item>poi-parks-scalerank3</item>
+        <item>poi-scalerank3</item>
+        <item>poi-parks_scalerank4</item>
+        <item>poi-scalerank4-l1</item>
+        <item>poi-scalerank4-l15</item>
+        <item>waterway-label</item>
+        <!--<item>contour-index-label</item>-->
+        <item>housenum-label</item>
+        <item>bridge-oneway-arrows-white</item>
+        <!--<item>bridge-oneway-arrows-color</item>-->
+        <item>road-oneway-arrows-white</item>
+        <!--<item>road-oneway-arrows-color</item>-->
+        <item>tunnel-oneway-arrows-white</item>
+        <!--<item>tunnel-oneway-arrows-color</item>-->
+    </string-array>
+
+</resources>

@@ -165,7 +165,7 @@ public class WeatherCursorAdapter extends CursorAdapter {
         } else if (mUnitsFormat == 1) { // imperial == Fahrenheit
 
             viewHolder.dayTempTextView
-                    .setText(CelsiusToFahrenheit(cursor.getInt(cursor
+                    .setText(CelsiusToFahrenheit(cursor.getDouble(cursor
                             .getColumnIndex(DataContract.WeatherEntry.COLUMN_DAY_TEMP))));
 
             viewHolder.tempUnitTextView.setText("\u2109"); // Fahrenheit sign
@@ -225,7 +225,7 @@ public class WeatherCursorAdapter extends CursorAdapter {
                     NumberFormat.getPercentInstance().format(h / 100.0)));
         } else {
 
-            viewHolder.humidityTextView.setText(context.getString(R.string.weather_humidity, "no data"));
+            viewHolder.humidityTextView.setText(context.getString(R.string.weather_humidity, context.getString(R.string.no_data)));
         }
 
 
@@ -270,8 +270,14 @@ public class WeatherCursorAdapter extends CursorAdapter {
     }
 
 
-    private String CelsiusToFahrenheit(int temp) {
+/*    private String CelsiusToFahrenheit(int temp) {
 
         return String.valueOf(temp * 9 / 5 + 32);
+    }*/
+
+    private String CelsiusToFahrenheit(double temp) {
+
+        // return (int) (temp * 9 / 5 + 32);
+        return String.valueOf((int)(temp * 9 / 5 + 32));
     }
 }

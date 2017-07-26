@@ -4,116 +4,67 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
+    <GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_marginLeft="10dp"
+                  android:layout_marginRight="10dp"
+                  android:orientation="horizontal"
+                android:columnCount="2"
         >
 
         <TextView
             android:id="@+id/titleTextView"
             style="@style/mainTitle"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Settings"
+            android:text="@string/settings_title"
+            android:layout_marginLeft="45dp"
+            android:layout_columnSpan="2"
             />
 
+            <TextView
+                android:id="@+id/unitsFormatTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_units_format"
+                />
 
-     <!--   <TextView
-            android:id="@+id/mapStyleTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Map style: "
-            android:layout_below="@+id/titleTextView"
-            android:layout_alignLeft="@+id/titleTextView"
-            android:layout_alignStart="@+id/titleTextView"
-            android:layout_marginTop="20dp"
-            />
+            <ToggleButton
+                android:id="@+id/unitsFormatToggleButton"
+                style="@style/ToggleButton"
+                android:textOff="@string/units_metric"
+                android:textOn="@string/units_imperial"
+                />
 
-        <Spinner
-            android:id="@+id/mapStyleSpinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:entries="@array/map_styles_names"
-            android:padding="2dp"
-            android:layout_alignBaseline="@+id/mapStyleTextView"
-            android:layout_toRightOf="@+id/mapLanguageTextView"
-            android:layout_toEndOf="@+id/mapLanguageTextView"/>-->
+            <TextView
+                android:id="@+id/sortOrderTextView"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="@string/settings_sort_cities"
+                />
 
-
-  <!--      <TextView
-            android:id="@+id/mapLanguageTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Map language: "
-            android:layout_below="@+id/titleTextView"
-            android:layout_alignLeft="@+id/titleTextView"
-            android:layout_alignStart="@+id/titleTextView"
-            android:layout_marginTop="20dp"
-            />
-
-        <Spinner
-            android:id="@+id/mapLanguageSpinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:entries="@array/languages_array"
-            android:padding="2dp"
-            android:layout_alignBaseline="@+id/mapLanguageTextView"
-            android:layout_alignBottom="@+id/mapLanguageTextView"
-            android:layout_toRightOf="@+id/mapLanguageTextView"
-            android:layout_toEndOf="@+id/mapLanguageTextView"/>
--->
+            <ToggleButton
+                android:id="@+id/sortCitiesToggleButton"
+                style="@style/ToggleButton"
+                android:textOff="@string/sort_by_adding"
+                android:textOn="@string/sort_alphabetically"
+                />
 
         <TextView
-            android:id="@+id/unitsFormatTextView"
-            android:layout_width="wrap_content"
+            android:id="@+id/sendNotificationsTextView"
             android:layout_height="wrap_content"
-            android:text="Units format: "
-            android:layout_below="@+id/titleTextView"
-            android:layout_alignLeft="@+id/titleTextView"
-            android:layout_alignStart="@+id/titleTextView"
-            android:layout_marginTop="20dp"
-
+            android:layout_width="wrap_content"
+            android:text="Send notifications: "
             />
 
         <ToggleButton
-            android:id="@+id/unitsFormatToggleButton"
+            android:id="@+id/sendNotificationsToggleButton"
             style="@style/ToggleButton"
-            android:textOff="metric"
-            android:textOn="imperial"
-            android:layout_alignBaseline="@+id/unitsFormatTextView"
-            android:layout_alignBottom="@+id/unitsFormatTextView"
-            android:layout_toRightOf="@+id/unitsFormatTextView"
-            android:layout_toEndOf="@+id/unitsFormatTextView"/>
-
-
-        <TextView
-            android:id="@+id/sortOrderTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/unitsFormatTextView"
-            android:text="Sort cities: "
-            android:layout_alignLeft="@+id/titleTextView"
-            android:layout_alignStart="@+id/titleTextView"
-            android:layout_marginTop="20dp"
+            android:textOff="no"
+            android:textOn="yes"
             />
 
-        <ToggleButton
-            android:id="@+id/sortCitiesToggleButton"
-            style="@style/ToggleButton"
-            android:textOff="by adding"
-            android:textOn="alphabetically"
-            android:layout_below="@+id/unitsFormatToggleButton"
-            android:layout_alignBaseline="@+id/sortOrderTextView"
-            android:layout_toRightOf="@+id/unitsFormatTextView"
-            android:layout_toEndOf="@+id/unitsFormatTextView"/>
-
-
-
-
-
-
-    </RelativeLayout>
+    </GridLayout>
 
 </ScrollView>

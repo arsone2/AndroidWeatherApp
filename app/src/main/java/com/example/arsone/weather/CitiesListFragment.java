@@ -7,9 +7,7 @@ import android.content.DialogInterface;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.RemoteException;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -27,26 +25,16 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.regex.Pattern;
 
 
 public class CitiesListFragment extends Fragment implements
@@ -69,6 +57,8 @@ public class CitiesListFragment extends Fragment implements
         void onAddCity();
 
         void onDeleteCity();
+
+        void viewData();
 
         MainActivity.Settings readSettingsFromDB();
     }
@@ -112,7 +102,7 @@ public class CitiesListFragment extends Fragment implements
         Button deleteItems = (Button) view.findViewById(R.id.button_delete);
         deleteItems.setOnClickListener(this);
 
-        ((Button) view.findViewById(R.id.button_backup)).setOnClickListener(this);
+        //  ((Button) view.findViewById(R.id.button_backup)).setOnClickListener(this);
 
         citiesListView = (ListView) view.findViewById(R.id.citiesListView);
 
@@ -121,7 +111,7 @@ public class CitiesListFragment extends Fragment implements
         titleTextView = (TextView) view.findViewById(R.id.titleTextView);
 
         // uncheck all items for delete
-         CityCursorAdapter.setCheckboxesVisibility(false);
+        CityCursorAdapter.setCheckboxesVisibility(false);
 
         cityCursorAdapter = new CityCursorAdapter(getContext(), null, 0);
         citiesListView.setAdapter(cityCursorAdapter);
@@ -138,7 +128,7 @@ public class CitiesListFragment extends Fragment implements
 
         // get settings data from DB
         MainActivity.Settings settings = activity.readSettingsFromDB();
-       // MainActivity.Settings settings = activity.readSettings();
+        // MainActivity.Settings settings = activity.readSettings();
         mUnitsFormat = settings.getUnitsFormat();
         mSortCities = settings.getSortCities();
 
@@ -157,8 +147,6 @@ public class CitiesListFragment extends Fragment implements
             Log.d("AAAAA", "initLoader");
         }
         // --------------------------------------------------------------
-
-   //     cityCursorAdapter.notifyDataSetChanged();
     }
 
 
@@ -254,11 +242,11 @@ public class CitiesListFragment extends Fragment implements
 
                 break;
 
-            case R.id.button_backup:
+ /*           case R.id.button_backup:
 
                 backupDatabase();
 
-                break;
+                break;*/
         }
     }
 
@@ -295,27 +283,21 @@ public class CitiesListFragment extends Fragment implements
 
     private void onButtonDelete() {
 
-        List<String> cityWhereList = new ArrayList<String>();
-        List<String> weatherWhereList = new ArrayList<String>();
+        final List<String> cityWhereList = new ArrayList<>();
+        List<String> weatherWhereList = new ArrayList<>();
 
-        List<String> argsList = new ArrayList<String>();
+        final List<String> argsList = new ArrayList<>();
 
-        // get all checked cities for ic_delete_item
-        for (int i = 0; i < citiesListView.getChildCount(); i++) {
+        for (int i = 0; i < CityCursorAdapter.selectedItemsArray.size(); i++) {
 
-            View v = (View) citiesListView.getChildAt(i);
+            int key = CityCursorAdapter.selectedItemsArray.keyAt(i);
 
-            if (v != null) {
+            if (CityCursorAdapter.selectedItemsArray.get(key)) {
 
-                CheckBox checkbox = (CheckBox) v.findViewById(R.id.checkboxForDelete);
-
-                if (checkbox != null && checkbox.isChecked()) {
-
-                    cityWhereList.add(DataContract.CityEntry._ID + "=?");
-                    weatherWhereList.add(DataContract.WeatherEntry.COLUMN_CITY_ID_FK + "=?");
-
-                    argsList.add(String.valueOf(checkbox.getTag()));
-                }
+                //      Log.d("AAAAA" , "key = " + key);
+                cityWhereList.add(DataContract.CityEntry._ID + "=?");
+                weatherWhereList.add(DataContract.WeatherEntry.COLUMN_CITY_ID_FK + "=?");
+                argsList.add(String.valueOf(key));
             }
         }
 
@@ -336,6 +318,15 @@ public class CitiesListFragment extends Fragment implements
             builder.setPositiveButton(R.string.delete_dialog_ok, new DialogInterface.OnClickListener() {
 
                 public void onClick(DialogInterface dialog, int which) {
+
+
+/*                    Log.d("AAAAA" , "citySelection = " + citySelection);
+                    Log.d("AAAAA" , "weatherSelection = " + weatherSelection);
+
+                    for(int i = 0; i < citySelectionArgs.length; i++)
+                        Log.d("AAAAA" , "citySelectionArgs = " + citySelectionArgs[i]);*/
+
+                    // Log.d("AAAAA" , "argsList = " + argsList);
 
                     // as has foreign key from "city" table to child table "weather" need
                     // to ic_delete_item data in "weather" table first
@@ -480,12 +471,18 @@ public class CitiesListFragment extends Fragment implements
                 onActionDeleteCity();
 
                 return true;
+
+            case R.id.action_view:
+
+                activity.viewData();
+
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
 
-    private void backupDatabase() {
+/*    private void backupDatabase() {
 
         ///     Log.d("AAAAA", "backup Database begins");
 
@@ -493,10 +490,10 @@ public class CitiesListFragment extends Fragment implements
 
         String[] dirs = getStorageDirectories();
 
-/*        for (String dir : dirs) {
-
-            Log.d("AAAAA", "dir = " + dir);
-        }*/
+//        for (String dir : dirs) {
+//
+//            Log.d("AAAAA", "dir = " + dir);
+//        }
 
         // dir = /storage/extSdCard
         // dir = /storage/emulated/0
@@ -530,10 +527,10 @@ public class CitiesListFragment extends Fragment implements
             Log.d("AAAAA", "backup error: " + e.getMessage());
         }
 
-    }
+    }*/
 
 
-    private static final Pattern DIR_SEPARATOR = Pattern.compile("/");
+    //  private static final Pattern DIR_SEPARATOR = Pattern.compile("/");
 
     /**
      * Returns all available SD-Cards in the system (include emulated)
@@ -544,7 +541,8 @@ public class CitiesListFragment extends Fragment implements
      *
      * @return paths to all available SD-Cards in the system (include emulated)
      */
-    public static String[] getStorageDirectories() {
+
+ /*   public static String[] getStorageDirectories() {
         // Final set of paths
         final Set<String> rv = new HashSet<String>();
         // Primary physical SD-CARD (not emulated)
@@ -593,5 +591,5 @@ public class CitiesListFragment extends Fragment implements
             Collections.addAll(rv, rawSecondaryStorages);
         }
         return rv.toArray(new String[rv.size()]);
-    }
+    }*/
 }

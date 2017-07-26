@@ -6,34 +6,44 @@
               android:orientation="vertical"
     >
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                  android:id="@+id/titleLayout"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:orientation="horizontal"
-                  android:background="@color/colorGray"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/colorGray"
         >
 
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                      android:id="@+id/titleLayout"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:orientation="horizontal"
+            >
+
+            <TextView
+                android:id="@+id/titleTextView"
+                style="@style/mainTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="title"
+                />
+
+        </LinearLayout>
+
+
         <TextView
-            android:id="@+id/titleTextView"
-            style="@style/mainTitle"
-            android:layout_width="0dp"
+            android:id="@+id/updateTimeTextView"
+            style="@style/updateText"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|right"
+            android:layout_marginRight="35dp"
             android:layout_weight="1"
+            android:gravity="right"
+            android:text="date"
             />
 
     </LinearLayout>
-
-
-    <TextView
-        android:id="@+id/updateTimeTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="3dp"
-        android:paddingLeft="17dp"
-        android:background="@color/colorGray"
-        style="@style/updateText"
-        />
 
     <ListView
         android:id="@+id/detailsListView"

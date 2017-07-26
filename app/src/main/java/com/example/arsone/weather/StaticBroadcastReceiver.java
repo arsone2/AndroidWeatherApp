@@ -6,8 +6,6 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.PowerManager;
-import android.os.SystemClock;
 import android.util.Log;
 
 
@@ -128,7 +126,9 @@ public class StaticBroadcastReceiver extends BroadcastReceiver {
                 // start service for added a city details and weather data
                 context.startService(i);
                 // -----------------------------------------------------------
-            } else { // different boot actions: run service periodically
+            }
+
+            else { // different boot actions: run service periodically
 
                 Log.d("AAAAA", "StaticBroadcastReceiver: onReceive() - after BOOT actions");
 

@@ -1,6 +1,7 @@
 package com.example.arsone.weather;
 
 import android.annotation.TargetApi;
+import android.content.ContentProviderOperation;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -24,8 +25,15 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.NetworkResponse;
+import com.android.volley.RequestQueue;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.example.arsone.weather.data.Weather;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationSource;
@@ -42,6 +50,12 @@ import com.mapbox.services.api.geocoding.v5.models.CarmenFeature;
 import com.mapbox.services.api.geocoding.v5.models.GeocodingResponse;
 import com.mapbox.services.commons.models.Position;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -142,10 +156,10 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
 
 
                 mMapboxMap.addMarker(new MarkerOptions()
-                        .position(point)
-                        .title(cursor.getString(cursor.getColumnIndex(DataContract.CityEntry.COLUMN_ENTERED_CITY)))
-                        .snippet(cursor.getString(cursor.getColumnIndex(DataContract.CityEntry.COLUMN_RETURNED_CITY)))
-                      //  .icon(icon)
+                                .position(point)
+                                .title(cursor.getString(cursor.getColumnIndex(DataContract.CityEntry.COLUMN_ENTERED_CITY)))
+                                .snippet(cursor.getString(cursor.getColumnIndex(DataContract.CityEntry.COLUMN_RETURNED_CITY)))
+                        //  .icon(icon)
                 );
             }
             cursor.moveToNext();
@@ -241,6 +255,10 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
         cityEditText = (TextView) view.findViewById(R.id.cityEditText);
         messageTextView = (TextView) view.findViewById(R.id.messageTextView);
 
+        // adjust z-Index
+        view.findViewById(R.id.cityEditText).bringToFront();
+        view.findViewById(R.id.messageTextView).bringToFront();
+
         // Mapbox access token is configured here. This needs to be called either in your application
         // object or in the same activity which contains the mapview.
         Mapbox.getInstance(getContext(), getString(R.string.mapbox_api_key));
@@ -283,6 +301,37 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
                 // add markers
                 InitMarkerLoader();
 
+
+                // read map camera settings
+                Cursor cursor = getActivity().getContentResolver().query(DataContentProvider.SETTINGS_CONTENT_URI,
+                        new String[]{DataContract.SettingsEntry.COLUMN_CAMERA_LATITUDE,
+                                DataContract.SettingsEntry.COLUMN_CAMERA_LONGITUDE,
+                                DataContract.SettingsEntry.COLUMN_CAMERA_BEARING,
+                                DataContract.SettingsEntry.COLUMN_CAMERA_TILT,
+                                DataContract.SettingsEntry.COLUMN_CAMERA_ZOOM
+                        },
+                        null, // DataContract.CityEntry.COLUMN_ENTERED_CITY + "=?",
+                        null, // new String[]{enteredCity},
+                        null);
+
+                if (cursor != null && cursor.getCount() > 0) {
+
+                    cursor.moveToFirst();
+
+                    CameraPosition cameraPosition = new CameraPosition.Builder()
+                            .target(new LatLng(cursor.getDouble(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_CAMERA_LATITUDE)),
+                                    cursor.getDouble(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_CAMERA_LONGITUDE))))    // Sets the center of the map
+                            .bearing(cursor.getDouble(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_CAMERA_BEARING)))
+                            .zoom(cursor.getDouble(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_CAMERA_ZOOM)))                                   // Sets the zoom
+                            .tilt(cursor.getDouble(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_CAMERA_TILT)))                                   // Sets the tilt of the camera
+                            .build(); // Creates a CameraPosition from the builder
+
+                    mMapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+                    cursor.close();
+                }
+
+
                 // Click listener
                 mapboxMap.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
 
@@ -291,7 +340,12 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
 
                         activity.onMapClicked(); // hide keyboard
 
-                        geocode(point);
+                        Log.d("AAAAA", "point = " + point);
+
+                        if (point != null) {
+                            //  geocode(point);
+                            reverseGeocode(point);
+                        }
                     }
                 });
             }
@@ -394,7 +448,7 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
         locationEngine.addLocationEngineListener(locationEngineListener);
 
         //Enable or disable the location layer on the map
-        mMapboxMap.setMyLocationEnabled(true);
+////        mMapboxMap.setMyLocationEnabled(true);
     }
 
 
@@ -414,6 +468,7 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
     }
 
 
+ /*
     // https://github.com/mapbox/mapbox-java/blob/master/mapbox/app/src/main/java/com/mapbox/services/android/testapp/geocoding/GeocodingReverseActivity.java
     // geocoding parameters: https://www.mapbox.com/api-documentation/#request-format
     private void geocode(LatLng point) {
@@ -424,7 +479,13 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
 
         String locale = getCurrentLocale().getCountry().toLowerCase();
 
-        //    Log.d("AAAAA", "geocode - locale = " + locale);
+        // https://www.mapbox.com/api-documentation/#search-for-places
+        // https://www.mapbox.com/api-playground/#/reverse-geocoding/?_k=drcw7f
+
+        // https://api.mapbox.com/geocoding/v5/mapbox.places/38,48.json?access_token=pk.eyJ1IjoiYXJzb25lIiwiYSI6ImNqNGp2NDRoeDBid3YzM3FzaHYwMWdiMzAifQ.mYNMcy5YsMKFRXlEt6jNJw
+
+        Log.d("AAAAA", "geocode - locale = " + locale);
+
 
         MapboxGeocoding client = new MapboxGeocoding.Builder()
                 .setAccessToken(getString(R.string.mapbox_api_key))
@@ -440,8 +501,9 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
 
                 //   messageTextView.setText("Getting place name, please wait...");
 
-                if (response == null) {
+                if (response == null || response.body() == null) {
 //                    messageTextView.setText(""); // clear city nam
+                    Log.d("AAAAA", "response == null || response.body() == null");
                     return;
                 }
 
@@ -452,8 +514,8 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
 
                     double coord[] = results.get(0).getCenter();
 
-      /*              Log.d("AAAAA", "long = " + coord[0]);
-                    Log.d("AAAAA", "lat = " + coord[1]);*/
+                   Log.d("AAAAA", "long = " + coord[0]);
+                    Log.d("AAAAA", "lat = " + coord[1]);
 
 
                     cityEditText.setText(results.get(0).getText());
@@ -470,6 +532,91 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
                 messageTextView.setText(R.string.cannot_get_place_name);
             }
         });
+    }
+    */
+
+
+    private void reverseGeocode(LatLng point) {
+
+        String locale = getCurrentLocale().getCountry().toLowerCase();
+
+        String url = "https://api.mapbox.com/geocoding/v5/mapbox.places/"
+                + point.getLongitude() + "," + point.getLatitude();
+
+        if (!(locale.equals("en") || locale.equals("us"))) {
+
+            url += ".json?language=" + locale + "&access_token=" + getString(R.string.mapbox_api_key);
+        } else {
+            url += ".json?access_token=" + getString(R.string.mapbox_api_key);
+        }
+
+        //      Log.d("AAAAA", "url: " + url);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(url,
+                new com.android.volley.Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+                        try {
+
+                            //     Log.d("AAAAA", "response = " + response);
+
+                            JSONArray featuresArray = response.getJSONArray("features");
+
+                            String placeName = null;
+
+                            for (int i = 0; i < featuresArray.length(); i++) {
+
+                                //   Log.d("AAAAA", "i = " + i + "featuresArray = " + featuresArray.getJSONObject(i));
+
+                                JSONObject element = featuresArray.getJSONObject(i);
+
+                                JSONArray placeTypeArray = element.getJSONArray("place_type");
+
+                                String place = placeTypeArray.getString(0);
+
+                                //  Log.d("AAAAA","place = " + place);
+
+                                if (place.equals("place")) {
+
+                                    placeName = element.getString("text");
+                                    //      Log.d("AAAAA","placeName = " + placeName);
+                                }
+                            }
+
+                            if (placeName != null) {
+                                cityEditText.setText(placeName);
+                                messageTextView.setText("");
+                            } else {
+                                messageTextView.setText(R.string.no_results);
+                            }
+                        } catch (Exception e) {
+                            Log.d("AAAAA", "Exception: " + e.getMessage());
+                        }
+                    }
+                }, new com.android.volley.Response.ErrorListener() {
+
+            // ERROR MODES
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                NetworkResponse response = error.networkResponse;
+
+                if (response != null && response.data != null) {
+
+                    if (response.statusCode == 404) {
+
+                        Log.d("AAAA", "onErrorResponse: 404");
+                        messageTextView.setText(R.string.cannot_get_place_name);
+                    }
+                }
+            }
+        });
+
+        // Defining the Volley request queue that handles the URL request concurrently
+        RequestQueue requestQueue = Volley.newRequestQueue(getContext());
+        requestQueue.add(jsonObjectRequest);
     }
 
 

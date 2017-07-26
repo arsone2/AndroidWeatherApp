@@ -15,6 +15,7 @@ import android.os.Build;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.CursorLoader;
 import android.util.Log;
 
 import com.android.volley.NetworkResponse;
@@ -30,6 +31,8 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -47,6 +50,7 @@ public class GetDataService extends IntentService {
     private final static String PARAM_STATUS = "status";
     private final static String PARAM_CITY_ID = "city_id";
     private final static String PARAM_ENTERED_CITY = "city_name";
+    public final static String PARAM_SEND_NOTIFICATIONS = "notifications";
 
     private final static int TASK_GET_WEATHER_ONE_CITY = 1;
     private final static int TASK_GET_WEATHER_ALL_CITIES = 2;
@@ -60,9 +64,11 @@ public class GetDataService extends IntentService {
 
     private final String BROADCAST_DYNAMIC_ACTION = "com.example.arsone.weather.dynamic.broadcast";
 
-    private final int TIME_TO_WAIT = 800; // time to wait in milliseconds
+    private final int TIME_TO_WAIT = 1000; // time to wait in milliseconds
 
     private int mTask;
+    private int mSendNotifications;
+
 
     class City {
 
@@ -85,36 +91,57 @@ public class GetDataService extends IntentService {
 
 
     @Override
-    protected void onHandleIntent(@Nullable Intent intent) {
+    protected synchronized void onHandleIntent(@Nullable Intent intent) {
 
         Log.i("AAAAA", "Service running");
 
         if (intent == null)
             return;
 
-/*        String action = intent.getAction();
+        // ----------------------------------------------------------------
+        // check if database has cities
+        Cursor cursorCities = getContentResolver().query(DataContentProvider.CITY_CONTENT_URI,
+                new String[]{DataContract.CityEntry._ID},
+                null, null, null);
 
-        if (action != null && action.equals(BROADCAST_DYNAMIC_ACTION))
-            return;*/
+        if (cursorCities != null) {
 
-/*
-            if(intent == null)
+            if (cursorCities.getCount() == 0) {
+
+                Log.d("AAAAA", "GetDataService: No data in cities table");
+                cursorCities.close();
+                return;
+            }
+            cursorCities.close();
+        } else
             return;
 
-        mAction = intent.getAction();
+        // ----------------------------------------------------------------
+        // read settings
+        Cursor cursor = getContentResolver().query(DataContentProvider.SETTINGS_CONTENT_URI,
+                new String[]{DataContract.SettingsEntry.COLUMN_SEND_NOTIFY},
+                null, null, null);
 
-        if(mAction == null)
-            return;
-*/
+        if (cursor != null && cursor.getCount() > 0) {
 
-        //       Log.d("AAAAA", "GetDataService: action = " + action);
-/*
-       mAction = intent.getStringExtra(PARAM_ACTION);
-        Log.d("AAAAA" , "GetDataService: mAction = " + mAction);
-*/
+            cursor.moveToFirst();
+
+            // units format: 0 = metric, 1 = imperial
+            //       int unitsFormat = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_UNITS_FORMAT));
+
+            // sort: by id = 0, alphabetic = 1
+            //         int sortCities = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_SORT_CITIES));
+
+            mSendNotifications = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_SEND_NOTIFY));
+
+            cursor.close();
+        }
+        // ----------------------------------------------------------------
 
         // get task
         mTask = intent.getIntExtra(PARAM_TASK, 0);
+
+///        Log.d("AAAAA", "GetDataService: mSendNotifications = " + mSendNotifications);
 
         if (mTask == TASK_GET_WEATHER_ONE_CITY) {
 
@@ -132,58 +159,19 @@ public class GetDataService extends IntentService {
 
                 sendBroadcastData(STATUS_GET_WEATHER_ONE_CITY_START);
 
-/*                // inform about task starting
-                Intent startIntent = new Intent()
-                        .putExtra(PARAM_TASK, mTask)
-                        .putExtra(PARAM_STATUS, STATUS_GET_WEATHER_ONE_CITY_START)
-                        .setAction(BROADCAST_DYNAMIC_ACTION);
-
-                sendBroadcast(startIntent);*/
-
                 getWeather(id, city);
 
                 sendBroadcastData(STATUS_GET_WEATHER_ONE_CITY_FINISH);
-
-/*                SystemClock.sleep(TIME_TO_WAIT); // wait to update data in database!!
-
-                // inform about task finish
-                Intent finishIntent = new Intent()
-                        .putExtra(PARAM_TASK, mTask)
-                        .putExtra(PARAM_STATUS, STATUS_GET_WEATHER_ONE_CITY_FINISH)
-                        .setAction(BROADCAST_DYNAMIC_ACTION);
-
-                sendBroadcast(finishIntent);*/
             }
         } else if (mTask == TASK_GET_WEATHER_ALL_CITIES) {
 
             Log.d("AAAAA", "GetDataService: TASK_GET_WEATHER_ALL_CITIES");
 
-            //   String action = intent.getAction();
-            //    Log.d("AAAAA", "GetDataService: Service running for all cities - action = " + action);
-
             sendBroadcastData(STATUS_GET_WEATHER_ALL_CITIES_START);
-
-/*            // inform about task starting
-            Intent startIntent = new Intent()
-                    .putExtra(PARAM_TASK, mTask)
-                    .putExtra(PARAM_STATUS, STATUS_GET_WEATHER_ALL_CITIES_START)
-                    .setAction(BROADCAST_DYNAMIC_ACTION);
-
-            sendBroadcast(startIntent);*/
 
             getAllCities();
 
             sendBroadcastData(STATUS_GET_WEATHER_ALL_CITIES_FINISH);
-
-/*            SystemClock.sleep(TIME_TO_WAIT); // wait to update data in database!!
-
-            // Inform about task finish
-            Intent finishIntent = new Intent()
-                    .putExtra(PARAM_TASK, mTask)
-                    .putExtra(PARAM_STATUS, STATUS_GET_WEATHER_ALL_CITIES_FINISH)
-                    .setAction(BROADCAST_DYNAMIC_ACTION);
-
-            sendBroadcast(finishIntent);*/
 
         } else if (mTask == TASK_GET_DATA_PERIODICALLY) {
 
@@ -191,27 +179,10 @@ public class GetDataService extends IntentService {
 
             sendBroadcastData(STATUS_GET_WEATHER_ALL_CITIES_START);
 
-/*            // inform about task starting
-            Intent startIntent = new Intent()
-                    .putExtra(PARAM_TASK, mTask)
-                    .putExtra(PARAM_STATUS, STATUS_GET_WEATHER_ALL_CITIES_START)
-                    .setAction(BROADCAST_DYNAMIC_ACTION);
-
-            sendBroadcast(startIntent);*/
-
             getAllCities();
 
             sendBroadcastData(STATUS_GET_WEATHER_ALL_CITIES_FINISH);
 
-/*            SystemClock.sleep(TIME_TO_WAIT); // wait to update data in database!!
-
-            // Inform about task finish
-            Intent finishIntent = new Intent()
-                    .putExtra(PARAM_TASK, mTask)
-                    .putExtra(PARAM_STATUS, STATUS_GET_WEATHER_ALL_CITIES_FINISH)
-                    .setAction(BROADCAST_DYNAMIC_ACTION);
-
-            sendBroadcast(finishIntent);*/
         } else {
             Log.d("AAAAA", "GetDataService: CATCH OTHER TASK FOR TEST !!!");
         }
@@ -219,7 +190,7 @@ public class GetDataService extends IntentService {
 
 
     // Inform about task status
-    private void sendBroadcastData(int status){
+    private void sendBroadcastData(int status) {
 
         SystemClock.sleep(TIME_TO_WAIT); // wait to update data in database!!
 
@@ -244,11 +215,10 @@ public class GetDataService extends IntentService {
                 null//@Nullable String sortOrder)
         );
 
-        if(cursor == null)
+        if (cursor == null)
             return;
 
         if (cursor.getCount() == 0) {
-            //  Log.d("AAAAA", "cursor.getCount() = 0");
             cursor.close();
             return;
         }
@@ -418,6 +388,10 @@ public class GetDataService extends IntentService {
                             }
                             getContentResolver().applyBatch(DataContentProvider.AUTHORITY, ops);
 
+                            if (mSendNotifications != 0) {
+                                sendNotification(getString(R.string.service_get_data_success) + "\n" + getCurrentTime());
+                            }
+
                         } catch (Exception e) {
                             Log.d("AAAAA", "Exception: " + e.getMessage());
                         } finally {
@@ -429,6 +403,10 @@ public class GetDataService extends IntentService {
             // ERROR MODES
             @Override
             public void onErrorResponse(VolleyError error) {
+
+                if (mSendNotifications != 0) {
+                    sendNotification(getString(R.string.service_get_data_error) + "\n" + getCurrentTime());
+                }
 
                 NetworkResponse response = error.networkResponse;
 
@@ -444,6 +422,8 @@ public class GetDataService extends IntentService {
 
         // Defining the Volley request queue that handles the URL request concurrently
         RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+
+        // Add a request (in this example, called stringRequest) to your RequestQueue.
         requestQueue.add(jsonObjectRequest);
 
         // Delay for OpenWeatherMap.org limitation (1 query per second)
@@ -466,6 +446,34 @@ public class GetDataService extends IntentService {
     }
 
 
+    private String getCurrentTime() {
+
+        SimpleDateFormat currentTimeDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        String currentDateAndTime = currentTimeDate.format(new Date());
+
+        String stringDate = null;
+
+        //      Log.d("AAAAA", "currentDateAndTime = " + currentDateAndTime);
+
+        try {
+            // Date today = new Date();
+            Date date = currentTimeDate.parse(currentDateAndTime);
+
+            stringDate = DateFormat.getDateTimeInstance().format(date);
+
+            Log.d("AAAAA", "sendNotification: stringDate = " + stringDate);
+
+            return stringDate;
+
+        } catch (ParseException e) {
+            Log.d("AAAAA", "Date ParseException: " + e.getMessage());
+        }
+
+        return null;
+    }
+
+
     private void sendNotification(String msg) {
 
         // NotificationManager class to notify the user of events
@@ -478,8 +486,11 @@ public class GetDataService extends IntentService {
 
         // set icon, title and message for notification
         NotificationCompat.Builder alamNotificationBuilder = new NotificationCompat.Builder(this)
-                .setContentTitle("Alarm")
-                /// .setSmallIcon(R.drawable.ic_launcher)
+                //  .setDefaults(NotificationCompat.DEFAULT_ALL)
+                //  .setWhen(System.currentTimeMillis())
+                .setContentTitle("Weather Info")
+                .setSmallIcon(R.drawable.ic_sunny)
+                /// .setSmallIcon(R.drawable.ic_add_location)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(msg))
                 .setContentText(msg);
 

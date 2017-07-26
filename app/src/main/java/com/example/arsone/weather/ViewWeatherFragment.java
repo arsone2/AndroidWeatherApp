@@ -4,13 +4,11 @@ import android.annotation.TargetApi;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -21,12 +19,8 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.Mapbox;
@@ -35,7 +29,6 @@ import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
-import com.mapbox.mapboxsdk.camera.CameraUpdate;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationSource;
@@ -76,12 +69,13 @@ public class ViewWeatherFragment extends Fragment implements LoaderManager.Loade
 
     private MapView mapView;
     private MapboxMap map;
-    //private MarkerView userMarker;
     private LocationEngine locationEngine;
-    // private LocationEngineListener locationListener;
     private PermissionsManager permissionsManager;
     private LocationEngineListener locationEngineListener;
 
+    private CameraPosition mCameraPosition;
+    private int mMarkerIndex;
+    private Marker mMarker;
 
     // ---------------------------------------------------------
     // implements LoaderManager.LoaderCallbacks<Cursor>
@@ -109,7 +103,6 @@ public class ViewWeatherFragment extends Fragment implements LoaderManager.Loade
         );
     }
 
-//    private static String descText;
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
@@ -135,45 +128,69 @@ public class ViewWeatherFragment extends Fragment implements LoaderManager.Loade
                                 "drawable", getContext().getPackageName()));
 
                 String descText = cursor.getString(cursor.getColumnIndex(DataContract.WeatherEntry.COLUMN_DESCRIPTION))
-                        + "\n" + cursor.getInt(cursor.getColumnIndex(DataContract.WeatherEntry.COLUMN_DAY_TEMP));
+                        + "\n"; // + cursor.getInt(cursor.getColumnIndex(DataContract.WeatherEntry.COLUMN_DAY_TEMP));
+
+                double dayTemp = cursor.getDouble(cursor.getColumnIndex(DataContract.WeatherEntry.COLUMN_DAY_TEMP));
+
+
 
                 if (mUnitsFormat == 0) { // metric = Celsius
 
-                    descText += " \u00B0C";
+                    descText += (int)dayTemp + " \u00B0C";
 
                 } else if (mUnitsFormat == 1) { // imperial == Fahrenheit
 
-                    descText += " \u2109";
+                    descText += CelsiusToFahrenheit(dayTemp) + " \u2109";
                 }
+
+/*                MarkerOptions markerOptions = new MarkerOptions()
+                        .position(point)
+                        .title(cursor.getString(cursor.getColumnIndex(DataContract.CityEntry.COLUMN_ENTERED_CITY)))
+                        .snippet(descText)
+                        .icon(icon);*/
 
                 map.addMarker(new MarkerOptions()
                         .position(point)
                         .title(cursor.getString(cursor.getColumnIndex(DataContract.CityEntry.COLUMN_ENTERED_CITY)))
-                        // .snippet(cursor.getString(cursor.getColumnIndex(DataContract.CityEntry.COLUMN_RETURNED_CITY)))
                         .snippet(descText)
                         .icon(icon)
                 );
+
+
+                if (mShowEnteredCity && cursor.getInt(cursor.getColumnIndex(DataContract.CityEntry._ID)) == mID) {
+
+                    CameraPosition cameraPosition = new CameraPosition.Builder()
+                            .target(new LatLng(cursor.getDouble(cursor.getColumnIndex(DataContract.CityEntry.COLUMN_LATITUDE)),
+                                    cursor.getDouble(cursor.getColumnIndex(DataContract.CityEntry.COLUMN_LONGITUDE))))    // Sets the center of the map
+                            .zoom(5) // Set default zoom
+                            .build(); // Creates a CameraPosition from the builder
+
+                    map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                }
             }
             cursor.moveToNext();
         }
-
-
-
-
-/*        if (cursor.getCount() == 0) {
-
-            ///   showMessageBar("Данные не найдены", false);
-
-            // set mStatus info
-            ///    setModeBar(getString(R.string.message_city_not_found), R.color.nothingColor, R.drawable.ic_lamp_nothing);
-        }*/
     }
+
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
     }
     // ---------------------------------------------------------
+
+
+/*    private String CelsiusToFahrenheit(double temp) {
+
+        // return (int) (temp * 9 / 5 + 32);
+        return String.valueOf((int)(temp * 9 / 5 + 32));
+    }*/
+
+    private String CelsiusToFahrenheit(double temp) {
+
+        // return (int) (temp * 9 / 5 + 32);
+        return String.valueOf((int)(temp * 9 / 5 + 32));
+    }
 
 
     @Override
@@ -239,28 +256,8 @@ public class ViewWeatherFragment extends Fragment implements LoaderManager.Loade
             saveCameraPositionToDB();
             // Log.d("AAAAA", "mCameraPosition.target = " + mCameraPosition.target + ", mCameraPosition.zoom = " + mCameraPosition.zoom);
         }
-/*
-
-// Save to database
-
-    latitude
-    longitude
-    // altitude
-    bearing
-    tilt
-    zoom
-
-    */
-
-        // save camera position to DB
-        /*    CameraPosition(LatLng target, double zoom, double tilt, double bearing) {
-        this.target = target;
-        this.bearing = bearing;
-        this.tilt = tilt;
-        this.zoom = zoom;
-    }*/
-
     }
+
 
     private void saveCameraPositionToDB() {
 
@@ -275,16 +272,7 @@ public class ViewWeatherFragment extends Fragment implements LoaderManager.Loade
         values.put(DataContract.SettingsEntry.COLUMN_CAMERA_TILT, mCameraPosition.tilt);
         values.put(DataContract.SettingsEntry.COLUMN_CAMERA_ZOOM, mCameraPosition.zoom);
 
-        //   Log.d("AAAAA", "mapStyleSpinner.getSelectedItemPosition() = " + mapStyleSpinner.getSelectedItemPosition());
-        //  Log.d("AAAAA", "mapLanguageSpinner.getSelectedItemPosition() = " + mapLanguageSpinner.getSelectedItemPosition());
-
-        //    values.put(DataContract.SettingsEntry.COLUMN_MAP_STYLE, mapStyleSpinner.getSelectedItemPosition());
-
-        //     values.put(DataContract.SettingsEntry.COLUMN_MAP_LANGUAGE, mapLanguageSpinner.getSelectedItemPosition());
-
         getActivity().getContentResolver().update(DataContentProvider.SETTINGS_CONTENT_URI, values, null, null);
-
-        ///   Log.d("AAAAA", "writeSettingsToDB(): updatedRowsCount = " + updatedRowsCount);
     }
 
 
@@ -309,6 +297,10 @@ public class ViewWeatherFragment extends Fragment implements LoaderManager.Loade
     }
 
 
+    private int mID;
+    private String mEnteredCity;
+    private boolean mShowEnteredCity;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -318,13 +310,19 @@ public class ViewWeatherFragment extends Fragment implements LoaderManager.Loade
 
         setHasOptionsMenu(true); // show action bar menu
 
+        Bundle bundle = getArguments();
+
+        if (bundle != null) {
+            mID = bundle.getInt(MainActivity.CITY_ID);
+            mEnteredCity = bundle.getString(MainActivity.ENTERED_CITY);
+            mShowEnteredCity = true;
+        }
+
         // Mapbox access token is configured here. This needs to be called either in your application
         // object or in the same activity which contains the mapview.
         Mapbox.getInstance(getContext(), getString(R.string.mapbox_api_key));
-//        Mapbox.getInstance(this, getString(R.string.access_token));
 
         initLoader();
-
 
         // Get the location engine object for later use.
         locationEngine = new LocationSource(getContext());
@@ -366,34 +364,38 @@ public class ViewWeatherFragment extends Fragment implements LoaderManager.Loade
                 // add markers
                 InitMarkerLoader();
 
+                if (!mShowEnteredCity) {
 
-                // read map camera settings
-                Cursor cursor = getActivity().getContentResolver().query(DataContentProvider.SETTINGS_CONTENT_URI,
-                        new String[]{DataContract.SettingsEntry.COLUMN_CAMERA_LATITUDE,
-                                DataContract.SettingsEntry.COLUMN_CAMERA_LONGITUDE,
-                                DataContract.SettingsEntry.COLUMN_CAMERA_BEARING,
-                                DataContract.SettingsEntry.COLUMN_CAMERA_TILT,
-                                DataContract.SettingsEntry.COLUMN_CAMERA_ZOOM
-                        },
-                        null, // DataContract.CityEntry.COLUMN_ENTERED_CITY + "=?",
-                        null, // new String[]{enteredCity},
-                        null);
+                    // ------------------------------------
+                    // read map camera settings
+                    Cursor cursor = getActivity().getContentResolver().query(DataContentProvider.SETTINGS_CONTENT_URI,
+                            new String[]{DataContract.SettingsEntry.COLUMN_CAMERA_LATITUDE,
+                                    DataContract.SettingsEntry.COLUMN_CAMERA_LONGITUDE,
+                                    DataContract.SettingsEntry.COLUMN_CAMERA_BEARING,
+                                    DataContract.SettingsEntry.COLUMN_CAMERA_TILT,
+                                    DataContract.SettingsEntry.COLUMN_CAMERA_ZOOM
+                            },
+                            null, // DataContract.CityEntry.COLUMN_ENTERED_CITY + "=?",
+                            null, // new String[]{enteredCity},
+                            null);
 
-                if (cursor != null && cursor.getCount() > 0) {
+                    if (cursor != null && cursor.getCount() > 0) {
 
-                    cursor.moveToFirst();
+                        cursor.moveToFirst();
 
-                    CameraPosition cameraPosition = new CameraPosition.Builder()
-                            .target(new LatLng(cursor.getDouble(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_CAMERA_LATITUDE)),
-                                    cursor.getDouble(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_CAMERA_LONGITUDE))))    // Sets the center of the map
-                            .bearing(cursor.getDouble(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_CAMERA_BEARING)))
-                            .zoom(cursor.getDouble(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_CAMERA_ZOOM)))                                   // Sets the zoom
-                            .tilt(cursor.getDouble(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_CAMERA_TILT)))                                   // Sets the tilt of the camera
-                            .build(); // Creates a CameraPosition from the builder
+                        CameraPosition cameraPosition = new CameraPosition.Builder()
+                                .target(new LatLng(cursor.getDouble(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_CAMERA_LATITUDE)),
+                                        cursor.getDouble(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_CAMERA_LONGITUDE))))    // Sets the center of the map
+                                .bearing(cursor.getDouble(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_CAMERA_BEARING)))
+                                .zoom(cursor.getDouble(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_CAMERA_ZOOM)))                                   // Sets the zoom
+                                .tilt(cursor.getDouble(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_CAMERA_TILT)))                                   // Sets the tilt of the camera
+                                .build(); // Creates a CameraPosition from the builder
 
-                    map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                        map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-                    cursor.close();
+                        cursor.close();
+                        // ------------------------------------
+                    }
                 }
 
  /*                // Click listener
@@ -473,33 +475,11 @@ public class ViewWeatherFragment extends Fragment implements LoaderManager.Loade
 
         // get settings data from DB
         MainActivity.Settings settings = activity.readSettingsFromDB();
-        // MainActivity.Settings settings = activity.readSettings();
         mUnitsFormat = settings.getUnitsFormat();
-        //  mSortCities = settings.getSortCities();
+
+        // set units format
+       /// WeatherCursorAdapter.setUnitsFormat(mUnitsFormat);
     }
-
-
-/*    private void animateMarker(MarkerView marker) {
-
-        View view = map.getMarkerViewManager().getView(marker);
-        if (view != null) {
-
-            View backgroundView = view.findViewById(R.id.background_imageview);
-
-            ValueAnimator scaleCircleX = ObjectAnimator.ofFloat(backgroundView, "scaleX", 1.8f);
-            ValueAnimator scaleCircleY = ObjectAnimator.ofFloat(backgroundView, "scaleY", 1.8f);
-            ObjectAnimator fadeOut = ObjectAnimator.ofFloat(backgroundView, "alpha", 1f, 0f);
-
-            scaleCircleX.setRepeatCount(ValueAnimator.INFINITE);
-            scaleCircleY.setRepeatCount(ValueAnimator.INFINITE);
-            fadeOut.setRepeatCount(ObjectAnimator.INFINITE);
-
-            AnimatorSet animatorSet = new AnimatorSet();
-            animatorSet.play(scaleCircleX).with(scaleCircleY).with(fadeOut);
-            animatorSet.setDuration(1000);
-            animatorSet.start();
-        }
-    }*/
 
 
     private void enableLocation() {
@@ -569,7 +549,6 @@ public class ViewWeatherFragment extends Fragment implements LoaderManager.Loade
             enableLocation();
         } else {
             Toast.makeText(getContext(), R.string.user_location_permission_not_granted, Toast.LENGTH_LONG).show();
-            ///   finish();
         }
     }
 
@@ -579,7 +558,7 @@ public class ViewWeatherFragment extends Fragment implements LoaderManager.Loade
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
         // clear previous menu items
-        menu.clear();
+       // menu.clear();
 
         super.onCreateOptionsMenu(menu, inflater);
 
@@ -587,34 +566,9 @@ public class ViewWeatherFragment extends Fragment implements LoaderManager.Loade
     }
 
 
-/*    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-
-       for (int index = 0; index < menu.size(); index++) {
-
-            MenuItem menuItem = menu.getItem(index);
-
-            if (menuItem != null) {
-
-                int id = menuItem.getItemId();
-
-                // hide "view" and "settings" icons
-                if (id == R.id.action_view || id == R.id.action_settings) {
-
-                    menuItem.setVisible(false);
-                }
-
-                // hide the menu items if the drawer is open
-                //   menuItem.setVisible(mMenuVisible);
-            }
-        }
-
-        super.onPrepareOptionsMenu(menu);
-    }*/
-
-    private int mMarkerIndex;
-
     private void nextPlace() {
+
+        hideAllMarkers();
 
         mMarkerIndex++;
 
@@ -623,53 +577,35 @@ public class ViewWeatherFragment extends Fragment implements LoaderManager.Loade
             mMarkerIndex = 0;
         }
 
-        Marker marker = map.getMarkers().get(mMarkerIndex);
+        mMarker = map.getMarkers().get(mMarkerIndex);
 
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(new LatLng(marker.getPosition()))
-                //  .bearing(0)
-                //  .tilt(0)
-                //        .bearing(cursor.getDouble(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_CAMERA_BEARING)))
-                //        .zoom(cursor.getDouble(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_CAMERA_ZOOM)))                                   // Sets the zoom
-                //        .tilt(cursor.getDouble(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_CAMERA_TILT)))                                   // Sets the tilt of the camera
-                .build(); // Creates a CameraPosition from the builder
-
-        //   map.getUiSettings().getHeight(
-
-        //     mapView.clearFocus();
-
-        map.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(marker.getPosition()))); // .newCameraPosition(cameraPosition));
-
-        //  map.invalidateCameraPosition();
-        //    map.getMarkerViewManager().invalidateViewMarkersInVisibleRegion();
+        map.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(mMarker.getPosition())));
     }
 
 
     private void previousPlace() {
 
+        hideAllMarkers();
+
         mMarkerIndex--;
 
-        if (mMarkerIndex < 0) { // (map.getMarkers().size() - 1)) {
+        if (mMarkerIndex < 0) {
 
             mMarkerIndex = map.getMarkers().size() - 1;
         }
 
-        Marker marker = map.getMarkers().get(mMarkerIndex);
+        mMarker = map.getMarkers().get(mMarkerIndex);
 
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(new LatLng(marker.getPosition()))
-                //  .bearing(0)
-                //  .tilt(0)
-                //        .bearing(cursor.getDouble(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_CAMERA_BEARING)))
-                //        .zoom(cursor.getDouble(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_CAMERA_ZOOM)))                                   // Sets the zoom
-                //        .tilt(cursor.getDouble(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_CAMERA_TILT)))                                   // Sets the tilt of the camera
-                .build(); // Creates a CameraPosition from the builder
+        map.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(mMarker.getPosition())));
+    }
 
-        //   map.getUiSettings().getHeight(
 
-        //    mapView.clearFocus();
+    private void hideAllMarkers() {
 
-        map.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(marker.getPosition()))); // .newCameraPosition(cameraPosition));
+        for (Marker marker : map.getMarkers()) {
+
+            marker.hideInfoWindow();
+        }
     }
 
 
@@ -701,13 +637,16 @@ public class ViewWeatherFragment extends Fragment implements LoaderManager.Loade
     }
 
 
-    private CameraPosition mCameraPosition;
-
     @Override
     public void onCameraChange(CameraPosition position) {
 
-        if (position.target != null)
+        if (position != null && position.target != null)
             mCameraPosition = position;
+
+        if (mMarker != null) {
+
+            mMarker.showInfoWindow(map, mapView);
+        }
     }
 
     /// https://github.com/mapbox/mapbox-gl-native/blob/master/platform/android/MapboxGLAndroidSDK/src/main/java/com/mapbox/mapboxsdk/camera/CameraPosition.java
