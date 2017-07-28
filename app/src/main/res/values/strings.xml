@@ -6,7 +6,7 @@
     <string name="action_add">Add place</string>
     <string name="action_view">View on map</string>
     <string name="action_sync">Sync with server</string>
-    <string name="action_delete">Delete record</string>
+    <string name="action_delete">Delete records</string>
     <string name="action_settings">Settings</string>
     <string name="action_cancel">Cancel</string>
     <string name="action_save">Save</string>
@@ -31,6 +31,7 @@
     <string name="ok">OK</string>
     <string name="button_delete_city_cancel">Cancel</string>
     <string name="button_delete_city">Delete</string>
+ <!--   <string name="notify_city_spinner_prompt">select city</string>-->
 
     <!--  messages  -->
 
@@ -77,6 +78,7 @@
     <string name="settings_title">Settings</string>
     <string name="settings_units_format">Units format:</string>
     <string name="settings_sort_cities">Sort cities:</string>
+    <string name="settings_send_notifications">Send notifications:</string>
     <string name="sort_by_adding">by adding</string>
     <string name="sort_alphabetically">alphabetically</string>
     <string name="units_metric">metric</string>

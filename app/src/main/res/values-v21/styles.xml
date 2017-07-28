@@ -5,22 +5,28 @@
     <!-- Base application theme. -->
 
     <style name="AppBaseTheme" parent="Theme.AppCompat.Light">
+
     </style>
 
-    <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
+     <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowBackground">@drawable/background_splash</item>
     </style>
 
-    <style name="DarkBlueTheme" parent="AppBaseTheme">
-        <item name="android:textColorPrimary">@color/colorBlack</item>
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-
+    <style name="MyTheme" parent="AppBaseTheme">
+        <item name="actionBarStyle">@style/MyActionBar</item>
+        <item name="android:textColorPrimary">@color/iconColor</item>
+        <item name="android:colorPrimary">@color/colorPrimary</item>
+        <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="android:colorAccent">@color/colorAccent</item>
         <item name="android:textColor">@color/basicText</item>
-        <!-- <item name="android:windowBackground">@color/windowBackground</item>-->
+    </style>
 
-        <!--      <item name="android:alertDialogTheme">@style/AlertDialog.AppCompat.Light</item>-->
+    <style name="MyActionBar"
+           parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+       <!-- <item name="android:background">@color/actionbar_background</item>-->
+
+        <!-- Support library compatibility -->
+        <item name="background">@color/colorPrimary</item>
     </style>
 
     <style name="mainTitle">
@@ -54,7 +60,7 @@
     <style name="ButtonText">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:textColor">@color/colorBlack</item>
         <item name="android:layout_marginTop">15dp</item>
         <!--<item name="android:textSize">30dp</item>-->
         <item name="android:textStyle">bold</item>
@@ -88,11 +94,5 @@
         <item name="android:minHeight">10dp</item>
         <item name="android:maxHeight">10dp</item>
     </style>
-
-    <!--
-        <style name="SettingsTheme" parent="Theme.AppCompat.NoActionBar">
-            <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
-        </style>
-    -->
 
 </resources>

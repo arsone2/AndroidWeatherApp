@@ -125,7 +125,9 @@ public class DataContentProvider extends ContentProvider {
 
             case URI_CITIES:
 
-                //        Log.d("AAAAA", "URI_CITIES: " + uri);
+                   //     Log.d("AAAAA", "URI_CITIES: " + uri);
+
+            //    Log.d("AAAAA", "URI_CITIES: sortOrder = " + sortOrder);
 
                 // if sort order don`t specified
                 if (TextUtils.isEmpty(sortOrder)) {
@@ -144,7 +146,7 @@ public class DataContentProvider extends ContentProvider {
 
                 id = uri.getLastPathSegment();
 
-                //      Log.d("AAAAA", "URI_CITY_ID: " + uri + " id =" + id);
+               //       Log.d("AAAAA", "URI_CITY_ID: " + uri + " id =" + id);
 
                 /// Log.d(LOG_TAG, "URI_CONTACTS_ID, " + id);
 
@@ -300,6 +302,8 @@ public class DataContentProvider extends ContentProvider {
         }
 
         database = dbHelper.getReadableDatabase();
+
+    //    Log.d("AAAAA", "Cursor: sortOrder = " + sortOrder);
 
         Cursor cursor = database.query(table,
                 projection,    // the columns to return from the query
@@ -671,7 +675,7 @@ public class DataContentProvider extends ContentProvider {
                     + DataContract.SettingsEntry.COLUMN_UNITS_FORMAT + " INTEGER DEFAULT 0,"    //  (int/INTEGER)
                     + DataContract.SettingsEntry.COLUMN_SORT_CITIES + " INTEGER DEFAULT 0,"     //  (int/INTEGER)
                     + DataContract.SettingsEntry.COLUMN_MAP_LANGUAGE + " INTEGER DEFAULT 0,"    //  (int/INTEGER)
-                    + DataContract.SettingsEntry.COLUMN_SEND_NOTIFY + " INTEGER DEFAULT 0,"     //  (int/INTEGER)
+                    + DataContract.SettingsEntry.COLUMN_NOTIFY_CITY_ID + " INTEGER DEFAULT 0,"  //  (int/INTEGER)
                     + DataContract.SettingsEntry.COLUMN_CAMERA_LATITUDE + " DOUBLE DEFAULT 0,"  // (double/DOUBLE)
                     + DataContract.SettingsEntry.COLUMN_CAMERA_LONGITUDE + " DOUBLE DEFAULT 0," // (double/DOUBLE)
                     + DataContract.SettingsEntry.COLUMN_CAMERA_BEARING + " DOUBLE DEFAULT 0,"   // (double/DOUBLE)
@@ -689,7 +693,7 @@ public class DataContentProvider extends ContentProvider {
             cvSettings.put(DataContract.SettingsEntry.COLUMN_UNITS_FORMAT, 0);
             cvSettings.put(DataContract.SettingsEntry.COLUMN_SORT_CITIES, 0);
             cvSettings.put(DataContract.SettingsEntry.COLUMN_MAP_LANGUAGE, 0);
-            cvSettings.put(DataContract.SettingsEntry.COLUMN_SEND_NOTIFY, 0);
+            cvSettings.put(DataContract.SettingsEntry.COLUMN_NOTIFY_CITY_ID, 0);
 
             db.insert(DataContract.SettingsEntry.TABLE_NAME, null, cvSettings);
         }

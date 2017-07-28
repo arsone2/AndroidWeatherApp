@@ -6,7 +6,7 @@ import android.provider.BaseColumns;
 public final class DataContract {
 
     public static final String DATABASE_NAME = "weather.db";
-    public static final int DATABASE_VERSION = 2;
+    public static final int DATABASE_VERSION = 1;
 
     // private constructor
     private DataContract(){}
@@ -18,14 +18,14 @@ public final class DataContract {
         public static final String TABLE_NAME = "cities";
 
         // table 'cities' columns
-        public static final String _ID                      = BaseColumns._ID;    // int/INTEGER
-        public static final String COLUMN_ENTERED_CITY      = "entered_city";     // String/TEXT
-        public static final String COLUMN_RETURNED_CITY     = "returned_city";    // String/TEXT
-        public static final String COLUMN_COUNTRY_CODE      = "country_code";     // String/TEXT
-        public static final String COLUMN_LATITUDE          = "latitude";         // double/DOUBLE
-        public static final String COLUMN_LONGITUDE         = "longitude";        // double/DOUBLE
-        public static final String COLUMN_SERVER_CITY_ID    = "server_city_id";   // int/INTEGER
-        public static final String COLUMN_UPDATE_TIMESTAMP  = "update_timestamp"; // timestamp, when data was added
+        public static final String _ID                     = BaseColumns._ID;    // int/INTEGER
+        public static final String COLUMN_ENTERED_CITY     = "entered_city";     // String/TEXT
+        public static final String COLUMN_RETURNED_CITY    = "returned_city";    // String/TEXT
+        public static final String COLUMN_COUNTRY_CODE     = "country_code";     // String/TEXT
+        public static final String COLUMN_LATITUDE         = "latitude";         // double/DOUBLE
+        public static final String COLUMN_LONGITUDE        = "longitude";        // double/DOUBLE
+        public static final String COLUMN_SERVER_CITY_ID   = "server_city_id";   // int/INTEGER
+        public static final String COLUMN_UPDATE_TIMESTAMP = "update_timestamp"; // timestamp, when data was added
     }
 
 
@@ -72,6 +72,6 @@ public final class DataContract {
         public static final String COLUMN_CAMERA_BEARING   = "camera_bearing";   // (double/DOUBLE)
         public static final String COLUMN_CAMERA_TILT      = "camera_tilt";      // (double/DOUBLE)
         public static final String COLUMN_CAMERA_ZOOM      = "camera_zoom";      // (double/DOUBLE)
-        public static final String COLUMN_SEND_NOTIFY      = "send_notify";      //  (int/INTEGER)
+        public static final String COLUMN_NOTIFY_CITY_ID   = "notify_city_id";   //  (int/INTEGER)
     }
 }

@@ -124,7 +124,7 @@ public class CitiesListFragment extends Fragment implements
 
     public void initLoader() {
 
-        Log.d("AAAAA", "CitiesListFragment - initLoader");
+     //   Log.d("AAAAA", "CitiesListFragment - initLoader");
 
         // get settings data from DB
         MainActivity.Settings settings = activity.readSettingsFromDB();
@@ -141,10 +141,10 @@ public class CitiesListFragment extends Fragment implements
 
         if (loader != null && !loader.isReset()) {
             getLoaderManager().restartLoader(MainActivity.LOADER_CITIES_ID, null, this);
-            Log.d("AAAAA", "restartLoader");
+        //    Log.d("AAAAA", "restartLoader");
         } else {
             getLoaderManager().initLoader(MainActivity.LOADER_CITIES_ID, null, this);
-            Log.d("AAAAA", "initLoader");
+        //    Log.d("AAAAA", "initLoader");
         }
         // --------------------------------------------------------------
     }

@@ -100,7 +100,7 @@ public class WeatherCursorAdapter extends CursorAdapter {
                         "drawable", context.getPackageName()));
 
         long timeStamp = cursor.getLong(cursor.getColumnIndex(DataContract.WeatherEntry.COLUMN_TIMESTAMP));
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
+       // SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
 
         viewHolder.dayOfWeekTextView.setText(convertTimeStampToDay(timeStamp));
 

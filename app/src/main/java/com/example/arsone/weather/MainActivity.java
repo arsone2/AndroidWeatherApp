@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -27,11 +28,14 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 import com.mapbox.mapboxsdk.Mapbox;
 
+// https://developers.google.com/admob/android/interstitial
 
 // https://www.thorntech.com/2016/03/parsing-json-android-using-volley-library/
 // https://www.smashingmagazine.com/2017/03/simplify-android-networking-volley-http-library/
@@ -45,6 +49,7 @@ import com.mapbox.mapboxsdk.Mapbox;
 // https://stackoverflow.com/questions/35496493/getmapasync-in-fragment
 // https://developers.google.com/android/guides/setup
 // http://www.mobilab.ru/androiddev/androidalarmmanagertutorial.html
+// https://stackoverflow.com/questions/11930587/change-action-bar-color-in-android
 
 
 public class MainActivity extends AppCompatActivity implements
@@ -66,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements
     private ProgressBar messageProgressBar;
 
     private AdView mAdView;
+    private InterstitialAd mInterstitialAd;
 
     // -------------------------------------------
     // Unique loaders ID:
@@ -77,6 +83,9 @@ public class MainActivity extends AppCompatActivity implements
 
     // Loader ID: AddCityFragment
     public static final int LOADER_MARKER_ID = 3;
+
+    // Loader ID: SettingsFragment
+    public static final int LOADER_CITIES_SETTINGS = 4;
     // -------------------------------------------
 
     private final String BROADCAST_STATIC_ACTION = "com.example.arsone.weather.static.broadcast";
@@ -144,17 +153,73 @@ public class MainActivity extends AppCompatActivity implements
 
         /// https://developers.google.com/admob/android/test-ads#enable_test_devices
         // test banner
-        MobileAds.initialize(this, "ca-app-pub-3940256099942544/6300978111");
-
+        MobileAds.initialize(this, "ca-app-pub-3940256099942544/6300978111"); // test ID !!!
         mAdView = (AdView) findViewById(R.id.adView);
-
         // Use AdRequest.Builder.addTestDevice("DAA423565A27FA89F79E8F5698DC18DD") to get test ads on this device.
         AdRequest adRequest = new AdRequest.Builder()
                 //.addTestDevice(AdRequest.TEST_EMULATOR)
-                .addTestDevice("DAA423565A27FA89F79E8F5698DC18DD")
+                .addTestDevice("DAA423565A27FA89F79E8F5698DC18DD") // test device ID !!!
                 .build();
-
         mAdView.loadAd(adRequest);
+
+
+        // add an interstitial ad
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712"); // test ID !!!
+        mInterstitialAd.loadAd(new AdRequest
+                .Builder()
+                .addTestDevice("DAA423565A27FA89F79E8F5698DC18DD")
+                .build());
+
+        mInterstitialAd.setAdListener(new AdListener(){
+
+            @Override
+            public void onAdLoaded() {
+
+                // Code to be executed when an ad finishes loading.
+                Log.i("AAAAA", "onAdLoaded");
+            }
+
+
+            @Override
+            public void onAdFailedToLoad(int errorCode) {
+
+                // Code to be executed when an ad request fails.
+                Log.i("AAAAA", "onAdFailedToLoad");
+            }
+
+
+            @Override
+            public void onAdOpened() {
+
+                // Code to be executed when the ad is displayed.
+                Log.i("AAAAA", "onAdOpened");
+            }
+
+
+            @Override
+            public void onAdLeftApplication() {
+
+                // Code to be executed when the user has left the app.
+                Log.i("AAAAA", "onAdLeftApplication");
+            }
+
+
+            @Override
+            public void onAdClosed() {
+
+                // Code to be executed when when the interstitial ad is closed.
+                Log.i("AAAAA", "onAdClosed");
+
+          //      startActivity(new Intent(MainActivity.this, InterstitialActivity.class));
+                mInterstitialAd.loadAd(new AdRequest
+                        .Builder()
+                        .addTestDevice("DAA423565A27FA89F79E8F5698DC18DD")
+                        .build());
+
+                finish();
+            }
+        });
 
 
         Mapbox.getInstance(this, getString(R.string.mapbox_api_key));
@@ -186,7 +251,7 @@ public class MainActivity extends AppCompatActivity implements
 
                         case STATUS_GET_WEATHER_ONE_CITY_START:
 
-                            Log.d("AAAAA", "dynamicBroadcastReceiver GET: STATUS_GET_WEATHER_ONE_CITY_START");
+                            //       Log.d("AAAAA", "dynamicBroadcastReceiver GET: STATUS_GET_WEATHER_ONE_CITY_START");
 
                             showMessageBar(getString(R.string.message_wait_for_data), true);
 
@@ -194,7 +259,7 @@ public class MainActivity extends AppCompatActivity implements
 
                         case STATUS_GET_WEATHER_ONE_CITY_FINISH:
 
-                            Log.d("AAAAA", "dynamicBroadcastReceiver GET: STATUS_GET_WEATHER_ONE_CITY_FINISH");
+                            //     Log.d("AAAAA", "dynamicBroadcastReceiver GET: STATUS_GET_WEATHER_ONE_CITY_FINISH");
 
                             refreshData();
 
@@ -202,7 +267,7 @@ public class MainActivity extends AppCompatActivity implements
 
                         case STATUS_GET_WEATHER_ALL_CITIES_START:
 
-                            Log.d("AAAAA", "dynamicBroadcastReceiver GET: STATUS_GET_WEATHER_ALL_CITIES_START");
+                            //        Log.d("AAAAA", "dynamicBroadcastReceiver GET: STATUS_GET_WEATHER_ALL_CITIES_START");
 
                             showMessageBar(getString(R.string.message_wait_for_data), true);
 
@@ -210,7 +275,7 @@ public class MainActivity extends AppCompatActivity implements
 
                         case STATUS_GET_WEATHER_ALL_CITIES_FINISH:
 
-                            Log.d("AAAAA", "dynamicBroadcastReceiver GET: STATUS_GET_WEATHER_ALL_CITIES_FINISH");
+                            //          Log.d("AAAAA", "dynamicBroadcastReceiver GET: STATUS_GET_WEATHER_ALL_CITIES_FINISH");
 
                             refreshData();
 
@@ -233,13 +298,19 @@ public class MainActivity extends AppCompatActivity implements
         getSupportActionBar().setIcon(R.drawable.white_balance_sunny);*/
 
 
-        // set action bar text color
+/*        // set action bar text color
         String title = getSupportActionBar().getTitle().toString();
         Spannable spannablerTitle = new SpannableString(title);
         spannablerTitle.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getApplicationContext(),
-                R.color.colorWhite)),
-                0, spannablerTitle.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        getSupportActionBar().setTitle(spannablerTitle);
+                R.color.colorPrimaryDark)), 0, spannablerTitle.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        getSupportActionBar().setTitle(spannablerTitle);*/
+
+
+/*        // set action bar background color
+        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        ColorDrawable colorDrawable = new ColorDrawable(ContextCompat
+                .getColor(getApplication(), R.color.colorPrimaryDark));
+        actionBar.setBackgroundDrawable(colorDrawable);*/
 
 
         if (savedInstanceState != null) // create activity only one time?
@@ -311,14 +382,14 @@ public class MainActivity extends AppCompatActivity implements
 
     public Settings readSettingsFromDB() {
 
-        Log.d("AAAAA", "readSettingsFromDB()");
+        //   Log.d("AAAAA", "readSettingsFromDB()");
 
         // read all columns
         Cursor cursor = getContentResolver().query(DataContentProvider.SETTINGS_CONTENT_URI,
-                new String[]{ DataContract.SettingsEntry.COLUMN_UNITS_FORMAT,
-                              DataContract.SettingsEntry.COLUMN_SORT_CITIES,
-                              DataContract.SettingsEntry.COLUMN_MAP_LANGUAGE,
-                              DataContract.SettingsEntry.COLUMN_SEND_NOTIFY },
+                new String[]{DataContract.SettingsEntry.COLUMN_UNITS_FORMAT,
+                        DataContract.SettingsEntry.COLUMN_SORT_CITIES,
+                        DataContract.SettingsEntry.COLUMN_MAP_LANGUAGE,
+                        DataContract.SettingsEntry.COLUMN_NOTIFY_CITY_ID},
                 null, // DataContract.CityEntry.COLUMN_ENTERED_CITY + "=?",
                 null, // new String[]{enteredCity},
                 null);
@@ -333,7 +404,7 @@ public class MainActivity extends AppCompatActivity implements
             // sort: by id = 0, alphabetic = 1
             int sortCities = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_SORT_CITIES));
 
-            int sendNotifications = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_SEND_NOTIFY));
+            int sendNotifications = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_NOTIFY_CITY_ID));
 
             cursor.close();
 
@@ -443,7 +514,7 @@ public class MainActivity extends AppCompatActivity implements
                 .putExtra(PARAM_TASK, TASK_GET_WEATHER_ONE_CITY) // get weather data for one city only!
                 .putExtra(PARAM_CITY_ID, id) //  "CITIES" table: column "_id"
                 .putExtra(PARAM_ENTERED_CITY, enteredCity); // "CITIES" table: column "entered_city"
-             //   .putExtra(PARAM_SEND_NOTIFICATIONS, 1); // TEST
+        //   .putExtra(PARAM_SEND_NOTIFICATIONS, 1); // TEST
 
         // start service for added a city details and weather data
         startService(oneIntent);
@@ -494,7 +565,7 @@ public class MainActivity extends AppCompatActivity implements
 
             if (rightFragment instanceof DetailsFragment) { // refresh details: weather ListView
 
-                Log.d("AAAAA", "tablet = refreshData: citiesListFragment - initLoader();");
+                //    Log.d("AAAAA", "tablet = refreshData: citiesListFragment - initLoader();");
 
                 DetailsFragment detailsFragment = (DetailsFragment) rightFragment;
 
@@ -506,7 +577,7 @@ public class MainActivity extends AppCompatActivity implements
 
             if (fragment instanceof CitiesListFragment) { // refresh details: weather ListView
 
-                Log.d("AAAAA", "phone = refreshData: citiesListFragment - initLoader();");
+                //      Log.d("AAAAA", "phone = refreshData: citiesListFragment - initLoader();");
 
                 CitiesListFragment citiesListFragment = (CitiesListFragment) fragment;
 
@@ -514,7 +585,7 @@ public class MainActivity extends AppCompatActivity implements
 
             } else if (fragment instanceof DetailsFragment) { // refresh cities: cities ListView
 
-                Log.d("AAAAA", "phone = refreshData: DetailsFragment - initLoader()");
+                //       Log.d("AAAAA", "phone = refreshData: DetailsFragment - initLoader()");
 
                 DetailsFragment detailsFragment = (DetailsFragment) fragment;
 
@@ -522,7 +593,7 @@ public class MainActivity extends AppCompatActivity implements
 
             } else if (fragment instanceof ViewWeatherFragment) { // refresh cities: cities ListView
 
-                Log.d("AAAAA", "phone = refreshData: ViewWeatherFragment - initLoader()");
+                //        Log.d("AAAAA", "phone = refreshData: ViewWeatherFragment - initLoader()");
 
                 ViewWeatherFragment viewWeatherFragment = (ViewWeatherFragment) fragment;
 
@@ -574,7 +645,7 @@ public class MainActivity extends AppCompatActivity implements
             // get detailed data for ALL cities
             Intent intent = new Intent(this, GetDataService.class)
                     .putExtra(PARAM_TASK, TASK_GET_WEATHER_ALL_CITIES); // get weather data for all cities
-             //       .putExtra(PARAM_SEND_NOTIFICATIONS, 1); // TEST
+            //       .putExtra(PARAM_SEND_NOTIFICATIONS, 1); // TEST
 
             // start service for added a city details and weather data
             startService(intent);
@@ -591,7 +662,7 @@ public class MainActivity extends AppCompatActivity implements
 
         intent.setAction(BROADCAST_STATIC_ACTION);
 
-    //    intent.putExtra(PARAM_SEND_NOTIFICATIONS, 1); // TEST
+        //    intent.putExtra(PARAM_SEND_NOTIFICATIONS, 1); // TEST
 
 
         // Create a PendingIntent to be triggered when the alarm goes off
@@ -855,5 +926,41 @@ public class MainActivity extends AppCompatActivity implements
                     .commit();
         }
         // ----------------------------------------------------
+    }
+
+
+    @Override
+    public void onBackPressed() {
+
+        if (findViewById(R.id.onePaneLayout) != null) { // phone
+
+            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.onePaneLayout);
+
+            if (fragment instanceof CitiesListFragment) { // refresh details: weather ListView
+
+                Log.d("AAAAA", "Phone: Before exit !!!");
+                startInterstitialActivity();
+
+            }
+        } else { // tablet
+
+            Log.d("AAAAA", "Tablet: Before exit !!!");
+            startInterstitialActivity();
+        }
+
+        super.onBackPressed();
+    }
+
+
+    private void startInterstitialActivity() {
+
+        if (mInterstitialAd.isLoaded()) {
+
+            mInterstitialAd.show();
+
+        } else {
+
+      ///      startActivity(new Intent(this, InterstitialActivity.class));
+        }
     }
 }

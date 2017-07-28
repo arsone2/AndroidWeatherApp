@@ -110,7 +110,7 @@ public class StaticBroadcastReceiver extends BroadcastReceiver {
         String action = null;
 
 
-        Log.d("AAAAA", "StaticBroadcastReceiver: onReceive()");
+    //    Log.d("AAAAA", "StaticBroadcastReceiver: onReceive()");
 
         if ((intent != null) && ((action = intent.getAction()) != null)) {
 

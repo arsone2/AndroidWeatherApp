@@ -143,7 +143,7 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
 
     public void initLoader() {
 
-        Log.d("AAAAA", "DetailsFragment: initLoader");
+//        Log.d("AAAAA", "DetailsFragment: initLoader");
 
         // read entered city name and Data Update Time
         Cursor cursor = getActivity().getContentResolver()
@@ -180,7 +180,7 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
 
             SimpleDateFormat updateTimeDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-            Log.d("AAAAA", "mDataUpdateTime = " + mDataUpdateTime);
+       //     Log.d("AAAAA", "mDataUpdateTime = " + mDataUpdateTime);
 
             try {
                 Date today = new Date();
@@ -193,7 +193,7 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
                 /// int hours = (int) (diff / (1000 * 60 * 60));
                 int minutes = (int) (diff / (1000 * 60));
 
-                Log.d("AAAAA", "minutes = " + minutes);
+           //     Log.d("AAAAA", "minutes = " + minutes);
 
                 String stringDate = DateFormat.getDateTimeInstance().format(date);
 
@@ -218,7 +218,7 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
         MainActivity.Settings settings = activity.readSettingsFromDB();
         mUnitsFormat = settings.getUnitsFormat();
 
-        Log.d("AAAAA" , "mUnitsFormat = " + mUnitsFormat);
+     //   Log.d("AAAAA" , "mUnitsFormat = " + mUnitsFormat);
 
         // set units format
         WeatherCursorAdapter.setUnitsFormat(mUnitsFormat);

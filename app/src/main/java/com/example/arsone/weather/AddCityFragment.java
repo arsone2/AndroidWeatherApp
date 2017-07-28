@@ -340,7 +340,7 @@ public class AddCityFragment extends Fragment implements LoaderManager.LoaderCal
 
                         activity.onMapClicked(); // hide keyboard
 
-                        Log.d("AAAAA", "point = " + point);
+                   //     Log.d("AAAAA", "point = " + point);
 
                         if (point != null) {
                             //  geocode(point);

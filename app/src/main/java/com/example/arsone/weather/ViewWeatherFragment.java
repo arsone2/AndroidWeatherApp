@@ -471,7 +471,7 @@ public class ViewWeatherFragment extends Fragment implements LoaderManager.Loade
 
     public void initLoader() {
 
-        Log.d("AAAAA", "ViewWeatherFragment: initLoader");
+   //     Log.d("AAAAA", "ViewWeatherFragment: initLoader");
 
         // get settings data from DB
         MainActivity.Settings settings = activity.readSettingsFromDB();
@@ -558,7 +558,7 @@ public class ViewWeatherFragment extends Fragment implements LoaderManager.Loade
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
         // clear previous menu items
-       // menu.clear();
+        menu.clear();
 
         super.onCreateOptionsMenu(menu, inflater);
 
