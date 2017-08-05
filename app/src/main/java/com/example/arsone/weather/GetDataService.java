@@ -28,7 +28,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -44,29 +43,27 @@ public class GetDataService extends IntentService {
     private final static String PARAM_STATUS = "status";
     private final static String PARAM_CITY_ID = "city_id";
     private final static String PARAM_ENTERED_CITY = "city_name";
-//    public final static String PARAM_SEND_NOTIFICATIONS = "notifications";
 
     private final static int TASK_GET_WEATHER_ONE_CITY = 1;
     private final static int TASK_GET_WEATHER_ALL_CITIES = 2;
     private final static int TASK_GET_DATA_PERIODICALLY = 3;
 
-    private final static int STATUS_GET_WEATHER_ONE_CITY_START = 101;
-    private final static int STATUS_GET_WEATHER_ONE_CITY_FINISH = 102;
+    public final static int STATUS_GET_WEATHER_ONE_CITY_START = 101;
+    public final static int STATUS_GET_WEATHER_ONE_CITY_FINISH_SUCCESS = 102;
+    public final static int STATUS_GET_WEATHER_ONE_CITY_FINISH_FAIL = 103;
 
-    private final static int STATUS_GET_WEATHER_ALL_CITIES_START = 103;
-    private final static int STATUS_GET_WEATHER_ALL_CITIES_FINISH = 104;
+    public final static int STATUS_GET_WEATHER_ALL_CITIES_START = 104;
+    public final static int STATUS_GET_WEATHER_ALL_CITIES_FINISH_SUCCESS = 105;
+    public final static int STATUS_GET_WEATHER_ALL_CITIES_FINISH_FAIL = 106;
 
     private final String BROADCAST_DYNAMIC_ACTION = "com.example.arsone.weather.dynamic.broadcast";
 
     private final int TIME_TO_WAIT = 1000; // time to wait in milliseconds
 
     private int mTask;
-    private int mSendNotificationCityID;
-/*    private int mUnitsFormat;
-    private int mCityID;*/
+    private int mCitiesTotal;
 
-
- //   private boolean cityFound;
+    private int mCitiesCounter = 1;
 
 
     class City {
@@ -107,85 +104,42 @@ public class GetDataService extends IntentService {
 
             if (cursorCities.getCount() == 0) {
 
-                //     Log.d("AAAAA", "GetDataService: No data in cities table");
                 cursorCities.close();
                 return;
+            } else {
+
+                mCitiesTotal = cursorCities.getCount();
             }
             cursorCities.close();
         } else
             return;
 
-        // ----------------------------------------------------------------
-        // read settings
-        Cursor cursor = getContentResolver().query(DataContentProvider.SETTINGS_CONTENT_URI,
-                new String[]{DataContract.SettingsEntry.COLUMN_NOTIFY_CITY_ID,
-                        DataContract.SettingsEntry.COLUMN_UNITS_FORMAT},
-                null, null, null);
-
-        if (cursor != null && cursor.getCount() > 0) {
-
-            cursor.moveToFirst();
-
-            mSendNotificationCityID = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_NOTIFY_CITY_ID));
-
-            Log.d("AAAAA", "cursor - mSendNotificationCityID = " + mSendNotificationCityID);
-
-            // units format: 0 = metric, 1 = imperial
-        //    mUnitsFormat = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_UNITS_FORMAT));
-
-            // cursor.close();
-        }
-
-        cursor.close();
-        // ----------------------------------------------------------------
-
         // get task
         mTask = intent.getIntExtra(PARAM_TASK, 0);
 
-///        Log.d("AAAAA", "GetDataService: mSendNotificationCityID = " + mSendNotificationCityID);
-
         if (mTask == TASK_GET_WEATHER_ONE_CITY) {
-
-            //  String action = intent.getAction();
-            //   Log.d("AAAAA", "GetDataService: mTask = TASK_GET_WEATHER_ONE_CITY");
 
             int id = intent.getIntExtra(PARAM_CITY_ID, -1);
 
-     //       mCityID = id;
-
             String city = intent.getStringExtra(PARAM_ENTERED_CITY);
 
-            //  Log.d("AAAAA", "GetDataService: city = " + city);
-
             if (city != null && id != -1) {
-
-                //       Log.d("AAAAA", "GetDataService: Service running for ONE CITY.");
 
                 sendBroadcastData(STATUS_GET_WEATHER_ONE_CITY_START);
 
                 getWeather(id, city);
-
-                sendBroadcastData(STATUS_GET_WEATHER_ONE_CITY_FINISH);
             }
         } else if (mTask == TASK_GET_WEATHER_ALL_CITIES) {
 
-            //     Log.d("AAAAA", "GetDataService: TASK_GET_WEATHER_ALL_CITIES");
-
             sendBroadcastData(STATUS_GET_WEATHER_ALL_CITIES_START);
 
             getAllCities();
-
-            sendBroadcastData(STATUS_GET_WEATHER_ALL_CITIES_FINISH);
 
         } else if (mTask == TASK_GET_DATA_PERIODICALLY) {
 
-            //      Log.d("AAAAA", "GetDataService: TASK_GET_DATA_PERIODICALLY");
-
             sendBroadcastData(STATUS_GET_WEATHER_ALL_CITIES_START);
 
             getAllCities();
-
-            sendBroadcastData(STATUS_GET_WEATHER_ALL_CITIES_FINISH);
 
         } else {
             Log.d("AAAAA", "GetDataService: CATCH OTHER TASK FOR TEST !!!");
@@ -258,8 +212,6 @@ public class GetDataService extends IntentService {
         try {
             String locale = getCurrentLocale().getCountry().toLowerCase();
 
-            //     Log.d("AAAAA" , "GetDataService: locale = " + locale);
-
             url = getString(R.string.web_service_url)
                     + URLEncoder.encode(city, "UTF-8")
                     /// + "&units=metric&lang=ru&cnt=5&APPID="
@@ -268,8 +220,6 @@ public class GetDataService extends IntentService {
                     + "&lang=" + locale // languageCodeArray[languageIndex]
                     + "&cnt=5"        // default for 5 days
                     + "&APPID=" + getString(R.string.openweathermap_api_key);
-
-            //  Log.d("AAAAA", "getWeather: url = " + url);
 
         } catch (UnsupportedEncodingException e) {
             Log.d("AAAAA", "UnsupportedEncodingException:" + e.getMessage());
@@ -288,36 +238,11 @@ public class GetDataService extends IntentService {
                         double cityLongitude;
                         double cityLatitude;
 
-/*                        // selected city for notification
-                        String cityWeatherIcon = null;
-                        cityFound = false;
-                        String notifyText = null;
-
-                        double dayTemp;
-                        double minTemp;
-                        double maxTemp;
-                        double morningTemp;
-                        double eveningTemp;
-                        double nightTemp;
-                        int humidity;
-                        double pressure_hPa;
-                        double windSpeed;
-                        int windDirection;*/
-
-                        // current date
-                        ///SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-                        String currentDate = formatter.format(new Date());
-                        // Log.d("AAAAA", "currentDate = " + currentDate);
-                        Calendar calendar = Calendar.getInstance();
-
                         List<Weather> weatherList = new ArrayList<>();
                         ArrayList<ContentProviderOperation> ops = new ArrayList<>();
 
                         try {
                             JSONArray list;
-
-                            //       Log.d("AAAAA", "city: " + city + " response = " + response);
 
                             list = response.getJSONArray("list");
 
@@ -357,79 +282,6 @@ public class GetDataService extends IntentService {
                                         weather.getString("icon"), // String iconName
                                         weather.getInt("id") // int weatherID
                                 ));
-
-/*                                // convert milliseconds to date
-                                calendar.setTimeInMillis(day.getLong("dt") * 1000L);
-                                String date = formatter.format(calendar.getTime());
-
-                                if (id == mSendNotificationCityID && date.equals(currentDate)) {
-
-                                    notifyText = city + ": " + weather.getString("description") + "\n";
-
-                                    cityWeatherIcon = weather.getString("icon");
-                                    dayTemp = temperatures.getDouble("day");
-                                    minTemp = temperatures.getDouble("min");
-                                    maxTemp = temperatures.getDouble("max");
-                                    morningTemp = temperatures.getDouble("morn");
-                                    eveningTemp = temperatures.getDouble("eve");
-                                    nightTemp = temperatures.getDouble("night");
-                                    humidity = day.getInt("humidity");
-                                    pressure_hPa = day.getDouble("pressure");
-                                    windSpeed = day.getDouble("speed");
-                                    windDirection = day.getInt("deg");
-
-                                    if (mUnitsFormat == 0) { // metric = Celsius
-
-                                        notifyText += (getString(R.string.m_weather_day_temp,
-                                                String.valueOf((int) dayTemp)) + "\n"
-                                                + getString(R.string.m_weather_min_max_temp,
-                                                String.valueOf((int) minTemp), String.valueOf((int) maxTemp)) + "\n"
-                                                + getString(R.string.m_weather_morning_temp,
-                                                String.valueOf((int) morningTemp)) + "\n"
-                                                + getString(R.string.m_weather_evening_temp,
-                                                String.valueOf((int) eveningTemp)) + "\n"
-                                                + getString(R.string.m_weather_night_temp,
-                                                String.valueOf((int) nightTemp)) + "\n"
-                                                + getString(R.string.m_weather_wind_speed, windSpeed) + "\n");
-
-                                    } else if (mUnitsFormat == 1) { // imperial == Fahrenheit
-
-                                        notifyText += (getString(R.string.i_weather_day_temp,
-                                                String.valueOf(CelsiusToFahrenheit(dayTemp)) + "\n"
-                                                        + getString(R.string.i_weather_min_max_temp,
-                                                        String.valueOf(CelsiusToFahrenheit(minTemp)),
-                                                        String.valueOf(CelsiusToFahrenheit(maxTemp))) + "\n"
-                                                        + getString(R.string.i_weather_morning_temp,
-                                                        String.valueOf(CelsiusToFahrenheit(morningTemp))) + "\n"
-                                                        + getString(R.string.i_weather_evening_temp,
-                                                        String.valueOf(CelsiusToFahrenheit(eveningTemp))) + "\n"
-                                                        + getString(R.string.i_weather_night_temp,
-                                                        String.valueOf(CelsiusToFahrenheit(nightTemp))) + "\n"
-                                                        + getString(R.string.i_weather_wind_speed, windSpeed * 2.236936) + "\n"));
-
-                                    }
-
-                                    notifyText += (getString(R.string.weather_wind_direction, String.valueOf(windDirection)) + "\n");
-
-                                    if (humidity != 0) {
-                                        notifyText += (getString(R.string.weather_humidity, NumberFormat
-                                                .getPercentInstance().format(humidity / 100.0)) + "\n");
-                                    } else {
-                                        notifyText += (getString(R.string.weather_humidity, getString(R.string.no_data)) + "\n");
-                                    }
-
-                                    notifyText += (getString(R.string.weather_pressure,
-                                            pressure_hPa, pressure_hPa * 0.750063755419211) + "\n"); // hPa & Millimeter of mercury/ "mmHg"
-
-           *//*                         Log.d("AAAAA", "city = " + city);
-                                    Log.d("AAAAA", "id = " + id);
-                                    Log.d("AAAAA", "mSendNotificationCityID = " + mSendNotificationCityID);
-                                    Log.d("AAAAA", "date = " + date);
-                                    Log.d("AAAAA", "notifyText = " + notifyText);
-                                    Log.d("AAAAA", "cityWeatherIcon = " + cityWeatherIcon);*//*
-
-                                    cityFound = true;
-                                }*/
                             }
 
                             // database operations transaction:
@@ -486,10 +338,21 @@ public class GetDataService extends IntentService {
                             }
                             getContentResolver().applyBatch(DataContentProvider.AUTHORITY, ops);
 
-/*                            if (cityFound) {
-                                sendNotification(notifyText, cityWeatherIcon);
-                            }*/
+                       //     Log.d("AAAAA", "END: mCitiesCounter = " + mCitiesCounter);
+                       //     Log.d("AAAAA", "END: mCitiesTotal = " + mCitiesTotal);
 
+                            mCitiesCounter++;
+
+                            if (mTask == TASK_GET_WEATHER_ONE_CITY) {
+
+                                sendBroadcastData(STATUS_GET_WEATHER_ONE_CITY_FINISH_SUCCESS);
+                            } else {
+
+                                if (mCitiesCounter >= mCitiesTotal) {
+
+                                    sendBroadcastData(STATUS_GET_WEATHER_ALL_CITIES_FINISH_SUCCESS);
+                                }
+                            }
                         } catch (Exception e) {
                             Log.d("AAAAA", "Exception: " + e.getMessage());
                         } finally {
@@ -502,10 +365,19 @@ public class GetDataService extends IntentService {
             @Override
             public void onErrorResponse(VolleyError error) {
 
-/*                /// if (mSendNotificationCityID != 0) {
-                if (cityFound) {
-                    sendNotification(getString(R.string.service_get_data_error), null); //  + "\n" + getCurrentTime());
-                }*/
+                mCitiesCounter++;
+
+                if (mTask == TASK_GET_WEATHER_ONE_CITY) {
+
+                    sendBroadcastData(STATUS_GET_WEATHER_ONE_CITY_FINISH_FAIL);
+
+                } else {
+
+                    if (mCitiesCounter >= mCitiesTotal) {
+
+                        sendBroadcastData(STATUS_GET_WEATHER_ALL_CITIES_FINISH_FAIL);
+                    }
+                }
 
                 NetworkResponse response = error.networkResponse;
 
@@ -524,15 +396,6 @@ public class GetDataService extends IntentService {
 
         // Add a request (in this example, called stringRequest) to your RequestQueue.
         requestQueue.add(jsonObjectRequest);
-
-        // Delay for OpenWeatherMap.org limitation (1 query per second)
-        /// SystemClock.sleep(1000); // 1 second sleep
-    }
-
-
-    private String CelsiusToFahrenheit(double temp) {
-
-        return String.valueOf((int) (temp * 9 / 5 + 32));
     }
 
 
@@ -549,61 +412,4 @@ public class GetDataService extends IntentService {
             return getResources().getConfiguration().locale;
         }
     }
-
-/*
-    private String getCurrentTime() {
-
-        SimpleDateFormat currentTimeDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-        String currentDateAndTime = currentTimeDate.format(new Date());
-
-        String stringDate = null;
-
-        //      Log.d("AAAAA", "currentDateAndTime = " + currentDateAndTime);
-
-        try {
-            // Date today = new Date();
-            Date date = currentTimeDate.parse(currentDateAndTime);
-
-            stringDate = DateFormat.getDateTimeInstance().format(date);
-
-            //   Log.d("AAAAA", "sendNotification: stringDate = " + stringDate);
-
-            return stringDate;
-
-        } catch (ParseException e) {
-            Log.d("AAAAA", "Date ParseException: " + e.getMessage());
-        }
-
-        return null;
-    }*/
-
-/*
-    private void sendNotification(String msg, String icon) {
-
-        Log.d("AAAAA", "msg = " + msg);
-
-        // NotificationManager class to notify the user of events
-        // that happen. This is how you tell the user that something
-        // has   happened in the background.
-        NotificationManager alarmNotificationManager = (NotificationManager) this
-                .getSystemService(Context.NOTIFICATION_SERVICE);
-
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0);
-
-        // set icon, title and message for notification
-        NotificationCompat.Builder alamNotificationBuilder = new NotificationCompat.Builder(this)
-                //  .setDefaults(NotificationCompat.DEFAULT_ALL)
-                //  .setWhen(System.currentTimeMillis())
-                .setContentTitle("Weather Info")
-             ///   .setSmallIcon(R.drawable.ic_sunny)
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(), getResources().getIdentifier("_" + icon, "drawable", getPackageName())))
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(msg))
-                .setAutoCancel(true) // clear notification when clicked
-                .setContentText(msg);
-
-        alamNotificationBuilder.setContentIntent(contentIntent);
-
-        alarmNotificationManager.notify(1, alamNotificationBuilder.build());
-    }*/
 }

@@ -44,9 +44,10 @@
     <string name="cannot_get_place_name">Can`t get place name</string>
     <string name="data_not_found">Data not found</string>
     <string name="no_data">no data</string>
+    <string name="select_records_for_delete">Select records to delete</string>
 
-    <string name="service_get_data_error">Get weather data error.</string>
-    <string name="service_get_data_success">Weather data successfully obtained.</string>
+    <string name="service_get_data_success">Weather data successfully obtained</string>
+    <string name="service_get_data_error">Get weather data error</string>
 
     <!--Basic user location permission toasts-->
 
@@ -83,6 +84,9 @@
     <string name="sort_alphabetically">alphabetically</string>
     <string name="units_metric">metric</string>
     <string name="units_imperial">imperial</string>
+
+    <string name="day_of_week_today">%s (today)</string>
+    <string name="day_of_week_tomorrow">%s (tomorrow)</string>
 
     <!-- Metric / Celsius -->
 

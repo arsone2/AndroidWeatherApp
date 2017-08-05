@@ -9,24 +9,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
@@ -65,10 +54,10 @@ public class MainActivity extends AppCompatActivity implements
 
     // sort cities: 0 = by adding (default), 1 = alphabetically
 
-    // message panel
+/*    // message panel
     private LinearLayout messageBarLayout;
     private TextView messageTextView;
-    private ProgressBar messageProgressBar;
+    private ProgressBar messageProgressBar;*/
 
     private AdView mAdView;
     private InterstitialAd mInterstitialAd;
@@ -103,10 +92,12 @@ public class MainActivity extends AppCompatActivity implements
     public final static int TASK_GET_WEATHER_ALL_CITIES = 2;
 
     public final static int STATUS_GET_WEATHER_ONE_CITY_START = 101;
-    public final static int STATUS_GET_WEATHER_ONE_CITY_FINISH = 102;
+    public final static int STATUS_GET_WEATHER_ONE_CITY_FINISH_SUCCESS = 102;
+    public final static int STATUS_GET_WEATHER_ONE_CITY_FINISH_FAIL = 103;
 
-    public final static int STATUS_GET_WEATHER_ALL_CITIES_START = 103;
-    public final static int STATUS_GET_WEATHER_ALL_CITIES_FINISH = 104;
+    public final static int STATUS_GET_WEATHER_ALL_CITIES_START = 104;
+    public final static int STATUS_GET_WEATHER_ALL_CITIES_FINISH_SUCCESS = 105;
+    public final static int STATUS_GET_WEATHER_ALL_CITIES_FINISH_FAIL = 106;
 
     public static final String CITY_ID = "city_id";
     public static final String ENTERED_CITY = "entered_city";
@@ -116,13 +107,13 @@ public class MainActivity extends AppCompatActivity implements
 
         private final int unitsFormat;
         private final int sortCities;
-        private final int sendNotifications;
+     //   private final int sendNotifications;
 
-        public Settings(int unitsFormat, int sortCities, int sendNotifications) {
+        public Settings(int unitsFormat, int sortCities){//}, int sendNotifications) {
 
             this.unitsFormat = unitsFormat;
             this.sortCities = sortCities;
-            this.sendNotifications = sendNotifications;
+        //    this.sendNotifications = sendNotifications;
         }
 
         public int getUnitsFormat() {
@@ -133,9 +124,9 @@ public class MainActivity extends AppCompatActivity implements
             return sortCities;
         }
 
-        public int getSendNotifications() {
+/*        public int getSendNotifications() {
             return sendNotifications;
-        }
+        } */
     }
 
 
@@ -148,27 +139,35 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Sample AdMob app ID: ca-app-pub-1425799219086321~9883810492
-        ///MobileAds.initialize(this, getResources().getString(R.string.admob_publisher_id));
-
         /// https://developers.google.com/admob/android/test-ads#enable_test_devices
+
         // test banner
-        MobileAds.initialize(this, "ca-app-pub-3940256099942544/6300978111"); // test ID !!!
-        mAdView = (AdView) findViewById(R.id.adView);
-        // Use AdRequest.Builder.addTestDevice("DAA423565A27FA89F79E8F5698DC18DD") to get test ads on this device.
+      ///  MobileAds.initialize(this, "ca-app-pub-3940256099942544/6300978111"); // test ID !!!
+
+        MobileAds.initialize(this, "ca-app-pub-9533789273320761~3036759280"); // REAL ID !!!
+        // app id:  ca-app-pub-9533789273320761~3036759280
+
+         mAdView = (AdView) findViewById(R.id.adView);
+
         AdRequest adRequest = new AdRequest.Builder()
                 //.addTestDevice(AdRequest.TEST_EMULATOR)
-                .addTestDevice("DAA423565A27FA89F79E8F5698DC18DD") // test device ID !!!
+              //  .addTestDevice("DAA423565A27FA89F79E8F5698DC18DD") // test device ID
                 .build();
+
         mAdView.loadAd(adRequest);
+   //     mAdView.setAdSize(AdSize.BANNER);
+   //     mAdView.setAdUnitId("ca-app-pub-9533789273320761/1675576156");
 
 
         // add an interstitial ad
         mInterstitialAd = new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712"); // test ID !!!
+
+        /// mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712"); // test ID
+        mInterstitialAd.setAdUnitId("ca-app-pub-9533789273320761/4310667721"); // REAL ID !!!
+
         mInterstitialAd.loadAd(new AdRequest
                 .Builder()
-                .addTestDevice("DAA423565A27FA89F79E8F5698DC18DD")
+        //        .addTestDevice("DAA423565A27FA89F79E8F5698DC18DD")
                 .build());
 
         mInterstitialAd.setAdListener(new AdListener(){
@@ -177,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements
             public void onAdLoaded() {
 
                 // Code to be executed when an ad finishes loading.
-                Log.i("AAAAA", "onAdLoaded");
+               // Log.i("AAAAA", "onAdLoaded");
             }
 
 
@@ -185,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements
             public void onAdFailedToLoad(int errorCode) {
 
                 // Code to be executed when an ad request fails.
-                Log.i("AAAAA", "onAdFailedToLoad");
+              //  Log.i("AAAAA", "onAdFailedToLoad");
             }
 
 
@@ -201,7 +200,7 @@ public class MainActivity extends AppCompatActivity implements
             public void onAdLeftApplication() {
 
                 // Code to be executed when the user has left the app.
-                Log.i("AAAAA", "onAdLeftApplication");
+              //  Log.i("AAAAA", "onAdLeftApplication");
             }
 
 
@@ -209,7 +208,7 @@ public class MainActivity extends AppCompatActivity implements
             public void onAdClosed() {
 
                 // Code to be executed when when the interstitial ad is closed.
-                Log.i("AAAAA", "onAdClosed");
+             //   Log.i("AAAAA", "onAdClosed");
 
           //      startActivity(new Intent(MainActivity.this, InterstitialActivity.class));
                 mInterstitialAd.loadAd(new AdRequest
@@ -232,12 +231,12 @@ public class MainActivity extends AppCompatActivity implements
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
 
-        // message bar panel
+/*        // message bar panel
         messageBarLayout = (LinearLayout) findViewById(R.id.messageBar);
         messageTextView = (TextView) findViewById(R.id.messageTextView);
-        messageProgressBar = (ProgressBar) findViewById(R.id.messageProgressBar);
+        messageProgressBar = (ProgressBar) findViewById(R.id.messageProgressBar);*/
 
-        findViewById(R.id.messageBar).bringToFront();
+    ///    findViewById(R.id.messageBar).bringToFront();
 
         dynamicBroadcastReceiver = new BroadcastReceiver() {
 
@@ -253,13 +252,30 @@ public class MainActivity extends AppCompatActivity implements
 
                             //       Log.d("AAAAA", "dynamicBroadcastReceiver GET: STATUS_GET_WEATHER_ONE_CITY_START");
 
-                            showMessageBar(getString(R.string.message_wait_for_data), true);
+                            ///showMessageBar(getString(R.string.message_wait_for_data), true);
 
                             break;
 
-                        case STATUS_GET_WEATHER_ONE_CITY_FINISH:
+                        case STATUS_GET_WEATHER_ONE_CITY_FINISH_SUCCESS:
 
                             //     Log.d("AAAAA", "dynamicBroadcastReceiver GET: STATUS_GET_WEATHER_ONE_CITY_FINISH");
+
+                                Toast.makeText(getApplicationContext(), R.string.service_get_data_success, Toast.LENGTH_SHORT).show();
+
+/*                            } else{
+
+                                Toast.makeText(getApplicationContext(), R.string.service_get_data_error, Toast.LENGTH_SHORT).show();
+                            }*/
+
+                            refreshData();
+
+                            break;
+
+                        case STATUS_GET_WEATHER_ONE_CITY_FINISH_FAIL:
+
+                            //     Log.d("AAAAA", "dynamicBroadcastReceiver GET: STATUS_GET_WEATHER_ONE_CITY_FINISH");
+
+                            Toast.makeText(getApplicationContext(), R.string.service_get_data_error, Toast.LENGTH_SHORT).show();
 
                             refreshData();
 
@@ -269,13 +285,23 @@ public class MainActivity extends AppCompatActivity implements
 
                             //        Log.d("AAAAA", "dynamicBroadcastReceiver GET: STATUS_GET_WEATHER_ALL_CITIES_START");
 
-                            showMessageBar(getString(R.string.message_wait_for_data), true);
+                          ///  showMessageBar(getString(R.string.message_wait_for_data), true);
 
                             break;
 
-                        case STATUS_GET_WEATHER_ALL_CITIES_FINISH:
+                        case STATUS_GET_WEATHER_ALL_CITIES_FINISH_SUCCESS:
 
                             //          Log.d("AAAAA", "dynamicBroadcastReceiver GET: STATUS_GET_WEATHER_ALL_CITIES_FINISH");
+                            Toast.makeText(getApplicationContext(), R.string.service_get_data_success, Toast.LENGTH_SHORT).show();
+
+                            refreshData();
+
+                            break;
+
+                        case STATUS_GET_WEATHER_ALL_CITIES_FINISH_FAIL:
+
+                            //          Log.d("AAAAA", "dynamicBroadcastReceiver GET: STATUS_GET_WEATHER_ALL_CITIES_FINISH");
+                            Toast.makeText(getApplicationContext(), R.string.service_get_data_error, Toast.LENGTH_SHORT).show();
 
                             refreshData();
 
@@ -388,8 +414,7 @@ public class MainActivity extends AppCompatActivity implements
         Cursor cursor = getContentResolver().query(DataContentProvider.SETTINGS_CONTENT_URI,
                 new String[]{DataContract.SettingsEntry.COLUMN_UNITS_FORMAT,
                         DataContract.SettingsEntry.COLUMN_SORT_CITIES,
-                        DataContract.SettingsEntry.COLUMN_MAP_LANGUAGE,
-                        DataContract.SettingsEntry.COLUMN_NOTIFY_CITY_ID},
+                        DataContract.SettingsEntry.COLUMN_MAP_LANGUAGE},
                 null, // DataContract.CityEntry.COLUMN_ENTERED_CITY + "=?",
                 null, // new String[]{enteredCity},
                 null);
@@ -404,11 +429,11 @@ public class MainActivity extends AppCompatActivity implements
             // sort: by id = 0, alphabetic = 1
             int sortCities = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_SORT_CITIES));
 
-            int sendNotifications = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_NOTIFY_CITY_ID));
+          //  int sendNotifications = cursor.getInt(cursor.getColumnIndex(DataContract.SettingsEntry.COLUMN_NOTIFY_CITY_ID));
 
             cursor.close();
 
-            return new Settings(unitsFormat, sortCities, sendNotifications);
+            return new Settings(unitsFormat, sortCities);
         } else {
             return null;
         }
@@ -550,7 +575,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private void refreshData() {
 
-        hideMessageBar();
+        /// hideMessageBar();
 
         // determine what is the fragments are in activity?
         if (findViewById(R.id.onePaneLayout) == null) { // tablet
@@ -779,7 +804,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-    private void showMessageBar(String text, boolean showProgressBar) {
+/*    private void showMessageBar(String text, boolean showProgressBar) {
 
         if (messageBarLayout == null)
             return;
@@ -800,9 +825,9 @@ public class MainActivity extends AppCompatActivity implements
         if (messageBarLayout != null) {
             messageBarLayout.setVisibility(View.GONE);
         }
-    }
+    }*/
 
-
+/*
     // display menu items
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -812,9 +837,9 @@ public class MainActivity extends AppCompatActivity implements
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_activity_menu, menu);
         return true;
-    }
+    }*/
 
-
+/*
     // handle choice from options menu
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -834,7 +859,7 @@ public class MainActivity extends AppCompatActivity implements
                 return true;
         }
         return super.onOptionsItemSelected(item);
-    }
+    }*/
 
 
     // after settings has changed
@@ -938,13 +963,13 @@ public class MainActivity extends AppCompatActivity implements
 
             if (fragment instanceof CitiesListFragment) { // refresh details: weather ListView
 
-                Log.d("AAAAA", "Phone: Before exit !!!");
+             //   Log.d("AAAAA", "Phone: Before exit !!!");
                 startInterstitialActivity();
 
             }
         } else { // tablet
 
-            Log.d("AAAAA", "Tablet: Before exit !!!");
+         //   Log.d("AAAAA", "Tablet: Before exit !!!");
             startInterstitialActivity();
         }
 

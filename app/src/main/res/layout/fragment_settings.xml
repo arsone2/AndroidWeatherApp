@@ -1,124 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-    >
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/titleTextView"
+        style="@style/mainTitle"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:background="@color/colorGray2"
+        android:elevation="2dp"
+        android:gravity="center_horizontal"
+        android:text="@string/settings_title"
+        />
+
+    <GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:columnCount="2"
+                android:orientation="horizontal"
         >
 
         <TextView
-            android:id="@+id/titleTextView"
-            style="@style/mainTitle"
-            android:layout_width="match_parent"
+            android:id="@+id/unitsFormatTextView"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:layout_marginTop="5dp"
-            android:gravity="center_horizontal"
-            android:text="@string/settings_title"
+            android:layout_marginBottom="20dp"
+            android:text="@string/settings_units_format"
+            android:layout_marginRight="3dp"
             />
 
-        <GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:columnCount="2"
-                    android:orientation="horizontal"
-            >
+        <ToggleButton
+            android:id="@+id/unitsFormatToggleButton"
+            style="@style/ToggleButton"
+            android:layout_width="145dp"
+            android:background="@color/colorGray2"
+            android:paddingBottom="1dp"
+            android:paddingLeft="7dp"
+            android:paddingRight="7dp"
+            android:paddingTop="1dp"
+            android:textOff="@string/units_metric"
+            android:textOn="@string/units_imperial"
+            />
 
-            <TextView
-                android:id="@+id/unitsFormatTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:text="@string/settings_units_format"
-                />
+        <TextView
+            android:id="@+id/sortOrderTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:text="@string/settings_sort_cities"
+            android:layout_marginRight="3dp"
+            />
 
-            <ToggleButton
-                android:id="@+id/unitsFormatToggleButton"
-                style="@style/ToggleButton"
-                android:background="@color/colorGray2"
-                android:paddingBottom="1dp"
-                android:paddingLeft="7dp"
-                android:paddingRight="7dp"
-                android:paddingTop="1dp"
-                android:textOff="@string/units_metric"
-                android:textOn="@string/units_imperial"
-                android:layout_width="145dp"
-                />
+        <ToggleButton
+            android:id="@+id/sortCitiesToggleButton"
+            style="@style/ToggleButton"
+            android:layout_width="145dp"
+            android:background="@color/colorGray2"
+            android:paddingBottom="1dp"
+            android:paddingLeft="7dp"
+            android:paddingRight="7dp"
+            android:paddingTop="1dp"
+            android:textOff="@string/sort_by_adding"
+            android:textOn="@string/sort_alphabetically"
+            />
 
-            <TextView
-                android:id="@+id/sortOrderTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="15dp"
-                android:text="@string/settings_sort_cities"
-                />
+    </GridLayout>
 
-            <ToggleButton
-                android:id="@+id/sortCitiesToggleButton"
-                style="@style/ToggleButton"
-                android:background="@color/colorGray2"
-                android:paddingBottom="1dp"
-                android:paddingLeft="7dp"
-                android:paddingRight="7dp"
-                android:paddingTop="1dp"
-                android:textOff="@string/sort_by_adding"
-                android:textOn="@string/sort_alphabetically"
-                android:layout_width="145dp"
-                />
-
- <!--           <TextView
-                android:id="@+id/sendNotificationsTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginBottom="10dp"
-                android:text="@string/settings_send_notifications"
-                />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top"
-                android:layout_marginBottom="10dp"
-                >
-
-                <CheckBox
-                    android:id="@+id/sendNotifyCheckBox"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@color/colorWhite"
-                    android:buttonTint="@color/colorAccent"
-                    app:buttonTint="@color/colorAccent"
-                    />
-
-                <Spinner
-                    android:id="@+id/notifySpinner"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:background="@color/colorGray2"
-                    android:popupBackground="@color/colorWhite"
-                    android:paddingBottom="3dp"
-                    android:paddingLeft="7dp"
-                    android:paddingRight="7dp"
-                    android:paddingTop="3dp"
-                    android:visibility="gone"
-                    android:layout_width="110dp"
-                    />
-
-            </LinearLayout>-->
-
-        </GridLayout>
-
-    </LinearLayout>
-
-</ScrollView>
+</LinearLayout>

@@ -43,9 +43,10 @@
     <string name="cannot_get_place_name">Не получилось определить название города</string>
     <string name="data_not_found">данные не найдены</string>
     <string name="no_data">нет данных</string>
+    <string name="select_records_for_delete">Выберите записи для удаления</string>
 
-    <string name="service_get_data_error">Данные получить не удалось.</string>
-    <string name="service_get_data_success">Данные успешно получены.</string>
+    <string name="service_get_data_error">Данные получить не удалось</string>
+    <string name="service_get_data_success">Данные успешно получены</string>
 
     <!--Basic user location permission toasts-->
 
@@ -82,6 +83,9 @@
     <string name="sort_alphabetically">по алфавиту</string>
     <string name="units_metric">метрический</string>
     <string name="units_imperial">английский</string>
+
+    <string name="day_of_week_today">%s (сегодня)</string>
+    <string name="day_of_week_tomorrow">%s (завтра)</string>
 
     <!-- Metric / Celsius -->
 

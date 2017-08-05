@@ -9,6 +9,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -24,10 +25,12 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.annotations.MarkerView;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -133,10 +136,9 @@ public class ViewWeatherFragment extends Fragment implements LoaderManager.Loade
                 double dayTemp = cursor.getDouble(cursor.getColumnIndex(DataContract.WeatherEntry.COLUMN_DAY_TEMP));
 
 
-
                 if (mUnitsFormat == 0) { // metric = Celsius
 
-                    descText += (int)dayTemp + " \u00B0C";
+                    descText += (int) dayTemp + " \u00B0C";
 
                 } else if (mUnitsFormat == 1) { // imperial == Fahrenheit
 
@@ -155,7 +157,6 @@ public class ViewWeatherFragment extends Fragment implements LoaderManager.Loade
                         .snippet(descText)
                         .icon(icon)
                 );
-
 
                 if (mShowEnteredCity && cursor.getInt(cursor.getColumnIndex(DataContract.CityEntry._ID)) == mID) {
 
@@ -189,7 +190,7 @@ public class ViewWeatherFragment extends Fragment implements LoaderManager.Loade
     private String CelsiusToFahrenheit(double temp) {
 
         // return (int) (temp * 9 / 5 + 32);
-        return String.valueOf((int)(temp * 9 / 5 + 32));
+        return String.valueOf((int) (temp * 9 / 5 + 32));
     }
 
 
@@ -329,7 +330,10 @@ public class ViewWeatherFragment extends Fragment implements LoaderManager.Loade
         locationEngine.activate();
 
         mapView = (MapView) view.findViewById(R.id.mapView);
+
         mapView.onCreate(savedInstanceState);
+
+     //   map.setInfoWindowAdapter(new CustomInfoWindowAdapter());
 
         mapView.getMapAsync(new OnMapReadyCallback() {
 
@@ -471,14 +475,14 @@ public class ViewWeatherFragment extends Fragment implements LoaderManager.Loade
 
     public void initLoader() {
 
-   //     Log.d("AAAAA", "ViewWeatherFragment: initLoader");
+        //     Log.d("AAAAA", "ViewWeatherFragment: initLoader");
 
         // get settings data from DB
         MainActivity.Settings settings = activity.readSettingsFromDB();
         mUnitsFormat = settings.getUnitsFormat();
 
         // set units format
-       /// WeatherCursorAdapter.setUnitsFormat(mUnitsFormat);
+        /// WeatherCursorAdapter.setUnitsFormat(mUnitsFormat);
     }
 
 
@@ -595,6 +599,8 @@ public class ViewWeatherFragment extends Fragment implements LoaderManager.Loade
         }
 
         mMarker = map.getMarkers().get(mMarkerIndex);
+
+        // map.selectMarker(mMarker);
 
         map.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(mMarker.getPosition())));
     }

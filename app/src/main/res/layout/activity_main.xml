@@ -13,49 +13,11 @@
         android:id="@+id/onePaneLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        tools:context=".MainActivity"
         android:layout_weight="1"
+        tools:context=".MainActivity"
         >
 
     </FrameLayout>
-
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                  android:id="@+id/messageBar"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:background="@color/colorPrimary"
-                  android:elevation="1dp"
-                  android:orientation="vertical"
-                  android:visibility="gone"
-        >
-
-        <ProgressBar
-            android:id="@+id/messageProgressBar"
-            style="@style/CustomProgressBarHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginTop="3dp"
-            android:indeterminate="true"
-            android:max="100"
-            android:progress="20"
-            android:visibility="visible"
-            />
-
-        <TextView
-            android:id="@+id/messageTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginBottom="3dp"
-            android:gravity="center"
-            />
-
-        <!--style="@style/Widget.AppCompat.ProgressBar.Horizontal"-->
-
-    </LinearLayout>
 
     <com.google.android.gms.ads.AdView
         xmlns:ads="http://schemas.android.com/apk/res-auto"
@@ -63,73 +25,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         ads:adSize="BANNER"
-        ads:adUnitId="ca-app-pub-3940256099942544/6300978111"
+        ads:adUnitId="ca-app-pub-9533789273320761/1675576156"
         />
 
-   <!-- admob_publisher_id -->
-
-    <!--    ads:adUnitId="ca-app-pub-3940256099942544/6300978111" = test code-->
-
-    <!--ads:adUnitId="ca-app-pub-1425799219086321~9883810492"-->
-
 </LinearLayout>
-
-
-    <!--
-
-    <LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <FrameLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/onePaneLayout"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        tools:context=".MainActivity"
-        >
-
-    </FrameLayout>
-
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                  android:id="@+id/messageBar"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:orientation="vertical"
-                  android:visibility="gone"
-        >
-
-        <ProgressBar
-            android:id="@+id/messageProgressBar"
-            style="@style/CustomProgressBarHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="3dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:indeterminate="true"
-            android:max="100"
-            android:progress="20"
-            android:visibility="visible"
-            />
-
-        <TextView
-            android:id="@+id/messageTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginBottom="4dp"
-            android:gravity="center"
-            android:text="message"
-            />
-
-        &lt;!&ndash;style="@style/Widget.AppCompat.ProgressBar.Horizontal"&ndash;&gt;
-
-    </LinearLayout>
-
-    </LinearLayout>-->

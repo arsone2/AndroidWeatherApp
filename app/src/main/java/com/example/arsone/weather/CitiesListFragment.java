@@ -61,6 +61,10 @@ public class CitiesListFragment extends Fragment implements
         void viewData();
 
         MainActivity.Settings readSettingsFromDB();
+
+        void showSettings();
+
+        void syncData();
     }
 
     private Callbacks activity;
@@ -312,7 +316,7 @@ public class CitiesListFragment extends Fragment implements
 
             final String[] citySelectionArgs = argsList.toArray(new String[argsList.size()]);
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AppCompatAlertDialogStyle);
             builder.setTitle(R.string.delete_dialog_question);
             builder.setMessage(R.string.delete_dialog_text);
             builder.setPositiveButton(R.string.delete_dialog_ok, new DialogInterface.OnClickListener() {
@@ -377,7 +381,7 @@ public class CitiesListFragment extends Fragment implements
             builder.show(); // show dialog
         } else {
 
-            Toast.makeText(getContext(), "Выберите записи для удаления", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.select_records_for_delete, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -475,6 +479,18 @@ public class CitiesListFragment extends Fragment implements
             case R.id.action_view:
 
                 activity.viewData();
+
+                return true;
+
+            case R.id.action_settings:
+
+                activity.showSettings();
+
+                return true;
+
+            case R.id.action_sync:
+
+                activity.syncData();
 
                 return true;
         }

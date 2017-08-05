@@ -72,6 +72,5 @@ public final class DataContract {
         public static final String COLUMN_CAMERA_BEARING   = "camera_bearing";   // (double/DOUBLE)
         public static final String COLUMN_CAMERA_TILT      = "camera_tilt";      // (double/DOUBLE)
         public static final String COLUMN_CAMERA_ZOOM      = "camera_zoom";      // (double/DOUBLE)
-        public static final String COLUMN_NOTIFY_CITY_ID   = "notify_city_id";   //  (int/INTEGER)
     }
 }

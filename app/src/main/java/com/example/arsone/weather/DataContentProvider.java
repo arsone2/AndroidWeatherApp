@@ -675,7 +675,6 @@ public class DataContentProvider extends ContentProvider {
                     + DataContract.SettingsEntry.COLUMN_UNITS_FORMAT + " INTEGER DEFAULT 0,"    //  (int/INTEGER)
                     + DataContract.SettingsEntry.COLUMN_SORT_CITIES + " INTEGER DEFAULT 0,"     //  (int/INTEGER)
                     + DataContract.SettingsEntry.COLUMN_MAP_LANGUAGE + " INTEGER DEFAULT 0,"    //  (int/INTEGER)
-                    + DataContract.SettingsEntry.COLUMN_NOTIFY_CITY_ID + " INTEGER DEFAULT 0,"  //  (int/INTEGER)
                     + DataContract.SettingsEntry.COLUMN_CAMERA_LATITUDE + " DOUBLE DEFAULT 0,"  // (double/DOUBLE)
                     + DataContract.SettingsEntry.COLUMN_CAMERA_LONGITUDE + " DOUBLE DEFAULT 0," // (double/DOUBLE)
                     + DataContract.SettingsEntry.COLUMN_CAMERA_BEARING + " DOUBLE DEFAULT 0,"   // (double/DOUBLE)
@@ -693,7 +692,6 @@ public class DataContentProvider extends ContentProvider {
             cvSettings.put(DataContract.SettingsEntry.COLUMN_UNITS_FORMAT, 0);
             cvSettings.put(DataContract.SettingsEntry.COLUMN_SORT_CITIES, 0);
             cvSettings.put(DataContract.SettingsEntry.COLUMN_MAP_LANGUAGE, 0);
-            cvSettings.put(DataContract.SettingsEntry.COLUMN_NOTIFY_CITY_ID, 0);
 
             db.insert(DataContract.SettingsEntry.TABLE_NAME, null, cvSettings);
         }

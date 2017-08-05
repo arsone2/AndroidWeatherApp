@@ -2,18 +2,19 @@
 
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/itemLinearLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:layout_marginLeft="14dp"
-    android:layout_marginRight="14dp"
     >
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
         android:orientation="horizontal"
+        android:background="@color/colorGray2"
+        android:paddingLeft="23dp"
+        android:paddingTop="14dp"
         >
 
         <TextView
@@ -31,6 +32,7 @@
             android:layout_marginRight="12dp"
             android:gravity="right"
             android:text="date"
+            android:textSize="10sp"
             />
 
     </LinearLayout>
@@ -39,6 +41,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:background="@color/colorGray2"
         >
 
         <LinearLayout
@@ -76,7 +79,7 @@
             android:orientation="horizontal"
             android:layout_weight="1"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="30dp"
+            android:layout_marginLeft="8dp"
             >
 
         <TextView
@@ -107,6 +110,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_marginLeft="32dp"
         >
 
         <LinearLayout
@@ -163,6 +167,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
         android:orientation="horizontal"
+        android:layout_marginLeft="32dp"
         >
 
 
@@ -218,6 +223,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
+        android:layout_marginLeft="32dp"
         android:orientation="horizontal"
         >
 
@@ -275,6 +281,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
+        android:layout_marginLeft="32dp"
         android:layout_marginBottom="20dp"
         android:orientation="horizontal"
         >

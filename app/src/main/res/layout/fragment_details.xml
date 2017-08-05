@@ -3,6 +3,7 @@
               android:id="@+id/detailLayout"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
+              android:background="@color/colorGray2"
               android:orientation="vertical"
     >
 
@@ -10,30 +11,28 @@
                   android:id="@+id/titleLayout"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:orientation="horizontal"
-                  android:background="@color/colorGray"
+                  android:background="@color/colorGray2"
+                  android:elevation="3dp"
+                  android:orientation="vertical"
         >
 
         <TextView
             android:id="@+id/titleTextView"
             style="@style/mainTitle"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_marginLeft="18dp"
+            />
+
+        <TextView
+            android:id="@+id/updateTimeTextView"
+            style="@style/updateText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
             />
 
     </LinearLayout>
-
-
-    <TextView
-        android:id="@+id/updateTimeTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="3dp"
-        android:paddingLeft="17dp"
-        android:background="@color/colorGray"
-        style="@style/updateText"
-        />
 
     <ListView
         android:id="@+id/detailsListView"
@@ -42,44 +41,7 @@
         android:layout_weight="1"
         android:divider="@drawable/list_item_divider"
         android:dividerHeight="1px"
-        android:padding="3dp"
         >
     </ListView>
-
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                  android:id="@+id/messageBar"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:orientation="vertical"
-                  android:visibility="gone"
-        >
-
-        <ProgressBar
-            android:id="@+id/messageProgressBar"
-            style="@style/CustomProgressBarHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="3dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:indeterminate="true"
-            android:max="100"
-            android:progress="20"
-            android:visibility="visible"
-            />
-
-        <TextView
-            android:id="@+id/messageTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginBottom="4dp"
-            android:gravity="center"
-            />
-
-        <!--style="@style/Widget.AppCompat.ProgressBar.Horizontal"-->
-
-    </LinearLayout>
 
 </LinearLayout>

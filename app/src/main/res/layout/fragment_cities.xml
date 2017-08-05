@@ -40,7 +40,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
+            android:background="@drawable/button"
+            android:minHeight="10dp"
             android:text="@string/button_delete_city_cancel"
+            android:layout_margin="10dp"
             />
 
 <!--        <Button
@@ -59,13 +62,17 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:text="@string/button_delete_city"
+            android:minHeight="10dp"
+            android:background="@drawable/button"
             android:layout_alignParentTop="true"
             android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"/>
+            android:layout_alignParentEnd="true"
+            android:layout_margin="10dp"
+            />
 
     </RelativeLayout>
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+ <!--   <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                   android:id="@+id/messageBar"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
@@ -97,8 +104,6 @@
             android:layout_marginBottom="4dp"
             />
 
-        <!--style="@style/Widget.AppCompat.ProgressBar.Horizontal"-->
-
-    </LinearLayout>
+    </LinearLayout>-->
 
 </LinearLayout>

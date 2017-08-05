@@ -27,16 +27,27 @@
         <item name="android:background">@color/colorPrimary</item>
     </style>
 
+    <style name="AppCompatAlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorAccent">#FFCC00</item>
+        <item name="android:textColorPrimary">#FFFFFF</item>
+        <item name="android:background">#5fa3d0</item>
+    </style>
+
     <style name="mainTitle">
         <item name="android:textSize">21sp</item>
         <item name="android:textColor">@color/mainTitleColor</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:layout_marginLeft">10dp</item>
-        <item name="android:padding">5dp</item>
+       <!-- <item name="android:background">@color/colorGray2</item>-->
+    </style>
+
+    <style name="checkbox">
+        <item name="buttonTint">@color/colorAccent</item>
     </style>
 
     <style name="updateText">
         <item name="android:textSize">10sp</item>
+        <item name="android:layout_marginLeft">10dp</item>
+        <item name="android:background">@color/colorGray2</item>
     </style>
 
     <style name="titleText">
